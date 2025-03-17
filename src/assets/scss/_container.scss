@@ -245,3 +245,71 @@ td.hljs-ln-line.hljs-ln-numbers {
   width: 100px;  /* Ajuster selon la taille du texte et la présentation */
   text-align: center;
 }
+
+/* Container de la liste des services */
+.service-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Style de chaque carte de service */
+.service-card {
+  max-width: 300px;
+  min-width: 280px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Titre et contenu de la carte */
+.service-card .mat-card-header {
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.service-card .mat-card-header .service-icon {
+  font-size: 24px;
+  color: white;
+  background-color: #3f51b5; /* Par défaut bleu */
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.service-card .mat-card-header .active-service .service-icon {
+  background-color: #332f30; /* Couleur rose lorsque sélectionné */
+}
+
+/* Différentes couleurs de fond pour chaque service */
+.service-card:nth-child(odd) .mat-card-header .service-icon {
+  background-color: #4caf50; /* Vert */
+}
+
+.service-card:nth-child(even) .mat-card-header .service-icon {
+  background-color: #ff9800; /* Orange */
+}
+
+.service-card .mat-card-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Fond de la carte */
+.service-card .mat-card-content {
+  padding: 10px;
+  background-color: #fafafa;
+}
+
+/* Style de la carte active */
+.active-service {
+  border: 2px solid #4054ed;
+  border-radius: 8px;
+}

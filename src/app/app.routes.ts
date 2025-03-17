@@ -34,6 +34,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/voiture/voiture.routes').then((m) => m.VoitureRoutes),
       },
+      {
+        path: 'service',
+        loadChildren: () =>
+          import('./pages/service/service.routes').then((m) => m.ServiceRoutes),
+      },
     ],
   },
   {

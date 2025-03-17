@@ -39,6 +39,21 @@ export const navItems: NavItem[] = [
     iconName: 'solar:planet-3-line-duotone',
     route: '/extra/sample-page',
   },
+
+  {
+    navCap: 'Service',
+    divider: true
+  },
+  {
+    displayName: 'Service',
+    iconName: 'fluent-mdl2:service-off',
+    route: '/service',
+  },
+  {
+    displayName: 'Sous Service',
+    iconName: 'fluent-mdl2:service-off',
+    route: '/service/sous-service',
+  },
   
   {
     divider: true,
