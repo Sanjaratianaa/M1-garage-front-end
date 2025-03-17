@@ -220,3 +220,28 @@ td.hljs-ln-line.hljs-ln-numbers {
 .position-fixed {
   position: fixed;
 }
+
+/* Classe pour le statut actif */
+.active-status {
+  background-color: #28a745; /* Couleur verte pour actif */
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Classe pour le statut inactif */
+.inactive-status {
+  background-color: #dc3545; /* Couleur rouge pour inactif */
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Classe pour envelopper le statut dans une petite boîte */
+.status-container {
+  display: inline-block;
+  width: 100px;  /* Ajuster selon la taille du texte et la présentation */
+  text-align: center;
+}

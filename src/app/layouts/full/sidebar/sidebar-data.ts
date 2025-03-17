@@ -9,6 +9,27 @@ export const navItems: NavItem[] = [
     iconName: 'solar:widget-add-line-duotone',
     route: '/dashboard',
   },
+
+  {
+    navCap: 'Voiture',
+    divider: true
+  },
+  {
+    displayName: 'Marque',
+    iconName: 'solar:bill-list-line-duotone',
+    route: '/voiture/marque',
+  },
+  {
+    displayName: 'Modele',
+    iconName: 'solar:bill-list-line-duotone',
+    route: '/voiture/modele',
+  },
+  {
+    displayName: 'Sample Page',
+    iconName: 'solar:planet-3-line-duotone',
+    route: '/extra/sample-page',
+  },
+  
   {
     divider: true,
     navCap: 'Apps',
