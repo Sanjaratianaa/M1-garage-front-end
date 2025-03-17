@@ -15,6 +15,11 @@ export const navItems: NavItem[] = [
     divider: true
   },
   {
+    displayName: 'Categorie',
+    iconName: 'solar:bill-list-line-duotone',
+    route: '/voiture/categorie',
+  },
+  {
     displayName: 'Marque',
     iconName: 'solar:bill-list-line-duotone',
     route: '/voiture/marque',
@@ -23,6 +28,11 @@ export const navItems: NavItem[] = [
     displayName: 'Modele',
     iconName: 'solar:bill-list-line-duotone',
     route: '/voiture/modele',
+  },
+  {
+    displayName: 'Type de Transmission',
+    iconName: 'solar:bill-list-line-duotone',
+    route: '/voiture/type-transmission',
   },
   {
     displayName: 'Sample Page',
