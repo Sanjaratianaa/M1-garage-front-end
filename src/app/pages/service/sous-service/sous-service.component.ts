@@ -27,13 +27,13 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 export class SousServiceComponent {
     services = [
         { id: 1, nom: 'Mécanique', icon: 'build', backgroundColor: '#FF5722' },   // Orange
-        { id: 2, nom: 'Carrosserie', icon: 'cars', backgroundColor: '#4CAF50' },   // Vert
-        { id: 3, nom: 'Peinture', icon: 'palette', backgroundColor: '#2196F3' },    // Bleu
-        { id: 4, nom: 'Électronique', icon: 'devices', backgroundColor: '#FFEB3B' },  // Jaune
+        { id: 2, nom: 'Carrosserie', icon: 'build', backgroundColor: '#4CAF50' },   // Vert
+        { id: 3, nom: 'Peinture', icon: 'build', backgroundColor: '#2196F3' },    // Bleu
+        { id: 4, nom: 'Électronique', icon: 'build', backgroundColor: '#FFEB3B' },  // Jaune
         { id: 5, nom: 'Mécanique 2', icon: 'build', backgroundColor: '#FF5722' },   // Orange
-        { id: 6, nom: 'Carrosserie 2', icon: 'cars', backgroundColor: '#4CAF50' },   // Vert
-        { id: 7, nom: 'Peinture 3', icon: 'palette', backgroundColor: '#2196F3' },    // Bleu
-        { id: 8, nom: 'Électronique 4', icon: 'devices', backgroundColor: '#FFEB3B' }  // Jaune
+        { id: 6, nom: 'Carrosserie 2', icon: 'build', backgroundColor: '#4CAF50' },   // Vert
+        { id: 7, nom: 'Peinture 3', icon: 'build', backgroundColor: '#2196F3' },    // Bleu
+        { id: 8, nom: 'Électronique 4', icon: 'build', backgroundColor: '#FFEB3B' }  // Jaune
     ];
 
 
