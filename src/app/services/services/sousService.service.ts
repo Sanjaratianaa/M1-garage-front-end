@@ -39,10 +39,11 @@ export class SousServiceService {
     /**
      * Ajouter une nouvelle sousService
      */
-    addSousService(libelle: string, duree: number): Observable<SousService> {
+    addSousService(libelle: string, duree: number, idService: string): Observable<SousService> {
         const sousServiceData = {
             libelle: libelle, // Inclure seulement le libelle,
-            duree: duree
+            duree: duree,
+            service: idService
         };
         return this.http.post<SousService>(this.apiUrl, sousServiceData).pipe(
             catchError(this.handleError) // Gestion des erreurs
