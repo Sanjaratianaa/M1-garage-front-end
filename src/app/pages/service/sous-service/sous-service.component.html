@@ -9,10 +9,10 @@
     <!-- Barre des services en haut -->
     <mat-card-content>
         <div class="service-buttons">
-            <mat-card *ngFor="let service of services" class="service-card" (click)="selectService(service)" [ngStyle]="{ 'background-color': service.backgroundColor }">
-                <mat-card-header [ngClass]="{ 'active-service': selectedService?.id === service.id }">
-                    <mat-icon mat-card-avatar class="service-icon">{{ service.icon }}</mat-icon>
-                    <mat-card-title>{{ service.nom }}</mat-card-title>
+            <mat-card *ngFor="let service of services" class="service-card" (click)="selectService(service)" [ngStyle]="{ 'background-color': '#FF5722' }">
+                <mat-card-header [ngClass]="{ 'active-service': selectedService?._id === service._id }">
+                    <mat-icon mat-card-avatar class="service-icon">build</mat-icon>
+                    <mat-card-title>{{ service.libelle }}</mat-card-title>
                 </mat-card-header>
             </mat-card>
         </div>
@@ -51,15 +51,15 @@
             <mat-table [dataSource]="filteredSousServices" class="mat-elevation-z8">
 
                 <!-- 🟢 Colonne Nom -->
-                <ng-container matColumnDef="nom">
+                <ng-container matColumnDef="libelle">
                     <mat-header-cell *matHeaderCellDef> Nom </mat-header-cell>
-                    <mat-cell *matCellDef="let sousService"> {{ sousService.nom }} </mat-cell>
+                    <mat-cell *matCellDef="let sousService"> {{ sousService.libelle }} </mat-cell>
                 </ng-container>
 
                 <!-- 🟠 Colonne Service -->
                 <ng-container matColumnDef="service">
                     <mat-header-cell *matHeaderCellDef> Service </mat-header-cell>
-                    <mat-cell *matCellDef="let sousService"> {{ sousService.serviceNom }} </mat-cell>
+                    <mat-cell *matCellDef="let sousService"> {{ sousService.service.libelle }} </mat-cell>
                 </ng-container>
 
                 <!-- 🔵 Colonne Actions -->
@@ -76,8 +76,8 @@
                 </ng-container>
 
                 <!-- 🏆 En-tête et corps du tableau -->
-                <mat-header-row *matHeaderRowDef="['nom', 'service', 'actions']"></mat-header-row>
-                <mat-row *matRowDef="let row; columns: ['nom', 'service', 'actions'];"></mat-row>
+                <mat-header-row *matHeaderRowDef="['libelle', 'service', 'actions']"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: ['libelle', 'service', 'actions'];"></mat-row>
             </mat-table>
 
             <!-- Pagination -->

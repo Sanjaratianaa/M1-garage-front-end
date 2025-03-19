@@ -32,6 +32,15 @@ export class ServiceService {
     }
 
     /**
+     * Récupérer toutes les services
+     */
+    getServicesActives(): Observable<Service[]> {
+        return this.http.get<Service[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
      * Ajouter une nouvelle service
      */
     addService(libelle: string): Observable<Service> {

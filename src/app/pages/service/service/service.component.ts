@@ -54,7 +54,6 @@ export class ServiceComponent {
         alert('Impossible de charger les services. Veuillez réessayer plus tard.');
       }
     });
-
   }
 
   updatePagination() {

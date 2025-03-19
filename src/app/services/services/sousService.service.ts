@@ -22,7 +22,7 @@ export interface SousService {
 @Injectable({
     providedIn: 'root'
 })
-export class ServiceService {
+export class SousServiceService {
     private apiUrl = environment.apiUrl + '/sousServices'; // URL API depuis le fichier d’environnement
 
     constructor(private http: HttpClient) { }
