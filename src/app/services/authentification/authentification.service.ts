@@ -6,12 +6,17 @@ import { environment } from 'src/environnements/environnement';
 
 interface LoginResponse {
     token: string;
-    user: any;
 }
 
 interface RegisterResponse {
     message: string;
     data: any;
+}
+
+interface TokenVerificationResponse {
+  success: boolean;
+  user?: any;
+  message?: string;
 }
 
 @Injectable({
@@ -54,12 +59,18 @@ export class AuthentificationService {
     /**
      * Verify token
      */
-    verifyToken(token: string): Observable<any> {
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${token}`
-      });
+    // verifyToken(token: string): Observable<any> {
+    //   const headers = new HttpHeaders({
+    //     'Authorization': `Bearer ${token}`
+    //   });
   
-      return this.http.get<any>(`${this.apiUrl}/verify-token`, { headers }).pipe(
+    //   return this.http.get<any>(`${this.apiUrl}/verifyToken`, { headers }).pipe(
+    //     catchError(this.handleError)
+    //   );
+    // }
+
+    verifyToken(token: string): Observable<TokenVerificationResponse> {
+      return this.http.post<TokenVerificationResponse>(`${this.apiUrl}/verifyToken`, { token }).pipe(
         catchError(this.handleError)
       );
     }

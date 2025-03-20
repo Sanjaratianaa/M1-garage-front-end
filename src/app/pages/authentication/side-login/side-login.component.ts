@@ -19,14 +19,9 @@ export class AppSideLoginComponent {
 
   constructor(private router: Router, private authService: AuthentificationService) {}
 
-  // form = new FormGroup({
-  //   uname: new FormControl('', [Validators.required, Validators.minLength(6)]),
-  //   password: new FormControl('', [Validators.required]),
-  // });
-
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
 
   get f() {
@@ -39,23 +34,31 @@ export class AppSideLoginComponent {
 
   submit() {
     if (this.form.valid) {
-      this.authService.login(this.form.value.email!, this.form.value.password!).subscribe({ // The "!" tells TS that email and password will not be null
+      this.authService.login(this.form.value.email!, this.form.value.password!).subscribe({
         next: (response) => {
-          // Store the token (e.g., in localStorage)
           localStorage.setItem('token', response.token);
+          
+          this.authService.verifyToken(response.token).subscribe({
+            next: (verificationResponse) => {
+              if (verificationResponse.success) {
+                localStorage.setItem('user', JSON.stringify(verificationResponse.user));
+                this.router.navigate(['/dashboard']);
+              } else {
+                console.error('Token verification failed:', verificationResponse.message);
+                this.errorMessage = verificationResponse.message || 'Token verification failed.';
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+              }
+            }
+          });
 
-          // Optionally store user data
-          localStorage.setItem('user', JSON.stringify(response.user));
-
-          // Redirect to the dashboard
-          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          this.errorMessage = error.message; // Display the error message
+          this.errorMessage = error.message;
         }
       });
     } else {
-      this.errorMessage = 'Please fill in all required fields.'; // Display a generic error if the form is invalid
+      this.errorMessage = 'Please fill in all required fields.';
     }
   }
 }
