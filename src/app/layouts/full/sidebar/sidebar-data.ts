@@ -54,6 +54,11 @@ export const navItems: NavItem[] = [
     iconName: 'fluent-mdl2:service-off',
     route: '/service/sous-service',
   },
+  {
+    displayName: 'Prix Sous Service',
+    iconName: 'fluent-mdl2:service-off',
+    route: '/service/prix-sous-service',
+  },
   
   {
     divider: true,

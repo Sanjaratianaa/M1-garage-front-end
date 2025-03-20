@@ -36,6 +36,12 @@ export class SousServiceService {
         );
     }
 
+    getSousServicesActives(): Observable<SousService[]> {
+        return this.http.get<SousService[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
     /**
      * Ajouter une nouvelle sousService
      */
