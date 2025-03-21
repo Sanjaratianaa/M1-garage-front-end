@@ -21,7 +21,9 @@ export class AppResetPasswordComponent {
 
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    oldPassword: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    newPassword: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    confirmPassword: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
 
   get f() {
@@ -34,30 +36,9 @@ export class AppResetPasswordComponent {
 
   submit() {
     if (this.form.valid) {
-      this.authService.login(this.form.value.email!, this.form.value.password!).subscribe({
+      this.authService.changePassword(this.form.value.email!, this.form.value.oldPassword!, this.form.value.newPassword!, this.form.value.confirmPassword!).subscribe({
         next: (response) => {
-          console.log(response);
-          console.log(response.token);
-
-          localStorage.setItem('token', response.token);
-
-          this.authService.verifyToken(response.token).subscribe({
-            next: (verificationResponse) => {
-
-              console.log("verificationResponse : "+ verificationResponse.success);
-
-              if (verificationResponse.success) {
-                localStorage.setItem('user', JSON.stringify(verificationResponse.user));
-                this.router.navigate(['/dashboard']);
-              } else {
-                console.error('Token verification failed:', verificationResponse.message);
-                this.errorMessage = verificationResponse.message || 'Token verification failed.';
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-              }
-            }
-          });
-
+          this.router.navigate(['/authentification/login']);
         },
         error: (error) => {
           this.errorMessage = error.message;

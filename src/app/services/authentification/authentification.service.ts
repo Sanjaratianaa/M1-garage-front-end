@@ -13,6 +13,11 @@ interface RegisterResponse {
     data: any;
 }
 
+interface ChangePasswordResponse {
+  message: string;
+  data: any;
+}
+
 interface TokenVerificationSuccessResponse {
   success: true;
   user: any;
@@ -57,9 +62,9 @@ export class AuthentificationService {
      /**
    * Change password user
    */
-     changePassword(email: string, oldPassword: string, newPassword: string, confirmPassword: string): Observable<any> {
+     changePassword(email: string, oldPassword: string, newPassword: string, confirmPassword: string): Observable<ChangePasswordResponse> {
         const body = { email, oldPassword, newPassword, confirmPassword };
-        return this.http.post<any>(`${this.apiUrl}/change-password`, body).pipe(
+        return this.http.post<ChangePasswordResponse>(`${this.apiUrl}/change-password`, body).pipe(
           catchError(this.handleError)
         );
       }

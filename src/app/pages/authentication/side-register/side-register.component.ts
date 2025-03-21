@@ -5,21 +5,36 @@ import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from 'src/app/material.module';
+import { AuthentificationService  } from 'src/app/services/authentification/authentification.service';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-side-register',
-  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf],
   templateUrl: './side-register.component.html',
 })
 export class AppSideRegisterComponent {
+  errorMessage = '';
+
+  genderOptions = [
+    { value: 'masculin', label: 'Masculin' },
+    { value: 'feminin', label: 'Feminin' }
+  ];
+
   options = this.settings.getOptions();
 
-  constructor(private settings: CoreService, private router: Router) {}
+  constructor(private settings: CoreService, private router: Router, private authService: AuthentificationService) {}
 
   form = new FormGroup({
-    uname: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    nom: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    prenoms: new FormControl('', [Validators.required]),
+    dateDeNaissance: new FormControl('', [Validators.required]),
+    lieuDeNaissance: new FormControl('', [Validators.required]),
+    genre: new FormControl('', [Validators.required]),
+    numeroTelephone: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+    motDePasse: new FormControl('', [Validators.required]),
   });
 
   get f() {
@@ -27,7 +42,33 @@ export class AppSideRegisterComponent {
   }
 
   submit() {
-    // console.log(this.form.value);
-    this.router.navigate(['/']);
+    if (this.form.valid) {
+      const userData = {
+        nom: this.form.value.nom!,
+        prenoms: this.form.value.prenoms!,
+        dateDeNaissance: this.form.value.dateDeNaissance!,
+        lieuDeNaissance: this.form.value.lieuDeNaissance!,
+        genre: this.form.value.genre!,
+        etat: "Valide",
+        numeroTelephone: this.form.value.numeroTelephone!,
+        email: this.form.value.email!,
+        motDePasse: this.form.value.motDePasse!,
+        idRole: "Client"
+      };
+
+      this.authService.register(userData).subscribe({
+        next: (response) => {
+          console.log(response);
+
+          this.router.navigate(['/authentification/login']);
+
+        },
+        error: (error) => {
+          this.errorMessage = error.message;
+        }
+      });
+    } else {
+      this.errorMessage = 'Please fill in all required fields.';
+    }
   }
 }
