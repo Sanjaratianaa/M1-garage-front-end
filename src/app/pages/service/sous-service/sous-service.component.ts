@@ -50,7 +50,7 @@ export class SousServiceComponent {
     pageSizeOptions = [5, 10, 20];
 
     colors: string[] = ['#FF5722', '#4CAF50', '#2196F3', '#FFEB3B'];
-    columns = ['service', 'libelle', 'duree', 'Manager', 'Date d\'enregistrement', 'Manager Suppression', 'Statut', 'actions'];
+    columns = ['service', 'libelle', 'duree', 'Prix', 'Manager', 'Date d\'enregistrement', 'Manager Suppression', 'Date Suppression', 'Statut', 'actions'];
 
     // services = [
     //     { id: 1, nom: 'Mécanique', icon: 'build', backgroundColor: '#FF5722' },   // Orange #FF5722 #4CAF50 #2196F3 #FFEB3B
@@ -136,6 +136,7 @@ export class SousServiceComponent {
     getAllSousServices() {
         this.souServiceService.getSousServices().subscribe({
             next: (sousServices) => {
+                console.log(sousServices);
                 this.sousServices = sousServices;
                 this.filteredSousServices = [...this.sousServices];
                 console.log(this.filteredSousServices);

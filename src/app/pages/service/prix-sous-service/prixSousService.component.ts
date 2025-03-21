@@ -40,7 +40,7 @@ export class PrixSousServiceComponent {
 
   constructor(
     private dialog: MatDialog, 
-    private prixServiceService: PrixSousServiceService,
+    private prixSousServiceService: PrixSousServiceService,
     private serviceService: ServiceService, 
     private sousServiceService: SousServiceService
   ) { }
@@ -53,8 +53,9 @@ export class PrixSousServiceComponent {
   }
 
   getAllPrix() {
-    this.prixServiceService.getPrixSousServices().subscribe({
+    this.prixSousServiceService.getPrixSousServices().subscribe({
       next: (prixSousServices) => {
+        console.log(prixSousServices);
         this.prixSousServices = prixSousServices;
         this.updatePagination();
       },
@@ -107,7 +108,7 @@ export class PrixSousServiceComponent {
     if (this.newPrixSousService) {
       console.log(this.newPrixSousService);
       try {
-        const prix = await firstValueFrom(this.prixServiceService.addPrixSousService(this.newPrixSousService.id_sous_service, this.newPrixSousService.date, this.newPrixSousService.prix));
+        const prix = await firstValueFrom(this.prixSousServiceService.addPrixSousService(this.newPrixSousService.id_sous_service, this.newPrixSousService.date, this.newPrixSousService.prix));
         console.log('prix ajoutée avec succès:', prix);
         this.prixSousServices.push(prix);
 
@@ -137,32 +138,33 @@ export class PrixSousServiceComponent {
 
   async openModal(errorMessage: string = '') {
     const data = {
-      title: 'Ajouter un sous-service',
+      title: 'Ajouter un prix de sous-service',
       fields: [
         {
           name: 'id_service', label: 'Service', type: 'select', required: true,
-          options: this.services
+          options: this.services, defaultValue: this.newPrixSousService.id_service
         },
         {
           name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
-          options: this.sousServices
+          options: this.sousServices, defaultValue: this.newPrixSousService.id_sous_service
         },
         {
           name: "prix",
           label: "Prix en Ar",
           type: "number",
           required: true,
-          defaultValue: ""  // Valeur par défaut pour le champ prix
+          defaultValue: this.newPrixSousService.prix  // Valeur par défaut pour le champ prix
         },
         {
           name: "date",
           label: "Date",
           type: "date",
           required: true,
-          defaultValue: ""  // Valeur par défaut pour le champ date
+          defaultValue: this.newPrixSousService.date  // Valeur par défaut pour le champ date
         }
       ],
-      submitText: 'Ajouter'
+      submitText: 'Ajouter',
+      errorMessage: errorMessage
     };
 
     const dialogRef = this.dialog.open(PrixModalComponent, {
@@ -183,6 +185,84 @@ export class PrixSousServiceComponent {
       }
     });
   }
+
+  // Méthode pour ouvrir le modal en mode édition
+  async openEditModal(prixSousService: PrixSousService, errorMessage: string = ''): Promise<void> {
+
+    console.log(prixSousService);
+    const data = {
+      title: 'Modifier un prix de sous-service',
+      fields: [
+        {
+          name: 'id_service', label: 'Service', type: 'select', required: true,
+          options: this.services, defaultValue: prixSousService.sousService.service._id 
+        },
+        {
+          name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
+          options: this.sousServices, defaultValue: prixSousService.sousService._id 
+        },
+        {
+          name: "prix",
+          label: "Prix en Ar",
+          type: "number",
+          required: true,
+          defaultValue: prixSousService.prixUnitaire  // Valeur par défaut pour le champ prix
+        },
+        {
+          name: "date",
+          label: "Date",
+          type: "date",
+          required: true,
+          defaultValue: prixSousService.date ? new Date(prixSousService.date).toISOString().split('T')[0] : ""   // Valeur par défaut pour le champ date
+        }
+      ],
+      submitText: 'Modifier',
+      errorMessage: errorMessage
+    };
+
+    const dialogRef = this.dialog.open(PrixModalComponent, {
+      width: '400px',
+      data: data,
+    });
+
+    try {
+      // Attendre la fermeture de la modale et récupérer les données saisies
+      const result = await firstValueFrom(dialogRef.afterClosed());
+      
+      if (result) {
+        console.log('Modification enregistrée:', result);
+        this.newPrixSousService = result;
+        // Fusionner les données existantes de la prixSousService avec les modifications
+        const updatedData = { ...prixSousService, sousService: this.newPrixSousService.id_sous_service, 
+          prixUnitaire: this.newPrixSousService.prix, date: this.newPrixSousService.date};
+        console.log(updatedData);
+
+        this.newPrixSousService = {id_sous_service: '', date: null, prix: 0};
+
+        // Attendre la mise à jour via le prixSousService
+        const updatedService = await firstValueFrom(this.prixSousServiceService.updatePrixSousService(updatedData));
+
+        // Mettre à jour la liste locale
+        const index = this.prixSousServices.findIndex(mq => mq._id === prixSousService._id);
+        if (index !== -1) {
+          this.prixSousServices[index] = updatedService;
+          this.updatePagination(); // Rafraîchir la liste affichée
+        }
+      }
+    } catch (error: any) {
+      console.error('Erreur lors de la modification:', error.message);
+      alert('Erreur lors de la modification: ' + error.message);
+      // Réouvrir la modale en passant le message d'erreur
+      await this.openEditModal(prixSousService, error.message);
+    }
+  }
+
+
+  // Méthode appelée lorsqu'on clique sur "Modifier"
+  async editPrix(prixSousService: PrixSousService) {
+    await this.openEditModal(prixSousService);
+  }
+
   
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {

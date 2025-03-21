@@ -44,8 +44,8 @@
       </ng-container>
 
       <ng-container matColumnDef="Date">
-        <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
-        <mat-cell *matCellDef="let prix"> {{ prix.date | date:'shortDate' }} </mat-cell>
+        <mat-header-cell *matHeaderCellDef> Date Applicatif</mat-header-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.date | date:'dd/MM/yyyy' }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="prixUnitaire">
@@ -62,14 +62,14 @@
 
       <ng-container matColumnDef="Date d'enregistrement">
         <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
-        <mat-cell *matCellDef="let prix"> {{ prix.dateEnregistrement | date:'shortDate' }} </mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.dateEnregistrement | date:'dd/MM/yyyy HH:mm:ss' }} </mat-cell>
       </ng-container>
       
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
         <mat-cell *matCellDef="let prix">
           <div *ngIf="!prix.dateSuppression">
-            <button mat-icon-button color="primary" >
+            <button mat-icon-button color="primary" (click)="editPrix(prix)">
               <mat-icon>edit</mat-icon>
             </button>
           </div>

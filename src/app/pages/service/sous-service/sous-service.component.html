@@ -79,9 +79,14 @@
                     <mat-cell *matCellDef="let sousService"> {{ sousService.duree }} mn</mat-cell>
                 </ng-container>
 
+                <ng-container matColumnDef="Prix">
+                    <mat-header-cell *matHeaderCellDef> Prix </mat-header-cell>
+                    <mat-cell *matCellDef="let sousService"> {{ sousService.prixUnitaire }} Ar </mat-cell>
+                </ng-container>  
+
                 <ng-container matColumnDef="Date d'enregistrement">
                     <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
-                    <mat-cell *matCellDef="let sousService"> {{ sousService.dateEnregistrement | date:'shortDate' }} </mat-cell>
+                    <mat-cell *matCellDef="let sousService"> {{ sousService.dateEnregistrement | date:'dd/MM/yyyy hh:mm:ss' }} </mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="Manager">
@@ -94,7 +99,7 @@
                 <ng-container matColumnDef="Date Suppression">
                     <mat-header-cell *matHeaderCellDef> Date Suppression </mat-header-cell>
                     <mat-cell *matCellDef="let sousService">
-                        {{ sousService.dateSuppression ? (sousService.dateSuppression | date:'shortDate') : '-- --' }}
+                        {{ sousService.dateSuppression ? (sousService.dateSuppression | date:'dd/MM/yyyy hh:mm:ss') : '-- --' }}
                     </mat-cell>
                 </ng-container>
 
