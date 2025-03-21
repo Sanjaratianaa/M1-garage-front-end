@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement';
 
 interface LoginResponse {
@@ -13,11 +13,19 @@ interface RegisterResponse {
     data: any;
 }
 
-interface TokenVerificationResponse {
-  success: boolean;
-  user?: any;
-  message?: string;
+interface TokenVerificationSuccessResponse {
+  success: true;
+  user: any;
 }
+
+interface TokenVerificationErrorResponse {
+  success: false;
+  message: string;
+}
+
+type TokenVerificationResponse =
+  | TokenVerificationSuccessResponse
+  | TokenVerificationErrorResponse;
 
 @Injectable({
     providedIn: 'root'
@@ -70,21 +78,27 @@ export class AuthentificationService {
     // }
 
     verifyToken(token: string): Observable<TokenVerificationResponse> {
+      console.log("Sending token to verifyToken:", token);
+    
       return this.http.post<TokenVerificationResponse>(`${this.apiUrl}/verifyToken`, { token }).pipe(
-        catchError(this.handleError)
+        tap(response => {
+          console.log("verifyToken response received:", response);
+        }),
+        catchError(error => {
+          console.error("Error in verifyToken:", error);
+          return this.handleError(error);
+        })
       );
     }
-
+    
     /**
    * Error handling function
    */
     private handleError(error: HttpErrorResponse) {
         let errorMessage = 'An unknown error occurred!';
         if (error.error instanceof ErrorEvent) {
-            // Client-side errors
             errorMessage = `Error: ${error.error.message}`;
         } else {
-            // Server-side errors
             errorMessage = `Error Code: ${error.status}\nMessage: ${error.error.message || error.message}`; //Improved error
         }
 

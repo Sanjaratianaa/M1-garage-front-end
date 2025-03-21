@@ -9,12 +9,12 @@ import { AuthentificationService  } from 'src/app/services/authentification/auth
 import { NgIf } from '@angular/common'; // Import NgIf
 
 @Component({
-  selector: 'app-side-login',
+  selector: 'app-reset-password',
   standalone: true,
   imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf],
-  templateUrl: './side-login.component.html',
+  templateUrl: './reset-password.component.html',
 })
-export class AppSideLoginComponent {
+export class AppResetPasswordComponent {
   errorMessage = '';
 
   constructor(private router: Router, private authService: AuthentificationService) {}

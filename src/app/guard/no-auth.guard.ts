@@ -15,15 +15,11 @@ export class NoAuthGuard implements CanActivate {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      // No token, allow access to login/register
-      console.log('NoAuthGuard - Allowed Access'); // Add this line
-
+      console.log('NoAuthGuard - Allowed Access');
       return true;
     } else {
-      console.log('NoAuthGuard - Redirecting to Login'); // Add this line
-
-      // Token exists, redirect to dashboard (or wherever you want)
-      this.router.navigate(['/']);
+      console.log('NoAuthGuard - Redirecting to Dashboard');
+      this.router.navigate(['/dashboard']); // Redirect to dashboard
       return false;
     }
   }

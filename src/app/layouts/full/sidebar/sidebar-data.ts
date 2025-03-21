@@ -796,7 +796,7 @@ export const navItems: NavItem[] = [
     children: [
       {
         displayName: 'Login',
-         subItemIcon: true,
+        subItemIcon: true,
         iconName: 'solar:round-alt-arrow-right-line-duotone',
         route: '/authentication/login',
       },

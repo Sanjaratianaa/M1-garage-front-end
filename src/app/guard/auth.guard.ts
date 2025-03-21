@@ -16,16 +16,16 @@ export class AuthGuard implements CanActivate {
   ): boolean {
     const token = localStorage.getItem('token');
 
-    console.log('AuthGuard - Token:', token); // Add this line
+    console.log('AuthGuard - Token:', token);
 
     if (token) {
-      console.log('AuthGuard - Allowed Access'); // Add this line
+      console.log('AuthGuard - Allowed Access');
       // Token exists, allow access to the route
       return true;
     } else {
-      console.log('AuthGuard - Redirecting to Login'); // Add this line
+      console.log('AuthGuard - Redirecting to Login');
       // No token, redirect to the login page
-      this.router.navigate(['/'], { queryParams: { returnUrl: state.url } });
+      this.router.navigate(['/authentication/login']); // Corrected redirect
       return false;
     }
   }
