@@ -4,9 +4,15 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
 
-export interface Service {
+export interface SousService {
     _id: string;
     libelle: string;
+    service: { 
+        _id: string;
+        libelle: string;
+    },
+    duree: number | 0, 
+    prixUnitaire: number | 0,
     dateEnregistrement: Date | null;
     manager: { id: string, nom: string, prenom: string } | any;
     dateSuppression: Date | any;
@@ -17,55 +23,54 @@ export interface Service {
 @Injectable({
     providedIn: 'root'
 })
-export class ServiceService {
-    private apiUrl = environment.apiUrl + '/services'; // URL API depuis le fichier d’environnement
+export class SousServiceService {
+    private apiUrl = environment.apiUrl + '/sousServices'; // URL API depuis le fichier d’environnement
 
     constructor(private http: HttpClient) { }
 
     /**
-     * Récupérer toutes les services
+     * Récupérer toutes les sousServices
      */
-    getServices(): Observable<Service[]> {
-        return this.http.get<Service[]>(this.apiUrl).pipe(
+    getSousServices(): Observable<SousService[]> {
+        return this.http.get<SousService[]>(this.apiUrl).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    getSousServicesActives(): Observable<SousService[]> {
+        return this.http.get<SousService[]>(this.apiUrl + "/active").pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Récupérer toutes les services
+     * Ajouter une nouvelle sousService
      */
-    getServicesActives(): Observable<Service[]> {
-        return this.http.get<Service[]>(this.apiUrl + "/active").pipe(
-            catchError(this.handleError) // Gestion des erreurs
-        );
-    }
-
-    /**
-     * Ajouter une nouvelle service
-     */
-    addService(libelle: string): Observable<Service> {
-        const serviceData = {
-            libelle: libelle, // Inclure seulement le libelle
+    addSousService(libelle: string, duree: number, idService: string): Observable<SousService> {
+        const sousServiceData = {
+            libelle: libelle, // Inclure seulement le libelle,
+            duree: duree,
+            service: idService
         };
-        return this.http.post<Service>(this.apiUrl, serviceData).pipe(
+        return this.http.post<SousService>(this.apiUrl, sousServiceData).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Modifier une service existante
+     * Modifier une sousService existante
      */
-    updateService(service: Service): Observable<Service> {
-        return this.http.put<Service>(`${this.apiUrl}/${service._id}`, service).pipe(
+    updateSousService(sousService: SousService): Observable<SousService> {
+        return this.http.put<SousService>(`${this.apiUrl}/${sousService._id}`, sousService).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Supprimer une service par ID
+     * Supprimer une sousService par ID
      */
-    deleteService(serviceId: string): Observable<Service> {
-        return this.http.delete<Service>(`${this.apiUrl}/${serviceId}`).pipe(
+    deleteSousService(sousServiceId: string): Observable<SousService> {
+        return this.http.delete<SousService>(`${this.apiUrl}/${sousServiceId}`).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

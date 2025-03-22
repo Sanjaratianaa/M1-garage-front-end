@@ -15,7 +15,7 @@
 <!-- Ajout d'un nouvel employé -->
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Add Categorie</button>
+    <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Ajouter un nouveau Categorie</button>
   </mat-card-content>
 </mat-card>
 
@@ -35,7 +35,7 @@
       
       <ng-container matColumnDef="Date d'enregistrement">
         <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
-        <mat-cell *matCellDef="let marque"> {{ marque.dateEnregistrement | date:'shortDate' }} </mat-cell>
+        <mat-cell *matCellDef="let marque"> {{ marque.dateEnregistrement | date:'dd/MM/yyyy HH:mm:ss' }} </mat-cell>
       </ng-container>
       
       <ng-container matColumnDef="Manager">
@@ -48,7 +48,7 @@
       <ng-container matColumnDef="Date Suppression">
         <mat-header-cell *matHeaderCellDef> Date Suppression </mat-header-cell>
         <mat-cell *matCellDef="let marque"> 
-          {{ marque.dateSuppression ? (marque.dateSuppression | date:'shortDate') : '-- --' }} 
+          {{ marque.dateSuppression ? (marque.dateSuppression | date:'dd/MM/yyyy HH:mm:ss') : '-- --' }} 
         </mat-cell>
       </ng-container>
       

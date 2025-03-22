@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
 
-export interface Service {
+export interface Piece {
     _id: string;
     libelle: string;
     dateEnregistrement: Date | null;
@@ -17,55 +17,53 @@ export interface Service {
 @Injectable({
     providedIn: 'root'
 })
-export class ServiceService {
-    private apiUrl = environment.apiUrl + '/services'; // URL API depuis le fichier d’environnement
+export class PieceService {
+    private apiUrl = environment.apiUrl + '/pieces'; // URL API depuis le fichier d’environnement
 
     constructor(private http: HttpClient) { }
 
     /**
-     * Récupérer toutes les services
+     * Récupérer toutes les pieces
      */
-    getServices(): Observable<Service[]> {
-        return this.http.get<Service[]>(this.apiUrl).pipe(
+    getPieces(): Observable<Piece[]> {
+        return this.http.get<Piece[]>(this.apiUrl).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    getPiecesActives(): Observable<Piece[]> {
+        console.log('getPiecesActives');
+        return this.http.get<Piece[]>(this.apiUrl + "/active").pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Récupérer toutes les services
+     * Ajouter une nouvelle piece
      */
-    getServicesActives(): Observable<Service[]> {
-        return this.http.get<Service[]>(this.apiUrl + "/active").pipe(
-            catchError(this.handleError) // Gestion des erreurs
-        );
-    }
-
-    /**
-     * Ajouter une nouvelle service
-     */
-    addService(libelle: string): Observable<Service> {
-        const serviceData = {
+    addPiece(libelle: string): Observable<Piece> {
+        const pieceData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<Service>(this.apiUrl, serviceData).pipe(
+        return this.http.post<Piece>(this.apiUrl, pieceData).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Modifier une service existante
+     * Modifier une piece existante
      */
-    updateService(service: Service): Observable<Service> {
-        return this.http.put<Service>(`${this.apiUrl}/${service._id}`, service).pipe(
+    updatePiece(piece: Piece): Observable<Piece> {
+        return this.http.put<Piece>(`${this.apiUrl}/${piece._id}`, piece).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Supprimer une service par ID
+     * Supprimer une piece par ID
      */
-    deleteService(serviceId: string): Observable<Service> {
-        return this.http.delete<Service>(`${this.apiUrl}/${serviceId}`).pipe(
+    deletePiece(pieceId: string): Observable<Piece> {
+        return this.http.delete<Piece>(`${this.apiUrl}/${pieceId}`).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

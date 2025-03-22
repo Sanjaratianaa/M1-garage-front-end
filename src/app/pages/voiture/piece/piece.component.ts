@@ -9,85 +9,87 @@ import { PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';  // Assurez-vous que FormsModule est bien importé ici
 import { GenericModalComponent } from '../../../components/modal-generique/add-modal/modal.component';
 import { DeleteConfirmationModalComponent } from '../../../components/modal-generique/confirm-modal/delete-confirmation-modal.component';
-import { ServiceService } from 'src/app/services/services/service.service'; 
-import { Service } from 'src/app/services/services/service.service';
+import { PieceService } from 'src/app/services/caracteristiques/piece.service';
+import { Piece } from 'src/app/services/caracteristiques/piece.service';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
-  selector: 'app-service',
+  selector: 'app-piece',
   standalone: true,
-  templateUrl: './service.component.html',
+  templateUrl: './piece.component.html',
   imports: [MatListModule, MatCardModule, DatePipe, MatIconModule, MaterialModule, FormsModule, CommonModule, MatButtonModule],
 
 })
-export class ServiceComponent {
+export class PieceComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
-  services: Service[];
+  pieces: Piece[];
 
-  paginatedServices: Service[] = [];
+  paginatedPieces: Piece[] = [];
 
   // Nouveau employé à ajouter
-  newService: string = "";
+  newPiece: string = "";
 
   // Paramètres de pagination
   pageSize = 5;
   currentPage = 0;
   pageSizeOptions = [5, 10, 20];
 
-  constructor(private dialog: MatDialog, private serviceService: ServiceService) { }
+  constructor(private dialog: MatDialog, private pieceService: PieceService) { }
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
-    this.getAllServices();
+    this.getAllPieces();
   }
 
-  getAllServices() {
-    this.serviceService.getServices().subscribe({
-      next: (services) => {
-        this.services = services;
+  getAllPieces() {
+    this.pieceService.getPieces().subscribe({
+      next: (pieces) => {
+        console.log(pieces);
+        this.pieces = pieces;
         this.updatePagination();
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des services:', error.message);
-        alert('Impossible de charger les services. Veuillez réessayer plus tard.');
+        console.error('Erreur lors du chargement des pieces:', error.message);
+        alert('Impossible de charger les pieces. Veuillez réessayer plus tard.');
       }
     });
+
   }
 
   updatePagination() {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedServices = this.services.slice(startIndex, endIndex);
+    this.paginatedPieces = this.pieces.slice(startIndex, endIndex);
   }
 
 
-  async addNewServiceAsync(): Promise<Service | undefined> {
-    if (this.newService) {
-      console.log(this.newService);
+  async addNewPieceAsync(): Promise<Piece | undefined> {
+    if (this.newPiece) {
+      console.log(this.newPiece);
       try {
-        const service = await firstValueFrom(this.serviceService.addService(this.newService));
-        console.log('Service ajoutée avec succès:', service);
-        this.services.push(service);
+        const piece = await firstValueFrom(this.pieceService.addPiece(this.newPiece));
+        console.log('Piece ajoutée avec succès:', piece);
+        this.pieces.push(piece);
 
         // Calculer le nombre total d'éléments dans la page actuelle
         const startIndex = this.currentPage * this.pageSize;
         const endIndex = startIndex + this.pageSize;
 
         // Vérifier si la page actuelle a encore de la place
-        if (this.services.length > startIndex && this.services.length <= endIndex) {
+        if (this.pieces.length > startIndex && this.pieces.length <= endIndex) {
           // La page actuelle a encore de la place, on reste dessus
         } else {
           // Aller à la dernière page si la page actuelle est pleine
-          this.currentPage = Math.floor((this.services.length - 1) / this.pageSize);
+          this.currentPage = Math.floor((this.pieces.length - 1) / this.pageSize);
         }
 
         this.updatePagination();
-        this.newService = "";
-        return service;
+        this.newPiece = "";
+        return piece;
       } catch (error: any) {
-        console.error('Erreur lors de l’ajout de la service:', error);
+        console.error('Erreur lors de l’ajout de la piece:', error);
         const errorMessage = error.error && error.error.message ? error.error.message : error.toString();
         throw new Error(errorMessage);
       }
@@ -97,9 +99,9 @@ export class ServiceComponent {
 
   async openModal(errorMessage: string = '') {
     const data = {
-      title: 'Ajouter un nouveau Service',
+      title: 'Ajouter une nouvelle Piece',
       fields: [
-        { name: 'libelle', label: 'Service', type: 'text', required: true, defaultValue: this.newService },
+        { name: 'libelle', label: 'Piece', type: 'text', required: true, defaultValue: this.newPiece },
       ],
       submitText: 'Ajouter',
       errorMessage: errorMessage,
@@ -114,8 +116,8 @@ export class ServiceComponent {
       if (result) {
         try {
           console.log('Données du formulaire:', result);
-          this.newService = result.libelle;
-          await this.addNewServiceAsync();
+          this.newPiece = result.libelle;
+          await this.addNewPieceAsync();
         } catch (error: any) {
           console.error('Erreur lors de l’ajout:', error.message);
           await this.openModal(error.message.replace("Error: ", ""));
@@ -125,11 +127,11 @@ export class ServiceComponent {
   }
 
   // Méthode pour ouvrir le modal en mode édition
-  async openEditModal(service: Service, errorMessage: string = ''): Promise<void> {
+  async openEditModal(piece: Piece, errorMessage: string = ''): Promise<void> {
     const data = {
-      title: 'Modifier un service',
+      title: 'Modifier une piece',
       fields: [
-        { name: 'libelle', label: 'Service', type: 'text', required: true, defaultValue: service.libelle }
+        { name: 'libelle', label: 'Piece', type: 'text', required: true, defaultValue: piece.libelle }
       ],
       submitText: 'Modifier',
       errorMessage: errorMessage
@@ -147,17 +149,17 @@ export class ServiceComponent {
       if (result) {
         console.log('Modification enregistrée:', result);
         
-        // Fusionner les données existantes de la service avec les modifications
-        const updatedData = { ...service, libelle: result.libelle };
+        // Fusionner les données existantes de la piece avec les modifications
+        const updatedData = { ...piece, libelle: result.libelle };
         console.log(updatedData);
 
         // Attendre la mise à jour via le service
-        const updatedService = await firstValueFrom(this.serviceService.updateService(updatedData));
+        const updatedPiece = await firstValueFrom(this.pieceService.updatePiece(updatedData));
 
         // Mettre à jour la liste locale
-        const index = this.services.findIndex(mq => mq._id === service._id);
+        const index = this.pieces.findIndex(mq => mq._id === piece._id);
         if (index !== -1) {
-          this.services[index] = updatedService;
+          this.pieces[index] = updatedPiece;
           this.updatePagination(); // Rafraîchir la liste affichée
         }
       }
@@ -165,29 +167,29 @@ export class ServiceComponent {
       console.error('Erreur lors de la modification:', error.message);
       alert('Erreur lors de la modification: ' + error.message);
       // Réouvrir la modale en passant le message d'erreur
-      await this.openEditModal(service, error.message);
+      await this.openEditModal(piece, error.message);
     }
   }
 
 
   // Méthode appelée lorsqu'on clique sur "Modifier"
-  async editService(service: Service) {
-    await this.openEditModal(service);
+  async editPiece(piece: Piece) {
+    await this.openEditModal(piece);
   }
 
   // Ouvrir la modale de confirmation avant de supprimer un employé
-  openDeleteConfirmation(service: Service): void {
+  openDeleteConfirmation(piece: Piece): void {
     const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ service.libelle }" comme service ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${ piece.libelle }" comme piece ? Cette action est irréversible.`
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.deleteService(service._id); // Si l'utilisateur confirme, supprimer l'employé
+        this.deletePiece(piece._id); // Si l'utilisateur confirme, supprimer l'employé
       } else {
         console.log('Suppression annulée');
       }
@@ -195,18 +197,18 @@ export class ServiceComponent {
   }
 
   // Fonction de suppression d'un employé
-  async deleteService(serviceId: string) {
+  async deletePiece(pieceId: string) {
   
     try {
-      // Appel API pour supprimer la service
-      const deletedService = await lastValueFrom(this.serviceService.deleteService(serviceId));
+      // Appel API pour supprimer la piece
+      const deletedPiece = await lastValueFrom(this.pieceService.deletePiece(pieceId));
 
       // Vérification si la suppression a bien été effectuée
-      if (deletedService && deletedService.dateSuppression) {
+      if (deletedPiece && deletedPiece.dateSuppression) {
         // Mise à jour locale en modifiant l'état au lieu de supprimer
-        const index = this.services.findIndex(mq => mq._id === serviceId);
+        const index = this.pieces.findIndex(mq => mq._id === pieceId);
         if (index !== -1) {
-          this.services[index] = deletedService; // Mettre à jour l'objet avec la version renvoyée
+          this.pieces[index] = deletedPiece; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
       } 

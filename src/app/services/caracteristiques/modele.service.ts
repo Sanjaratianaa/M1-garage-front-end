@@ -31,6 +31,12 @@ export class ModeleService {
         );
     }
 
+    getModelesActives(): Observable<Modele[]> {
+        return this.http.get<Modele[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
     /**
      * Ajouter une nouvelle modele
      */

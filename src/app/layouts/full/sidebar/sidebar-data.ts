@@ -35,9 +35,33 @@ export const navItems: NavItem[] = [
     route: '/voiture/type-transmission',
   },
   {
-    displayName: 'Sample Page',
-    iconName: 'solar:planet-3-line-duotone',
-    route: '/extra/sample-page',
+    displayName: 'Pièce détachée',
+    iconName: 'solar:widget-2-line-duotone',
+    route: '',
+    children: [
+      {
+        displayName: 'Piece',
+         subItemIcon: true,
+        iconName: 'solar:bill-list-line-duotone',
+        route: '/voiture/piece',
+      },
+      {
+        displayName: 'Gestion Stock',
+        subItemIcon: true,
+        iconName: 'solar:bill-list-line-duotone',
+        route: '/voiture/piece/gestion-stock',
+      },
+      {
+        displayName: 'Side Login',
+         subItemIcon: true,
+        iconName: 'solar:round-alt-arrow-right-line-duotone',
+        route: 'https://matdash-angular-main.netlify.app/authentication/boxed-login',
+        external: true,
+        chip: true,
+        chipClass: 'bg-secondary text-white',
+        chipContent: 'PRO',
+      },
+    ],
   },
 
   {
@@ -53,6 +77,11 @@ export const navItems: NavItem[] = [
     displayName: 'Sous Service',
     iconName: 'fluent-mdl2:service-off',
     route: '/service/sous-service',
+  },
+  {
+    displayName: 'Prix Sous Service',
+    iconName: 'fluent-mdl2:service-off',
+    route: '/service/prix-sous-service',
   },
   
   {
