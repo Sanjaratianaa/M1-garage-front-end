@@ -27,45 +27,51 @@
   <mat-card class="cardWithShadow">
     <mat-card-content>
       <mat-card-title>Liste des employés</mat-card-title>
-      <mat-table [dataSource]="paginatedServices" matSort class="mat-elevation-z8">
-        <ng-container matColumnDef="Libelle">
-          <mat-header-cell *matHeaderCellDef> Libelle </mat-header-cell>
-          <mat-cell *matCellDef="let marque"> {{ marque.libelle }} </mat-cell>
+      <mat-table [dataSource]="paginatedPersonnes" matSort class="mat-elevation-z8">
+        <ng-container matColumnDef="Nom">
+          <mat-header-cell *matHeaderCellDef> Nom </mat-header-cell>
+          <mat-cell *matCellDef="let personne"> {{ personne.nom }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Prenoms">
+          <mat-header-cell *matHeaderCellDef> Prenoms </mat-header-cell>
+          <mat-cell *matCellDef="let personne"> {{ personne.prenoms }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Email">
+          <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+          <mat-cell *matCellDef="let personne"> {{ personne.email }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Date Naissance">
+          <mat-header-cell *matHeaderCellDef> Date de naissance </mat-header-cell>
+          <mat-cell *matCellDef="let personne"> {{ personne.dateDeNaissance | date:'shortDate' }} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="Lieu Naissance">
+          <mat-header-cell *matHeaderCellDef> Lieu de naissance </mat-header-cell>
+          <mat-cell *matCellDef="let personne"> {{ personne.lieuDeNaissance }} </mat-cell>
         </ng-container>
         
-        <ng-container matColumnDef="Date d'enregistrement">
-          <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
-          <mat-cell *matCellDef="let marque"> {{ marque.dateEnregistrement | date:'shortDate' }} </mat-cell>
-        </ng-container>
-        
-        <ng-container matColumnDef="Manager">
-          <mat-header-cell *matHeaderCellDef> Manager </mat-header-cell>
-          <mat-cell *matCellDef="let marque"> 
-            {{ marque.manager?.personne.nom }} {{ marque.manager?.personne.prenom }} 
-          </mat-cell>
+        <ng-container matColumnDef="Date Embauche">
+          <mat-header-cell *matHeaderCellDef> Date d'embauche </mat-header-cell>
+          <mat-cell *matCellDef="let personne"> {{ personne.dateEmbauche | date:'shortDate' }} </mat-cell>
         </ng-container>
         
         <ng-container matColumnDef="Date Suppression">
           <mat-header-cell *matHeaderCellDef> Date Suppression </mat-header-cell>
-          <mat-cell *matCellDef="let marque"> 
-            {{ marque.dateSuppression ? (marque.dateSuppression | date:'shortDate') : '-- --' }} 
-          </mat-cell>
-        </ng-container>
-        
-        <ng-container matColumnDef="Manager Suppression">
-          <mat-header-cell *matHeaderCellDef> Manager Suppression </mat-header-cell>
-          <mat-cell *matCellDef="let marque"> 
-            {{ marque.managerSuppression?.personne.nom || '--' }} {{ marque.managerSuppression?.personne.prenom || '--' }} 
+          <mat-cell *matCellDef="let personne"> 
+            {{ personne.dateSuppression ? (personne.dateSuppression | date:'shortDate') : '-- --' }} 
           </mat-cell>
         </ng-container>
   
         <ng-container matColumnDef="Statut">
           <mat-header-cell *matHeaderCellDef> Statut </mat-header-cell>
-          <mat-cell *matCellDef="let marque">
-            <div [ngClass]="{'inactive-status': marque.dateSuppression, 'active-status': !marque.dateSuppression}" 
+          <mat-cell *matCellDef="let personne">
+            <div [ngClass]="{'inactive-status': personne.dateSuppression, 'active-status': !personne.dateSuppression}" 
                  class="status-container">
-              <!-- Si la marque a une date de suppression, elle est inactive -->
-              <span>{{ marque.etat }}</span>
+              <!-- Si la personne a une date de suppression, elle est inactive -->
+              <span>{{ personne.etat }}</span>
             </div>
           </mat-cell>
         </ng-container>
@@ -73,12 +79,12 @@
         
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
-          <mat-cell *matCellDef="let marque">
-            <div *ngIf="!marque.dateSuppression">
-              <button mat-icon-button color="primary" (click)="editService(marque)">
+          <mat-cell *matCellDef="let personne">
+            <div *ngIf="!personne.dateSuppression">
+              <button mat-icon-button color="primary" (click)="editPersonne(personne)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="openDeleteConfirmation(marque)">
+              <button mat-icon-button color="warn" (click)="openDeleteConfirmation(personne)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -91,7 +97,7 @@
       </mat-table>
   
       <!-- Pagination -->
-      <mat-paginator [length]="services.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      <mat-paginator *ngIf="personnes" [length]="personnes.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
         (page)="onPaginateChange($event)">
       </mat-paginator>
     </mat-card-content>

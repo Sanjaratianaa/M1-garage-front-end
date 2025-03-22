@@ -16,8 +16,6 @@ export class AuthGuard implements CanActivate {
   ): boolean {
     const token = localStorage.getItem('token');
 
-    console.log('AuthGuard - Token:', token);
-
     if (token) {
       console.log('AuthGuard - Allowed Access');
       // Token exists, allow access to the route

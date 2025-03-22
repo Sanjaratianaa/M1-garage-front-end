@@ -16,6 +16,7 @@ export interface Personne {
     motDePasse: string;
     idRole: string;
     dateEmbauche: Date | any;
+    dateSuppression: Date | any;
 }
 
 @Injectable({

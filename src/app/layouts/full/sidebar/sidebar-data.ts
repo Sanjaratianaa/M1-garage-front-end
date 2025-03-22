@@ -62,11 +62,11 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Employee',
     iconName: 'solar:user-id-line-duotone',
-    route: 'https://matdash-angular-main.netlify.app/apps/employee',
+    route: '/personne',
     chip: true,
-    external: true,
-    chipClass: 'bg-secondary text-white',
-    chipContent: 'PRO',
+    // external: true,
+    // chipClass: 'bg-secondary text-white',
+    // chipContent: 'PRO',
   },
   {
     displayName: 'Notes',

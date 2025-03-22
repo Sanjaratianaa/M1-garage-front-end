@@ -7,8 +7,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MaterialModule } from 'src/app/material.module';
 import { PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
-import { GenericModalComponent } from '../../../components/modal-generique/add-modal/modal.component';
-import { DeleteConfirmationModalComponent } from '../../../components/modal-generique/confirm-modal/delete-confirmation-modal.component';
+import { GenericModalComponent } from '../../components/modal-generique/add-modal/modal.component';
+import { DeleteConfirmationModalComponent } from '../../components/modal-generique/confirm-modal/delete-confirmation-modal.component';
 import { PersonneService } from 'src/app/services/personne/personne.service';
 import { Personne } from 'src/app/services/personne/personne.service';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
@@ -18,12 +18,12 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-service',
   standalone: true,
-  templateUrl: './service.component.html',
+  templateUrl: './personne.component.html',
   imports: [MatListModule, MatCardModule, DatePipe, MatIconModule, MaterialModule, FormsModule, CommonModule, MatButtonModule],
 
 })
 export class PersonneComponent {
-  displayedColumns: string[] = ['Nom', "Prenoms", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
+  displayedColumns: string[] = ['Nom', "Prenoms", "Email", "Date Naissance", "Lieu Naissance", "Date Embauche", "Date Suppression", "Statut", 'actions'];
   personnes: Personne[];
 
   paginatedPersonnes: Personne[] = [];
@@ -46,6 +46,9 @@ export class PersonneComponent {
   getAllPersonnes() {
     this.personneService.getPersonnes().subscribe({
       next: (personnes) => {
+        
+        console.log(personnes);
+
         this.personnes = personnes;
         this.updatePagination();
       },
@@ -100,7 +103,13 @@ export class PersonneComponent {
     const data = {
       title: 'Ajouter un nouveau Personne',
       fields: [
-        { name: 'libelle', label: 'Personne', type: 'text', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: 'Nom', type: 'text', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: 'Prenoms', type: 'text', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: 'Email', type: 'email', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: 'Date de naissance', type: 'date', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: 'Lieu de naissance', type: 'text', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: "Date d'embauche", type: 'date', required: true, defaultValue: this.newPersonne },
+        { name: 'libelle', label: "Genre", type: 'text', required: true, defaultValue: this.newPersonne },
       ],
       submitText: 'Ajouter',
       errorMessage: errorMessage,
@@ -130,14 +139,14 @@ export class PersonneComponent {
     const data = {
       title: 'Modifier une personne',
       fields: [
-        { name: 'libelle', label: 'Nom', type: 'text', required: true, defaultValue: personne.nom }
+        { name: 'libelle', label: 'Nom', type: 'text', required: true, defaultValue:"test" }
       ],
       submitText: 'Modifier',
       errorMessage: errorMessage
     };
 
     const dialogRef = this.dialog.open(GenericModalComponent, {
-      width: '400px',
+      width: '600px',
       data: data,
     });
 
