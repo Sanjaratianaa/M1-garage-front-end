@@ -31,6 +31,13 @@ export class PieceService {
         );
     }
 
+    getPiecesActives(): Observable<Piece[]> {
+        console.log('getPiecesActives');
+        return this.http.get<Piece[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
     /**
      * Ajouter une nouvelle piece
      */

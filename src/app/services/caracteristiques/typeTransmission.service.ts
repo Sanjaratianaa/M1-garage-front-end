@@ -31,6 +31,12 @@ export class TypeTransmissionService {
         );
     }
 
+    getTypeTransmissionsActives(): Observable<TypeTransmission[]> {
+        return this.http.get<TypeTransmission[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
     /**
      * Ajouter une nouvelle typeTransmission
      */

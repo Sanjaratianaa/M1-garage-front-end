@@ -31,6 +31,12 @@ export class MarqueService {
         );
     }
 
+    getMarquesActives(): Observable<Marque[]> {
+        return this.http.get<Marque[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
     /**
      * Ajouter une nouvelle marque
      */

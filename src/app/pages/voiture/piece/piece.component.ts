@@ -46,6 +46,7 @@ export class PieceComponent {
   getAllPieces() {
     this.pieceService.getPieces().subscribe({
       next: (pieces) => {
+        console.log(pieces);
         this.pieces = pieces;
         this.updatePagination();
       },

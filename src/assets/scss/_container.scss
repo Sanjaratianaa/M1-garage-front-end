@@ -343,3 +343,9 @@ td.hljs-ln-line.hljs-ln-numbers {
 //   /* margin-bottom: 16px; */
 //   object-fit: cover;
 // }
+
+.scrollable-modal {
+  max-height: 80vh; /* Hauteur max pour éviter de dépasser l'écran */
+  overflow-y: auto; /* Active le scroll vertical si nécessaire */
+  padding: 16px; /* Espacement intérieur */
+}

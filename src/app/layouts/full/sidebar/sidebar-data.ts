@@ -46,6 +46,12 @@ export const navItems: NavItem[] = [
         route: '/voiture/piece',
       },
       {
+        displayName: 'Gestion Stock',
+        subItemIcon: true,
+        iconName: 'solar:bill-list-line-duotone',
+        route: '/voiture/piece/gestion-stock',
+      },
+      {
         displayName: 'Side Login',
          subItemIcon: true,
         iconName: 'solar:round-alt-arrow-right-line-duotone',

@@ -24,53 +24,6 @@ import { TypeTransmission, TypeTransmissionService } from 'src/app/services/cara
 export class TypeTransmissionComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   typeTransmissions: TypeTransmission[];
-  // typeTransmissions: TypeTransmission[] = [
-  //   {
-  //     id: 1,
-  //     libelle: 'Peugeot',
-  //     dateEnregistrement: new Date('2024-01-10'),
-  //     manager: { id: '101', nom: 'Dupont', prenom: 'Jean' },
-  //     dateSuppression: null,
-  //     managerSuppression: null,
-  //     etat: 1
-  //   },è
-  //   {
-  //     id: 2,
-  //     libelle: 'Renault',
-  //     dateEnregistrement: new Date('2023-12-05'),
-  //     manager: { id: '102', nom: 'Martin', prenom: 'Sophie' },
-  //     dateSuppression: null,
-  //     managerSuppression: null,
-  //     etat: 1
-  //   },
-  //   {
-  //     id: 3,
-  //     libelle: 'BMW',
-  //     dateEnregistrement: new Date('2024-02-20'),
-  //     manager: { id: '103', nom: 'Durand', prenom: 'Paul' },
-  //     dateSuppression: new Date('2024-03-01'),
-  //     managerSuppression: { id: '104', nom: 'Bernard', prenom: 'Alice' },
-  //     etat: 0
-  //   },
-  //   {
-  //     id: 4,
-  //     libelle: 'Toyota',
-  //     dateEnregistrement: new Date('2024-03-05'),
-  //     manager: { id: '105', nom: 'Morel', prenom: 'Lucie' },
-  //     dateSuppression: null,
-  //     managerSuppression: null,
-  //     etat: 1
-  //   },
-  //   {
-  //     id: 5,
-  //     libelle: 'Mercedes',
-  //     dateEnregistrement: new Date('2023-11-15'),
-  //     manager: { id: '106', nom: 'Lemoine', prenom: 'Pierre' },
-  //     dateSuppression: new Date('2024-02-10'),
-  //     managerSuppression: { id: '107', nom: 'Rousseau', prenom: 'Camille' },
-  //     etat: 0
-  //   }
-  // ];
 
   paginatedTypeTransmissions: TypeTransmission[] = [];
 
@@ -144,9 +97,9 @@ export class TypeTransmissionComponent {
 
   async openModal(errorMessage: string = '') {
     const data = {
-      title: 'Ajouter un nouveau TypeTransmission',
+      title: 'Ajouter un nouveau Type de Transmission',
       fields: [
-        { name: 'libelle', label: 'TypeTransmission', type: 'text', required: true, defaultValue: this.newTypeTransmission },
+        { name: 'libelle', label: 'Type Transmission', type: 'text', required: true, defaultValue: this.newTypeTransmission },
       ],
       submitText: 'Ajouter',
       errorMessage: errorMessage,
@@ -174,9 +127,9 @@ export class TypeTransmissionComponent {
   // Méthode pour ouvrir le modal en mode édition
   async openEditModal(typeTransmission: TypeTransmission, errorMessage: string = ''): Promise<void> {
     const data = {
-      title: 'Modifier un typeTransmission',
+      title: 'Modifier un type de transmission',
       fields: [
-        { name: 'libelle', label: 'TypeTransmission', type: 'text', required: true, defaultValue: typeTransmission.libelle }
+        { name: 'libelle', label: 'Type transmission', type: 'text', required: true, defaultValue: typeTransmission.libelle }
       ],
       submitText: 'Modifier',
       errorMessage: errorMessage
