@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -22,17 +22,29 @@ export class TypeTransmissionService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les typeTransmissions
      */
     getTypeTransmissions(): Observable<TypeTransmission[]> {
-        return this.http.get<TypeTransmission[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<TypeTransmission[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     getTypeTransmissionsActives(): Observable<TypeTransmission[]> {
-        return this.http.get<TypeTransmission[]>(this.apiUrl + "/active").pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<TypeTransmission[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -41,10 +53,14 @@ export class TypeTransmissionService {
      * Ajouter une nouvelle typeTransmission
      */
     addTypeTransmission(libelle: string): Observable<TypeTransmission> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const typeTransmissionData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<TypeTransmission>(this.apiUrl, typeTransmissionData).pipe(
+        return this.http.post<TypeTransmission>(this.apiUrl, typeTransmissionData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -53,7 +69,11 @@ export class TypeTransmissionService {
      * Modifier une typeTransmission existante
      */
     updateTypeTransmission(typeTransmission: TypeTransmission): Observable<TypeTransmission> {
-        return this.http.put<TypeTransmission>(`${this.apiUrl}/${typeTransmission._id}`, typeTransmission).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<TypeTransmission>(`${this.apiUrl}/${typeTransmission._id}`, typeTransmission, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -62,7 +82,11 @@ export class TypeTransmissionService {
      * Supprimer une typeTransmission par ID
      */
     deleteTypeTransmission(typeTransmissionId: string): Observable<TypeTransmission> {
-        return this.http.delete<TypeTransmission>(`${this.apiUrl}/${typeTransmissionId}`).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<TypeTransmission>(`${this.apiUrl}/${typeTransmissionId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

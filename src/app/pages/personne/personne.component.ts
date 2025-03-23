@@ -29,7 +29,7 @@ export class PersonneComponent {
   paginatedPersonnes: Personne[] = [];
 
   // Nouveau employé à ajouter
-  newPersonne: string = "";
+  newPersonne: any = {};
 
   // Paramètres de pagination
   pageSize = 5;
@@ -100,16 +100,26 @@ export class PersonneComponent {
   }
 
   async openModal(errorMessage: string = '') {
+
+    console.log(this.newPersonne);
+
     const data = {
       title: 'Ajouter un nouveau Personne',
       fields: [
-        { name: 'libelle', label: 'Nom', type: 'text', required: true, defaultValue: this.newPersonne },
-        { name: 'libelle', label: 'Prenoms', type: 'text', required: true, defaultValue: this.newPersonne },
-        { name: 'libelle', label: 'Email', type: 'email', required: true, defaultValue: this.newPersonne },
-        { name: 'libelle', label: 'Date de naissance', type: 'date', required: true, defaultValue: this.newPersonne },
-        { name: 'libelle', label: 'Lieu de naissance', type: 'text', required: true, defaultValue: this.newPersonne },
-        { name: 'libelle', label: "Date d'embauche", type: 'date', required: true, defaultValue: this.newPersonne },
-        { name: 'libelle', label: "Genre", type: 'text', required: true, defaultValue: this.newPersonne },
+        { name: 'nom', label: 'Nom', type: 'text', required: true, defaultValue: this.newPersonne.nom },
+        { name: 'prenoms', label: 'Prenoms', type: 'text', required: true, defaultValue: this.newPersonne.prenoms },
+        { name: 'email', label: 'Email', type: 'email', required: true, defaultValue: this.newPersonne.email },
+        { name: 'numeroTelephone', label: 'Numero de téléphone', type: 'text', required: true, defaultValue: this.newPersonne.numeroTelephone },
+        { name: 'dateDeNaissance', label: 'Date de naissance', type: 'date', required: true, defaultValue: this.newPersonne.dateDeNaissance },
+        { name: 'lieuDeNaissance', label: 'Lieu de naissance', type: 'text', required: true, defaultValue: this.newPersonne.lieuDeNaissance },
+        { name: 'dateEmbauche', label: "Date d'embauche", type: 'date', required: true, defaultValue: this.newPersonne.dateEmbauche },
+        {
+          name: 'genre', label: 'Genre', type: 'select', required: true,
+          options: [
+            {value: "Homme", label: "Homme"},
+            {value: "Femme", label: "Femme"}
+          ]
+        },
       ],
       submitText: 'Ajouter',
       errorMessage: errorMessage,
@@ -124,7 +134,19 @@ export class PersonneComponent {
       if (result) {
         try {
           console.log('Données du formulaire:', result);
-          this.newPersonne = result.libelle;
+          this.newPersonne = {
+            nom: result.nom,
+            prenom: result.prenoms,
+            dateDeNaissance: result.dateDeNaissance,
+            lieuDeNaissance: result.lieuDeNaissance,
+            genre: result.genre,
+            etat: "Active",
+            numeroTelephone: result.numeroTelephone,
+            email: result.email,
+            motDePasse: "",
+            idRole: "Mécanicien"
+          };
+
           await this.addNewPersonneAsync();
         } catch (error: any) {
           console.error('Erreur lors de l’ajout:', error.message);

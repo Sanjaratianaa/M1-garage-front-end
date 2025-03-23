@@ -83,7 +83,6 @@ export class AuthentificationService {
     // }
 
     verifyToken(token: string): Observable<TokenVerificationResponse> {
-      console.log("Sending token to verifyToken:", token);
     
       return this.http.post<TokenVerificationResponse>(`${this.apiUrl}/verifyToken`, { token }).pipe(
         tap(response => {

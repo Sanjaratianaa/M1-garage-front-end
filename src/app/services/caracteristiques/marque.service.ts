@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -22,17 +22,29 @@ export class MarqueService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les marques
      */
     getMarques(): Observable<Marque[]> {
-        return this.http.get<Marque[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Marque[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     getMarquesActives(): Observable<Marque[]> {
-        return this.http.get<Marque[]>(this.apiUrl + "/active").pipe(
+         const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Marque[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -41,10 +53,14 @@ export class MarqueService {
      * Ajouter une nouvelle marque
      */
     addMarque(libelle: string): Observable<Marque> {
+         const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const marqueData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<Marque>(this.apiUrl, marqueData).pipe(
+        return this.http.post<Marque>(this.apiUrl, marqueData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -53,7 +69,11 @@ export class MarqueService {
      * Modifier une marque existante
      */
     updateMarque(marque: Marque): Observable<Marque> {
-        return this.http.put<Marque>(`${this.apiUrl}/${marque._id}`, marque).pipe(
+         const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<Marque>(`${this.apiUrl}/${marque._id}`, marque, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -62,7 +82,11 @@ export class MarqueService {
      * Supprimer une marque par ID
      */
     deleteMarque(marqueId: string): Observable<Marque> {
-        return this.http.delete<Marque>(`${this.apiUrl}/${marqueId}`).pipe(
+         const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<Marque>(`${this.apiUrl}/${marqueId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

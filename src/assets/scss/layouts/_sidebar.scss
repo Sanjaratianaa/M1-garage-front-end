@@ -14,6 +14,14 @@
 }
 
 .sidebar-list {
+  position: fixed;
+  position: fixed;
+    top: 0; // Pour bien la fixer en haut
+    left: 0;
+    bottom: 0; // Assure qu'elle prend toute la hauteur de l'écran
+    z-index: 1000; // S'assurer qu'elle reste au-dessus
+    background-color: var(--mat-sys-background); // Ajoute un fond si besoin
+  
   &.mdc-list {
     padding: 0 18px;
     width: $sidenav-desktop;

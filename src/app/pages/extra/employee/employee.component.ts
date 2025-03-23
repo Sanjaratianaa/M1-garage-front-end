@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { DatePipe } from '@angular/common';
 import { MaterialModule } from 'src/app/material.module';
 import { PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';  // Assurez-vous que FormsModule est bien importé ici
@@ -20,7 +19,7 @@ export interface Employee {
   selector: 'app-employee',
   // standalone: true,
   templateUrl: './employee.component.html',
-  imports: [MatListModule, MatCardModule, DatePipe, MatIconModule, MaterialModule, FormsModule],
+  imports: [MatListModule, MatCardModule, MatIconModule, MaterialModule, FormsModule],
 
 })
 export class EmployeeComponent {

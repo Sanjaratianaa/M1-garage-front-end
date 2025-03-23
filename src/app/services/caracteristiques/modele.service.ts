@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -22,17 +22,29 @@ export class ModeleService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les modeles
      */
     getModeles(): Observable<Modele[]> {
-        return this.http.get<Modele[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Modele[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     getModelesActives(): Observable<Modele[]> {
-        return this.http.get<Modele[]>(this.apiUrl + "/active").pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Modele[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -41,10 +53,14 @@ export class ModeleService {
      * Ajouter une nouvelle modele
      */
     addModele(libelle: string): Observable<Modele> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const modeleData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<Modele>(this.apiUrl, modeleData).pipe(
+        return this.http.post<Modele>(this.apiUrl, modeleData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -53,7 +69,11 @@ export class ModeleService {
      * Modifier une modele existante
      */
     updateModele(modele: Modele): Observable<Modele> {
-        return this.http.put<Modele>(`${this.apiUrl}/${modele._id}`, modele).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<Modele>(`${this.apiUrl}/${modele._id}`, modele, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -62,7 +82,11 @@ export class ModeleService {
      * Supprimer une modele par ID
      */
     deleteModele(modeleId: string): Observable<Modele> {
-        return this.http.delete<Modele>(`${this.apiUrl}/${modeleId}`).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<Modele>(`${this.apiUrl}/${modeleId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

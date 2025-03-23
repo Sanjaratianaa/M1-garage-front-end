@@ -25,7 +25,7 @@ import { AuthentificationService } from 'src/app/services/authentification/authe
     MatBadgeModule
   ],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+  // styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None,
   standalone: true
 })

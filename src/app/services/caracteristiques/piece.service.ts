@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -22,18 +22,30 @@ export class PieceService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les pieces
      */
     getPieces(): Observable<Piece[]> {
-        return this.http.get<Piece[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Piece[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     getPiecesActives(): Observable<Piece[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         console.log('getPiecesActives');
-        return this.http.get<Piece[]>(this.apiUrl + "/active").pipe(
+        return this.http.get<Piece[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -42,10 +54,14 @@ export class PieceService {
      * Ajouter une nouvelle piece
      */
     addPiece(libelle: string): Observable<Piece> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const pieceData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<Piece>(this.apiUrl, pieceData).pipe(
+        return this.http.post<Piece>(this.apiUrl, pieceData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -54,7 +70,11 @@ export class PieceService {
      * Modifier une piece existante
      */
     updatePiece(piece: Piece): Observable<Piece> {
-        return this.http.put<Piece>(`${this.apiUrl}/${piece._id}`, piece).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<Piece>(`${this.apiUrl}/${piece._id}`, piece, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -63,7 +83,11 @@ export class PieceService {
      * Supprimer une piece par ID
      */
     deletePiece(pieceId: string): Observable<Piece> {
-        return this.http.delete<Piece>(`${this.apiUrl}/${pieceId}`).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<Piece>(`${this.apiUrl}/${pieceId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

@@ -17,6 +17,7 @@ export interface Personne {
     idRole: string;
     dateEmbauche: Date | any;
     dateSuppression: Date | any;
+    etat: string;
 }
 
 @Injectable({
@@ -39,11 +40,8 @@ export class PersonneService {
     /**
      * Ajouter une nouvelle personne
      */
-    addPersonne(libelle: string): Observable<Personne> {
-        const personneData = {
-            libelle: libelle, // Inclure seulement le libelle
-        };
-        return this.http.post<Personne>(this.apiUrl, personneData).pipe(
+    addPersonne(personneData: any): Observable<Personne> {
+        return this.http.post<Personne>(environment.apiUrl + '/auth/register', personneData).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

@@ -6,12 +6,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from 'src/app/material.module';
 import { AuthentificationService  } from 'src/app/services/authentification/authentification.service';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-side-register',
   standalone: true,
-  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf],
+  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf, NgFor],
   templateUrl: './side-register.component.html',
 })
 export class AppSideRegisterComponent {
@@ -33,7 +33,7 @@ export class AppSideRegisterComponent {
     lieuDeNaissance: new FormControl('', [Validators.required]),
     genre: new FormControl('', [Validators.required]),
     numeroTelephone: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]), // Add email validator
     motDePasse: new FormControl('', [Validators.required]),
   });
 
@@ -53,18 +53,17 @@ export class AppSideRegisterComponent {
         numeroTelephone: this.form.value.numeroTelephone!,
         email: this.form.value.email!,
         motDePasse: this.form.value.motDePasse!,
-        idRole: "Client"
+        idRole: "client"
       };
 
       this.authService.register(userData).subscribe({
         next: (response) => {
           console.log(response);
-
           this.router.navigate(['/authentification/login']);
-
         },
         error: (error) => {
           this.errorMessage = error.message;
+          console.error('Registration error:', error); // Log the full error
         }
       });
     } else {

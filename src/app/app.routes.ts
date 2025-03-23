@@ -47,6 +47,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/personne/personne.routes').then((m) => m.PersonneRoutes),
       },
+      {
+        path: 'rendez-vous',
+        loadChildren: () =>
+          import('./pages/calendar/calendar.routes').then((m) => m.CalendarRoutes),
+      },
     ],
   },
   {

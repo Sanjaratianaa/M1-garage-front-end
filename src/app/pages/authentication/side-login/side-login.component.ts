@@ -7,11 +7,12 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthentificationService  } from 'src/app/services/authentification/authentification.service';
 import { NgIf } from '@angular/common'; // Import NgIf
+import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
   selector: 'app-side-login',
   standalone: true,
-  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf],
+  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf, TablerIconsModule],
   templateUrl: './side-login.component.html',
 })
 export class AppSideLoginComponent {
@@ -20,8 +21,8 @@ export class AppSideLoginComponent {
   constructor(private router: Router, private authService: AuthentificationService) {}
 
   form = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    email: new FormControl('layah@example.com', [Validators.required, Validators.email]),
+    password: new FormControl('securePassword123', [Validators.required, Validators.minLength(6)]),
   });
 
   get f() {
@@ -36,15 +37,11 @@ export class AppSideLoginComponent {
     if (this.form.valid) {
       this.authService.login(this.form.value.email!, this.form.value.password!).subscribe({
         next: (response) => {
-          console.log(response);
-          console.log(response.token);
 
           localStorage.setItem('token', response.token);
 
           this.authService.verifyToken(response.token).subscribe({
             next: (verificationResponse) => {
-
-              console.log("verificationResponse : "+ verificationResponse.success);
 
               if (verificationResponse.success) {
                 localStorage.setItem('user', JSON.stringify(verificationResponse.user));

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -22,11 +22,18 @@ export class ServiceService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les services
      */
     getServices(): Observable<Service[]> {
-        return this.http.get<Service[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+        return this.http.get<Service[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -35,7 +42,11 @@ export class ServiceService {
      * Récupérer toutes les services
      */
     getServicesActives(): Observable<Service[]> {
-        return this.http.get<Service[]>(this.apiUrl + "/active").pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Service[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -44,10 +55,14 @@ export class ServiceService {
      * Ajouter une nouvelle service
      */
     addService(libelle: string): Observable<Service> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const serviceData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<Service>(this.apiUrl, serviceData).pipe(
+        return this.http.post<Service>(this.apiUrl, serviceData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -56,7 +71,11 @@ export class ServiceService {
      * Modifier une service existante
      */
     updateService(service: Service): Observable<Service> {
-        return this.http.put<Service>(`${this.apiUrl}/${service._id}`, service).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<Service>(`${this.apiUrl}/${service._id}`, service, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -65,7 +84,11 @@ export class ServiceService {
      * Supprimer une service par ID
      */
     deleteService(serviceId: string): Observable<Service> {
-        return this.http.delete<Service>(`${this.apiUrl}/${serviceId}`).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<Service>(`${this.apiUrl}/${serviceId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

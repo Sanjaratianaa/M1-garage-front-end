@@ -17,7 +17,7 @@ import { SousService, SousServiceService } from 'src/app/services/services/sousS
 @Component({
     selector: 'app-sous-service',
     templateUrl: './sous-service.component.html',
-    styleUrls: ['./sous-service.component.scss'],
+    // styleUrls: ['./sous-service.component.scss'],
     standalone: true,
     imports: [
         MatTableModule,
