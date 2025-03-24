@@ -18,7 +18,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "allowedCommonJsDependencies": ["apexcharts", "bezier-easing"],
-            "outputPath": "dist/Matdash",
+            "outputPath": "dist/Matdash/browser",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
