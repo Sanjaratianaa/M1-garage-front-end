@@ -4,5 +4,5 @@
   status = 200
 
   [build]
-  publish = "browser"
+  publish = "dist/Matdash"
   command = "npm run build --prod"
