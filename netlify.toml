@@ -3,6 +3,6 @@
   to = "/index.html"
   status = 200
 
-  [build]
+[build]
   publish = "dist/Matdash"
-  command = "npm run build --prod"
+  command = "ng build --configuration production"
