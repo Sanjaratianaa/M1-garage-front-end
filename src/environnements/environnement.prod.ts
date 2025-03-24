@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://api.production.com'
+    apiUrl: 'https://m1-garage-back-end.onrender.com/api'
   };
   
