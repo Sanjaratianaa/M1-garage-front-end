@@ -31,6 +31,12 @@ export class CategorieService {
         );
     }
 
+    getCategoriesActives(): Observable<Categorie[]> {
+        return this.http.get<Categorie[]>(this.apiUrl + "/active").pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
     /**
      * Ajouter une nouvelle categorie
      */

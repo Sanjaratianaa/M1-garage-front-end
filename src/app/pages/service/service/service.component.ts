@@ -232,16 +232,3 @@ export class ServiceComponent {
   }
 
 }
-
-@Component({
-  selector: 'app-modal',
-  template: `
-  `,
-})
-export class ModalComponent {
-  constructor(public dialog: MatDialog) { }
-
-  close() {
-    this.dialog.closeAll(); // Ferme la modale
-  }
-}

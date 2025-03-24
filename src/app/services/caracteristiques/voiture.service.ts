@@ -44,7 +44,7 @@ export class VoitureService {
     constructor(private http: HttpClient) { }
 
     /**
-     * Récupérer toutes les stocks
+     * Récupérer toutes les voitures
      */
     getVoitures(): Observable<Voiture[]> {
         return this.http.get<Voiture[]>(this.apiUrl).pipe(
@@ -59,38 +59,47 @@ export class VoitureService {
     }
 
     /**
-     * Ajouter une nouvelle stock
+     * Ajouter une nouvelle voiture
      */
-    addVoiture(idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, entree: number, sortie: number, prixUnitaire: number): Observable<Voiture> {
-        const mouvementData = {
-            piece: idPiece,
-            marquePiece: marquePiece,
-            marqueVoiture: idMarque === '0' ? null : idMarque,
-            modeleVoiture: idModele === '0' ? null : idModele,
-            typeTransmission: idTypeTransmission === '0' ? null : idTypeTransmission,
-            entree: entree,
-            sortie: sortie,
-            prixUnitaire: prixUnitaire
+    addVoiture(idMarque: string, idModele: string, idCategorie: string, idTypeTransmission: string, annee: number,
+        numeroImmatriculation: string, kilometrage: number, puissanceMoteur: number, cylindree: number, capaciteReservoir: number, 
+    pressionPneusRecommande: number): Observable<Voiture> {
+        const voitureData = {
+            marque: idMarque,
+            modele: idModele,
+            categorie: idCategorie,
+            typeTransmission: idTypeTransmission,
+            annee: annee,
+            numeroImmatriculation: numeroImmatriculation,
+            kilometrage: kilometrage,
+            puissanceMoteur: puissanceMoteur,
+            cylindree: cylindree,
+            capaciteReservoir: capaciteReservoir,
+            pressionPneusRecommande: pressionPneusRecommande
+
         };
-        return this.http.post<Voiture>(this.apiUrl, mouvementData).pipe(
+
+        console.log(voitureData);
+
+        return this.http.post<Voiture>(this.apiUrl, voitureData).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Modifier une stock existante
+     * Modifier une voiture existante
      */
-    updateVoiture(stock: Voiture): Observable<Voiture> {
-        return this.http.put<Voiture>(`${this.apiUrl}/${stock._id}`, stock).pipe(
+    updateVoiture(voiture: Voiture): Observable<Voiture> {
+        return this.http.put<Voiture>(`${this.apiUrl}/${voiture._id}`, voiture).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Supprimer une stock par ID
+     * Supprimer une voiture par ID
      */
-    deleteVoiture(stockId: string): Observable<Voiture> {
-        return this.http.delete<Voiture>(`${this.apiUrl}/${stockId}`).pipe(
+    deleteVoiture(voitureId: string): Observable<Voiture> {
+        return this.http.delete<Voiture>(`${this.apiUrl}/${voitureId}`).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -102,11 +111,5 @@ export class VoitureService {
         let errorMessage = error.error.message;
         console.log("handle erreur: erreor message : " + errorMessage);
         return throwError(() => new Error(errorMessage));
-    }
-
-    getStocks(): Observable<any[]> {
-        return this.http.get<any[]>(this.apiUrl + "/stocks").pipe(
-            catchError(this.handleError) // Prix des erreurs
-        );
     }
 }

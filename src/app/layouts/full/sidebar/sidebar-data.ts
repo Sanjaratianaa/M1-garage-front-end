@@ -15,6 +15,11 @@ export const navItems: NavItem[] = [
     divider: true
   },
   {
+    displayName: 'Voiture',
+    iconName: 'solar:bill-list-line-duotone',
+    route: '/voiture',
+  },
+  {
     displayName: 'Categorie',
     iconName: 'solar:bill-list-line-duotone',
     route: '/voiture/categorie',
