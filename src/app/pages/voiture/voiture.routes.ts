@@ -6,6 +6,8 @@ import { CategorieComponent } from './categorie/categorie.component';
 import { TypeTransmissionComponent } from './type-transmission/typeTransmission.component';
 import { PieceComponent } from './piece/piece.component';
 import { GestionStockComponent } from './stock-piece/gestion-stock.component';
+import { StockComponent } from './stock-piece/stock.component';
+import { PrixPieceComponent } from './prix-piece/prix-piece.component';
 
 export const VoitureRoutes: Routes = [
   {
@@ -34,6 +36,14 @@ export const VoitureRoutes: Routes = [
       {
         path: 'piece/gestion-stock',
         component: GestionStockComponent,
+      },
+      {
+        path: 'piece/stock',
+        component: StockComponent,
+      },
+      {
+        path: 'piece/prix',
+        component: PrixPieceComponent,
       },
     ],
   },

@@ -3,7 +3,7 @@
 <!-- ============================================================== -->
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <mat-card-title>Mouvement de stocks</mat-card-title>
+    <mat-card-title>Prix des pieces</mat-card-title>
     <!-- <mat-card-subtitle>This is test page</mat-card-subtitle> -->
   </mat-card-content>
 </mat-card>
@@ -15,7 +15,7 @@
 <!-- Ajout d'un nouvel employé -->
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Faire un mouvement</button>
+    <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Ajouter un nouveau prix</button>
   </mat-card-content>
 </mat-card>
 
@@ -26,57 +26,63 @@
 <!-- ============================================================== -->
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <mat-card-title>Liste des mouvements</mat-card-title>
-    <mat-table [dataSource]="paginatedStocks" matSort class="mat-elevation-z8">
+    <mat-card-title>Liste des prix des pieces</mat-card-title>
+    <mat-table [dataSource]="paginatedPrixPieces" matSort class="mat-elevation-z8">
       <ng-container matColumnDef="piece">
         <mat-header-cell *matHeaderCellDef> Piece </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.piece.libelle }} </mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.piece.libelle }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="marquePiece">
         <mat-header-cell *matHeaderCellDef> Marque piece </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.marquePiece }} </mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.marquePiece }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="marqueVoiture">
         <mat-header-cell *matHeaderCellDef> Marque voiture </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.marqueVoiture?.libelle ? sctok.marqueVoiture.libelle : 'Tous' }} </mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.marqueVoiture?.libelle ? prix.marqueVoiture.libelle : 'Tous' }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="modeleVoiture">
         <mat-header-cell *matHeaderCellDef> Modele voiture </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.modeleVoiture?.libelle ? sctok.modeleVoiture.libelle : 'Tous' }} </mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.modeleVoiture?.libelle ? prix.modeleVoiture.libelle : 'Tous' }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="typeTransmission">
         <mat-header-cell *matHeaderCellDef> Type Transmission </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.typeTransmission?.libelle ? sctok.typeTransmission.libelle : 'Tous' }}</mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.typeTransmission?.libelle ? prix.typeTransmission.libelle : 'Tous' }}</mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="entree">
-        <mat-header-cell *matHeaderCellDef> Entrée </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.entree }} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="sortie">
-        <mat-header-cell *matHeaderCellDef> Sortie </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.sortie }} </mat-cell>
+      <ng-container matColumnDef="Date">
+        <mat-header-cell *matHeaderCellDef> Date applicatif </mat-header-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.date | date:'dd/MM/yyyy' }} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="prixUnitaire">
         <mat-header-cell *matHeaderCellDef> Prix Unitaire </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.prixUnitaire }} </mat-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.prixUnitaire }} </mat-cell>
       </ng-container>
-      
-      <ng-container matColumnDef="Date et heure">
-        <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> {{ sctok.dateHeure | date:'dd/MM/yyyy HH:mm:ss' }} </mat-cell>
-      </ng-container>
-      
+
       <ng-container matColumnDef="Manager">
         <mat-header-cell *matHeaderCellDef> Manager </mat-header-cell>
-        <mat-cell *matCellDef="let sctok"> 
-          {{ sctok.manager?.personne.nom }} {{ sctok.manager?.personne.prenom }} 
+        <mat-cell *matCellDef="let prix"> 
+          {{ prix.manager?.personne.nom }} {{ prix.manager?.personne.prenom }} 
+        </mat-cell>
+      </ng-container>
+      
+      <ng-container matColumnDef="Date d'enregistrement">
+        <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
+        <mat-cell *matCellDef="let prix"> {{ prix.dateEnregistrement | date:'dd/MM/yyyy HH:mm:ss' }} </mat-cell>
+      </ng-container>
+      
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+        <mat-cell *matCellDef="let prix">
+          <div>
+            <button mat-icon-button color="primary" (click)="editPrix(prix)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
         </mat-cell>
       </ng-container>
 
@@ -86,7 +92,7 @@
     </mat-table>
 
     <!-- Pagination -->
-    <mat-paginator [length]="stocks.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+    <mat-paginator [length]="prixPieces.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
       (page)="onPaginateChange($event)">
     </mat-paginator>
   </mat-card-content>

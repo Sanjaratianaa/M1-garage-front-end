@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { JsonPipe, NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 
 export interface Field {
   name: string;
@@ -22,7 +22,7 @@ export interface Field {
   standalone: true,
   templateUrl: './modal.component.html',
   imports: [
-    NgIf, NgFor, JsonPipe, // Import Angular Common Pipes,
+    NgIf, NgFor, // Import Angular Common Pipes,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,

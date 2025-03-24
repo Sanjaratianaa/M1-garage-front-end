@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { JsonPipe, NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
@@ -24,7 +24,7 @@ export interface Field {
   standalone: true,
   templateUrl: './prix-modal.component.html',
   imports: [
-    NgIf, NgFor, JsonPipe,
+    NgIf, NgFor,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,

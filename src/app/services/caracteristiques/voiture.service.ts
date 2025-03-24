@@ -4,18 +4,18 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
 
-export interface GestionStock {
+export interface Voiture {
     _id: string;
-    piece: {
+    client: { id: string, nom: string, prenom: string } | null;
+    marque: {
         _id: string;
         libelle: string;
     } | any,
-    marquePiece: string;
-    marqueVoiture: {
+    modele: {
         _id: string;
         libelle: string;
     } | any,
-    modeleVoiture: {
+    categorie: {
         _id: string;
         libelle: string;
     } | any,
@@ -23,26 +23,37 @@ export interface GestionStock {
         _id: string;
         libelle: string;
     } | any,
-    entree: number | 0,
-    sortie: number | 0,
-    prixUnitaire: number | 0,
-    dateHeure: Date | null;
-    manager: { id: string, nom: string, prenom: string } | null;
+    annee: number | 0,
+    numeroImmatriculation: string
+    kilometrage: number | 0,
+    puissanceMoteur: number | 0,
+    cylindree:number | 0,
+    capaciteReservoir:  number | 0,
+    pressionPneusRecommande: string,
+    dateEnregistrement: Date | null;
+    dateSuppression: Date | null;
+    etat: string;
 }
 
 @Injectable({
     providedIn: 'root'
 })
-export class GestionStockService {
-    private apiUrl = environment.apiUrl + '/stocks'; // URL API depuis le fichier d’environnement
+export class VoitureService {
+    private apiUrl = environment.apiUrl + '/voitures'; // URL API depuis le fichier d’environnement
 
     constructor(private http: HttpClient) { }
 
     /**
      * Récupérer toutes les stocks
      */
-    getGestionStocks(): Observable<GestionStock[]> {
-        return this.http.get<GestionStock[]>(this.apiUrl).pipe(
+    getVoitures(): Observable<Voiture[]> {
+        return this.http.get<Voiture[]>(this.apiUrl).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    getVoituresByClient(): Observable<Voiture[]> {
+        return this.http.get<Voiture[]>(this.apiUrl + "/client").pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -50,7 +61,7 @@ export class GestionStockService {
     /**
      * Ajouter une nouvelle stock
      */
-    addGestionStock(idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, entree: number, sortie: number, prixUnitaire: number): Observable<GestionStock> {
+    addVoiture(idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, entree: number, sortie: number, prixUnitaire: number): Observable<Voiture> {
         const mouvementData = {
             piece: idPiece,
             marquePiece: marquePiece,
@@ -61,7 +72,7 @@ export class GestionStockService {
             sortie: sortie,
             prixUnitaire: prixUnitaire
         };
-        return this.http.post<GestionStock>(this.apiUrl, mouvementData).pipe(
+        return this.http.post<Voiture>(this.apiUrl, mouvementData).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -69,8 +80,8 @@ export class GestionStockService {
     /**
      * Modifier une stock existante
      */
-    updateGestionStock(stock: GestionStock): Observable<GestionStock> {
-        return this.http.put<GestionStock>(`${this.apiUrl}/${stock._id}`, stock).pipe(
+    updateVoiture(stock: Voiture): Observable<Voiture> {
+        return this.http.put<Voiture>(`${this.apiUrl}/${stock._id}`, stock).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -78,8 +89,8 @@ export class GestionStockService {
     /**
      * Supprimer une stock par ID
      */
-    deleteGestionStock(stockId: string): Observable<GestionStock> {
-        return this.http.delete<GestionStock>(`${this.apiUrl}/${stockId}`).pipe(
+    deleteVoiture(stockId: string): Observable<Voiture> {
+        return this.http.delete<Voiture>(`${this.apiUrl}/${stockId}`).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
