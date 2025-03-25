@@ -19,7 +19,8 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Marque' ||
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
-        item.displayName === 'Pièce détachée'
+        item.displayName === 'Pièce détachée' ||
+        item.displayName === 'Voiture'
         );
 
     } else if (userRole === 'client') {
@@ -32,7 +33,8 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Marque' ||
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
-        item.displayName === 'Pièce détachée'
+        item.displayName === 'Pièce détachée' ||
+        item.displayName === 'Voiture'
       );
     } else if (userRole === 'mecanicien') {
       return (
@@ -47,7 +49,8 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Marque' ||
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
-        item.displayName === 'Pièce détachée'
+        item.displayName === 'Pièce détachée' ||
+        item.displayName === 'Voiture'
       );
     }
 
@@ -69,6 +72,11 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
     {
       navCap: 'Voiture',
       divider: true
+    },
+    {
+      displayName: 'Voiture',
+      iconName: 'solar:bill-list-line-duotone',
+      route: '/voiture',
     },
     {
       displayName: 'Categorie',
@@ -108,14 +116,16 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
           route: '/voiture/piece/gestion-stock',
         },
         {
-          displayName: 'Side Login',
-           subItemIcon: true,
-          iconName: 'solar:round-alt-arrow-right-line-duotone',
-          route: 'https://matdash-angular-main.netlify.app/authentication/boxed-login',
-          external: true,
-          chip: true,
-          chipClass: 'bg-secondary text-white',
-          chipContent: 'PRO',
+          displayName: 'Stock Piece',
+          subItemIcon: true,
+          iconName: 'solar:bill-list-line-duotone',
+          route: '/voiture/piece/stock',
+        },
+        {
+          displayName: 'Gestion Prix Piece',
+          subItemIcon: true,
+          iconName: 'solar:bill-list-line-duotone',
+          route: '/voiture/piece/prix',
         },
       ],
     },

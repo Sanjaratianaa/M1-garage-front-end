@@ -40,6 +40,19 @@ export class CategorieService {
     }
 
     /**
+     * Récupérer toutes les categories avtives
+     */
+    getCategoriesActives(): Observable<Categorie[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Categorie[]>(this.apiUrl + "/active", { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
      * Ajouter une nouvelle categorie
      */
     addCategorie(libelle: string): Observable<Categorie> {

@@ -207,7 +207,7 @@ export class SousServiceComponent {
     async addNewSousServiceAsync(): Promise<Service | undefined> {
         if (this.newSousService) {
             try {
-                const sousService = await firstValueFrom(this.souServiceService.addSousService(this.newSousService.libelle, this.newSousService.duree, this.newSousService.id_service));
+                const sousService = await firstValueFrom(this.souServiceService.addSousService(this.newSousService.libelle.trim(), this.newSousService.duree, this.newSousService.id_service));
                 console.log('Sous service ajoutée avec succès:', sousService);
                 this.sousServices.push(sousService);
 
@@ -267,7 +267,7 @@ export class SousServiceComponent {
                 console.log('Modification enregistrée:', result);
 
                 // Fusionner les données existantes de la service avec les modifications
-                const updatedData = { ...sousService, libelle: result.libelle, duree: result.duree, service: result.id_service };
+                const updatedData = { ...sousService, libelle: result.libelle.trim(), duree: result.duree, service: result.id_service };
 
                 console.log(updatedData);
 

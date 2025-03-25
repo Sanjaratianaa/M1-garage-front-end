@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
 
-export interface GestionStock {
+export interface PrixPiece {
     _id: string;
     piece: {
         _id: string;
@@ -23,18 +23,16 @@ export interface GestionStock {
         _id: string;
         libelle: string;
     } | any,
-    entree: number | 0,
-    sortie: number | 0,
     prixUnitaire: number | 0,
-    dateHeure: Date | null;
+    date: Date | null;
     manager: { id: string, nom: string, prenom: string } | null;
 }
 
 @Injectable({
     providedIn: 'root'
 })
-export class GestionStockService {
-    private apiUrl = environment.apiUrl + '/stocks'; // URL API depuis le fichier d’environnement
+export class PrixPieceService {
+    private apiUrl = environment.apiUrl + '/prixPieces'; // URL API depuis le fichier d’environnement
     private headers: HttpHeaders;
 
     constructor(private http: HttpClient) {
@@ -52,48 +50,57 @@ export class GestionStockService {
     }
 
     /**
-     * Récupérer toutes les stocks
+     * Récupérer toutes les prix des pieces
      */
-    getGestionStocks(): Observable<GestionStock[]> {
-        return this.http.get<GestionStock[]>(this.apiUrl, {headers: this.headers}).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+    getPrixPieces(): Observable<PrixPiece[]> {
+        return this.http.get<PrixPiece[]>(this.apiUrl, {headers: this.headers}).pipe(
+            catchError(this.handleError) // Prix des erreurs
         );
     }
 
     /**
      * Ajouter une nouvelle stock
      */
-    addGestionStock(idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, entree: number, sortie: number, prixUnitaire: number): Observable<GestionStock> {
+    addPrixPiece(idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, prixUnitaire: number, date: Date): Observable<PrixPiece> {
         const mouvementData = {
             piece: idPiece,
             marquePiece: marquePiece.trim().toUpperCase(),
             marqueVoiture: idMarque === '0' ? null : idMarque,
             modeleVoiture: idModele === '0' ? null : idModele,
             typeTransmission: idTypeTransmission === '0' ? null : idTypeTransmission,
-            entree: entree,
-            sortie: sortie,
-            prixUnitaire: prixUnitaire
+            prixUnitaire: prixUnitaire,
+            date: date
         };
-        return this.http.post<GestionStock>(this.apiUrl, mouvementData, {headers: this.headers}).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+        return this.http.post<PrixPiece>(this.apiUrl, mouvementData, {headers: this.headers}).pipe(
+            catchError(this.handleError) // Prix des erreurs
         );
     }
 
     /**
      * Modifier une stock existante
      */
-    updateGestionStock(stock: GestionStock): Observable<GestionStock> {
-        return this.http.put<GestionStock>(`${this.apiUrl}/${stock._id}`, stock, {headers: this.headers}).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+    updatePrixPiece(stock: PrixPiece): Observable<PrixPiece> {
+        stock.marquePiece = stock.marquePiece.toUpperCase();
+        const mouvementData = {
+            piece: stock.piece,
+            marquePiece: stock.marquePiece.toUpperCase(),
+            marqueVoiture: stock.marqueVoiture._id === '0' ? null : stock.marqueVoiture._id,
+            modeleVoiture: stock.modeleVoiture._id === '0' ? null : stock.modeleVoiture._id,
+            typeTransmission: stock.typeTransmission._id === '0' ? null : stock.typeTransmission._id,
+            prixUnitaire: stock.prixUnitaire,
+            date: stock.date,
+        };
+        return this.http.put<PrixPiece>(`${this.apiUrl}/${stock._id}`, mouvementData, {headers: this.headers}).pipe(
+            catchError(this.handleError) // Prix des erreurs
         );
     }
 
     /**
      * Supprimer une stock par ID
      */
-    deleteGestionStock(stockId: string): Observable<GestionStock> {
-        return this.http.delete<GestionStock>(`${this.apiUrl}/${stockId}`, {headers: this.headers}).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+    deletePrixPiece(stockId: string): Observable<PrixPiece> {
+        return this.http.delete<PrixPiece>(`${this.apiUrl}/${stockId}`).pipe(
+            catchError(this.handleError) // Prix des erreurs
         );
     }
 
@@ -104,11 +111,5 @@ export class GestionStockService {
         let errorMessage = error.error.message;
         console.log("handle erreur: erreor message : " + errorMessage);
         return throwError(() => new Error(errorMessage));
-    }
-
-    getStocks(): Observable<any[]> {
-        return this.http.get<any[]>(this.apiUrl + "/stocks", {headers: this.headers}).pipe(
-            catchError(this.handleError) // Prix des erreurs
-        );
     }
 }

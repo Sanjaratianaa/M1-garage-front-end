@@ -25,53 +25,6 @@ import { MatButtonModule } from '@angular/material/button';
 export class ModeleComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   modeles: Modele[];
-  // modeles: Modele[] = [
-  //   {
-  //     id: 1,
-  //     libelle: 'Peugeot',
-  //     dateEnregistrement: new Date('2024-01-10'),
-  //     manager: { id: '101', nom: 'Dupont', prenom: 'Jean' },
-  //     dateSuppression: null,
-  //     managerSuppression: null,
-  //     etat: 1
-  //   },è
-  //   {
-  //     id: 2,
-  //     libelle: 'Renault',
-  //     dateEnregistrement: new Date('2023-12-05'),
-  //     manager: { id: '102', nom: 'Martin', prenom: 'Sophie' },
-  //     dateSuppression: null,
-  //     managerSuppression: null,
-  //     etat: 1
-  //   },
-  //   {
-  //     id: 3,
-  //     libelle: 'BMW',
-  //     dateEnregistrement: new Date('2024-02-20'),
-  //     manager: { id: '103', nom: 'Durand', prenom: 'Paul' },
-  //     dateSuppression: new Date('2024-03-01'),
-  //     managerSuppression: { id: '104', nom: 'Bernard', prenom: 'Alice' },
-  //     etat: 0
-  //   },
-  //   {
-  //     id: 4,
-  //     libelle: 'Toyota',
-  //     dateEnregistrement: new Date('2024-03-05'),
-  //     manager: { id: '105', nom: 'Morel', prenom: 'Lucie' },
-  //     dateSuppression: null,
-  //     managerSuppression: null,
-  //     etat: 1
-  //   },
-  //   {
-  //     id: 5,
-  //     libelle: 'Mercedes',
-  //     dateEnregistrement: new Date('2023-11-15'),
-  //     manager: { id: '106', nom: 'Lemoine', prenom: 'Pierre' },
-  //     dateSuppression: new Date('2024-02-10'),
-  //     managerSuppression: { id: '107', nom: 'Rousseau', prenom: 'Camille' },
-  //     etat: 0
-  //   }
-  // ];
 
   paginatedModeles: Modele[] = [];
 
@@ -115,7 +68,7 @@ export class ModeleComponent {
     if (this.newModele) {
       console.log(this.newModele);
       try {
-        const modele = await firstValueFrom(this.modeleService.addModele(this.newModele));
+        const modele = await firstValueFrom(this.modeleService.addModele(this.newModele.trim()));
         console.log('Modele ajoutée avec succès:', modele);
         this.modeles.push(modele);
 
@@ -196,7 +149,7 @@ export class ModeleComponent {
         console.log('Modification enregistrée:', result);
         
         // Fusionner les données existantes de la modele avec les modifications
-        const updatedData = { ...modele, libelle: result.libelle };
+        const updatedData = { ...modele, libelle: result.libelle.trim() };
         console.log(updatedData);
 
         // Attendre la mise à jour via le service
