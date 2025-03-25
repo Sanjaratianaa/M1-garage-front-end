@@ -18,8 +18,9 @@ export class AppSideRegisterComponent {
   errorMessage = '';
 
   genderOptions = [
-    { value: 'masculin', label: 'Masculin' },
-    { value: 'feminin', label: 'Feminin' }
+    { value: 'Homme', label: 'Homme' },
+    { value: 'Femme', label: 'Femme' },
+    { value: 'Autre', label: 'Autre' }
   ];
 
   options = this.settings.getOptions();
@@ -45,11 +46,11 @@ export class AppSideRegisterComponent {
     if (this.form.valid) {
       const userData = {
         nom: this.form.value.nom!,
-        prenoms: this.form.value.prenoms!,
+        prenom: this.form.value.prenoms!,
         dateDeNaissance: this.form.value.dateDeNaissance!,
         lieuDeNaissance: this.form.value.lieuDeNaissance!,
         genre: this.form.value.genre!,
-        etat: "Valide",
+        etat: "Active",
         numeroTelephone: this.form.value.numeroTelephone!,
         email: this.form.value.email!,
         motDePasse: this.form.value.motDePasse!,
@@ -59,11 +60,11 @@ export class AppSideRegisterComponent {
       this.authService.register(userData).subscribe({
         next: (response) => {
           console.log(response);
-          this.router.navigate(['/authentification/login']);
+          this.router.navigate(['/authentication/client-login']);
         },
         error: (error) => {
           this.errorMessage = error.message;
-          console.error('Registration error:', error); // Log the full error
+          console.error('Registration error:', error);
         }
       });
     } else {

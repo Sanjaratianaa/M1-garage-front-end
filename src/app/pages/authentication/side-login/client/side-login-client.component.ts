@@ -10,19 +10,19 @@ import { NgIf } from '@angular/common'; // Import NgIf
 import { TablerIconsModule } from 'angular-tabler-icons';
 
 @Component({
-  selector: 'app-side-login',
+  selector: 'app-side-login-client',
   standalone: true,
   imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf, TablerIconsModule],
-  templateUrl: './side-login.component.html',
+  templateUrl: './side-login-client.component.html',
 })
-export class AppSideLoginComponent {
+export class AppSideLoginClientComponent {
   errorMessage = '';
 
   constructor(private router: Router, private authService: AuthentificationService) {}
 
   form = new FormGroup({
-    email: new FormControl('layah@example.com', [Validators.required, Validators.email]),
-    password: new FormControl('securePassword123', [Validators.required, Validators.minLength(6)]),
+    email: new FormControl('maria@example.com', [Validators.required, Validators.email]),
+    password: new FormControl('maria1234', [Validators.required, Validators.minLength(6)]),
   });
 
   get f() {

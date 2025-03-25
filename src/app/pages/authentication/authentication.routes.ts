@@ -1,14 +1,26 @@
 import { Routes } from '@angular/router';
 import { NoAuthGuard } from 'src/app/guard/no-auth.guard';
 
-import { AppSideLoginComponent } from './side-login/side-login.component';
+import { AppSideLoginManagerComponent } from './side-login/manager/side-login-manager.component'
+import { AppSideLoginClientComponent } from './side-login/client/side-login-client.component';
+import { AppSideLoginMecanicienComponent } from './side-login/mecanicien/side-login-mecanicien.component';
 import { AppResetPasswordComponent } from './reset-password/reset-password.component';
 import { AppSideRegisterComponent } from './side-register/side-register.component';
 
 export const AuthenticationRoutes: Routes = [
   {
-    path: 'login',
-    component: AppSideLoginComponent,
+    path: 'manager-login',
+    component: AppSideLoginManagerComponent,
+    canActivate: [NoAuthGuard]
+  },
+  {
+    path: 'mecanicien-login',
+    component: AppSideLoginMecanicienComponent,
+    canActivate: [NoAuthGuard]
+  },
+  {
+    path: 'client-login',
+    component: AppSideLoginClientComponent,
     canActivate: [NoAuthGuard]
   },
   {
@@ -22,8 +34,8 @@ export const AuthenticationRoutes: Routes = [
     canActivate: [NoAuthGuard]
   },
   {
-    path: '',  // Add this: default route within authentication
-    redirectTo: 'login',
+    path: '',
+    redirectTo: 'client-login',
     pathMatch: 'full'
   }
 ];
