@@ -40,16 +40,16 @@ export class PersonneComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
-    this.getAllPersonnes();
+    this.getAllEmployésActive();
   }
 
-  getAllPersonnes() {
-    this.personneService.getPersonnes().subscribe({
-      next: (personnes) => {
+  getAllEmployésActive() {
+    this.personneService.getActiveByRole('mécanicien').subscribe({
+      next: (utilisateurs) => {
         
-        console.log(personnes);
+        console.log(utilisateurs);
 
-        this.personnes = personnes;
+        this.personnes = utilisateurs.map((utilisateur) => utilisateur.personne);
         this.updatePagination();
       },
       error: (error) => {
@@ -144,7 +144,8 @@ export class PersonneComponent {
             numeroTelephone: result.numeroTelephone,
             email: result.email,
             motDePasse: "",
-            idRole: "Mécanicien"
+            idRole: "Mécanicien",
+            dateEmbauche: result.dateEmbauche
           };
 
           await this.addNewPersonneAsync();

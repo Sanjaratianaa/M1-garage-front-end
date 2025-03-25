@@ -20,6 +20,15 @@ export interface Personne {
     etat: string;
 }
 
+export interface Utilisateur {
+    _id: string;
+    personne: Personne;
+    idRole: string;
+    etat: string;
+    dateInscription: Date;
+    matricule: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -34,6 +43,15 @@ export class PersonneService {
     getPersonnes(): Observable<Personne[]> {
         return this.http.get<Personne[]>(this.apiUrl).pipe(
             catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
+     * Récupérer toutes les employés actives
+     */
+    getActiveByRole(role: string): Observable<Utilisateur[]> {
+        return this.http.get<Utilisateur[]>(`${environment.apiUrl}/utilisateur/active-utilisateurs-by-role?role=${role}`).pipe(
+            catchError(this.handleError)
         );
     }
 
