@@ -8,9 +8,11 @@ import { FormsModule } from '@angular/forms';
 import { CalendarView, CalendarModule, CalendarEvent } from 'angular-calendar';
 import { Subject } from 'rxjs';
 import { isSameDay, isSameMonth } from 'date-fns';
+import { MatDialog } from '@angular/material/dialog';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { addMonths, subMonths } from 'date-fns';
+import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
 
 @Component({
     selector: 'app-calendar',
@@ -37,7 +39,13 @@ export class CalendarComponent {
     activeDayIsOpen: boolean = true;
     refresh = new Subject<void>();
 
-    constructor() {}
+    options = [
+        { value: 'Homme', label: 'Homme' },
+        { value: 'Femme', label: 'Femme' },
+        { value: 'Autre', label: 'Autre' }
+      ];
+
+    constructor(private dialog: MatDialog,) {}
 
     setView(view: CalendarView) {
         this.view = view;
@@ -62,6 +70,42 @@ export class CalendarComponent {
     async addEvent() {
         console.log('Event added');
     }
+
+    async openModal(errorMessage: string = '') {
+            const data = {
+                title: 'Prendre un nouveau rendez-vous',
+                fields: [
+                    {
+                        name: 'id_voiture', label: 'Voiture', type: 'select', required: true, defaultValue: "haha",
+                        options: this.options
+                    },
+                    {
+                        name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true, defaultValue: "haha",
+                        options: this.options
+                    },
+                    { name: 'dateSouhaite', label: 'Date du rendez-vous souhaité', type: 'datetime-local', required: true, defaultValue: "haha" }
+                ],
+                submitText: 'Ajouter',
+                errorMessage: errorMessage,
+            };
+    
+            const dialogRef = this.dialog.open(GenericModalComponent, {
+                width: '400px',
+                data: data,
+            });
+    
+            dialogRef.afterClosed().subscribe(async result => {
+                if (result) {
+                    try {
+                        this.openModal();
+                        console.log('Données du formulaire:', result);
+                    } catch (error: any) {
+                        console.error('Erreur lors de l’ajout:', error.message);
+                        await this.openModal(error.message.replace("Error: ", ""));
+                    }
+                }
+            });
+        }
 
     // Navigation functions
     previousMonth(): void {
