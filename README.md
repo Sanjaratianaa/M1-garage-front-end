@@ -1,1 +1,2 @@
-# M1-garage-front-end
+# Modernize-Angular-pro
+Modernize Angular Admin Dashboard
