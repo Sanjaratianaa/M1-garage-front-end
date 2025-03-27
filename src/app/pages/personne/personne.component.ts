@@ -9,24 +9,23 @@ import { PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
 import { GenericModalComponent } from '../../components/modal-generique/add-modal/modal.component';
 import { DeleteConfirmationModalComponent } from '../../components/modal-generique/confirm-modal/delete-confirmation-modal.component';
-import { PersonneService } from 'src/app/services/personne/personne.service';
-import { Personne } from 'src/app/services/personne/personne.service';
+import { PersonneService, Utilisateur } from 'src/app/services/personne/personne.service';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
-  selector: 'app-service',
+  selector: 'app-mecanicien',
   standalone: true,
   templateUrl: './personne.component.html',
   imports: [MatListModule, MatCardModule, DatePipe, MatIconModule, MaterialModule, FormsModule, CommonModule, MatButtonModule],
 
 })
 export class PersonneComponent {
-  displayedColumns: string[] = ['Nom', "Prenoms", "Email", "Date Naissance", "Lieu Naissance", "Date Embauche", "Date Suppression", "Statut", 'actions'];
-  personnes: Personne[];
+  displayedColumns: string[] = ['Nom', "Prenoms", "Email", "Date Naissance", "Lieu Naissance", "Date Embauche", "Matricule", "Date Suppression", "Statut", 'actions'];
+  utilisateurs: Utilisateur[];
 
-  paginatedPersonnes: Personne[] = [];
+  paginatedUtilisateurs: Utilisateur[] = [];
 
   // Nouveau employé à ajouter
   newPersonne: any = {};
@@ -40,21 +39,19 @@ export class PersonneComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
-    this.getAllEmployésActive();
+    this.getAllEmployés();
   }
 
-  getAllEmployésActive() {
-    this.personneService.getActiveByRole('mécanicien').subscribe({
+  getAllEmployés() {
+    this.personneService.getAllByRole('mécanicien').subscribe({
       next: (utilisateurs) => {
-        
         console.log(utilisateurs);
-
-        this.personnes = utilisateurs.map((utilisateur) => utilisateur.personne);
+        this.utilisateurs = utilisateurs;
         this.updatePagination();
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des personnes:', error.message);
-        alert('Impossible de charger les personnes. Veuillez réessayer plus tard.');
+        console.error('Erreur lors du chargement des utilisateurs:', error.message);
+        alert('Impossible de charger les utilisateurs. Veuillez réessayer plus tard.');
       }
     });
 
@@ -63,28 +60,28 @@ export class PersonneComponent {
   updatePagination() {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedPersonnes = this.personnes.slice(startIndex, endIndex);
+    this.paginatedUtilisateurs = this.utilisateurs.slice(startIndex, endIndex);
   }
 
 
-  async addNewPersonneAsync(): Promise<Personne | undefined> {
+  async addNewPersonneAsync() {
     if (this.newPersonne) {
       console.log(this.newPersonne);
       try {
         const personne = await firstValueFrom(this.personneService.addPersonne(this.newPersonne));
         console.log('Personne ajoutée avec succès:', personne);
-        this.personnes.push(personne);
+        this.utilisateurs.push(personne);
 
         // Calculer le nombre total d'éléments dans la page actuelle
         const startIndex = this.currentPage * this.pageSize;
         const endIndex = startIndex + this.pageSize;
 
         // Vérifier si la page actuelle a encore de la place
-        if (this.personnes.length > startIndex && this.personnes.length <= endIndex) {
+        if (this.utilisateurs.length > startIndex && this.utilisateurs.length <= endIndex) {
           // La page actuelle a encore de la place, on reste dessus
         } else {
           // Aller à la dernière page si la page actuelle est pleine
-          this.currentPage = Math.floor((this.personnes.length - 1) / this.pageSize);
+          this.currentPage = Math.floor((this.utilisateurs.length - 1) / this.pageSize);
         }
 
         this.updatePagination();
@@ -107,7 +104,7 @@ export class PersonneComponent {
       title: 'Ajouter un nouveau Personne',
       fields: [
         { name: 'nom', label: 'Nom', type: 'text', required: true, defaultValue: this.newPersonne.nom },
-        { name: 'prenoms', label: 'Prenoms', type: 'text', required: true, defaultValue: this.newPersonne.prenoms },
+        { name: 'prenom', label: 'Prenoms', type: 'text', required: true, defaultValue: this.newPersonne.prenom },
         { name: 'email', label: 'Email', type: 'email', required: true, defaultValue: this.newPersonne.email },
         { name: 'numeroTelephone', label: 'Numero de téléphone', type: 'text', required: true, defaultValue: this.newPersonne.numeroTelephone },
         { name: 'dateDeNaissance', label: 'Date de naissance', type: 'date', required: true, defaultValue: this.newPersonne.dateDeNaissance },
@@ -116,8 +113,8 @@ export class PersonneComponent {
         {
           name: 'genre', label: 'Genre', type: 'select', required: true,
           options: [
-            {value: "Homme", label: "Homme"},
-            {value: "Femme", label: "Femme"}
+            { value: "Homme", label: "Homme" },
+            { value: "Femme", label: "Femme" }
           ]
         },
       ],
@@ -136,7 +133,7 @@ export class PersonneComponent {
           console.log('Données du formulaire:', result);
           this.newPersonne = {
             nom: result.nom,
-            prenom: result.prenoms,
+            prenom: result.prenom,
             dateDeNaissance: result.dateDeNaissance,
             lieuDeNaissance: result.lieuDeNaissance,
             genre: result.genre,
@@ -158,11 +155,24 @@ export class PersonneComponent {
   }
 
   // Méthode pour ouvrir le modal en mode édition
-  async openEditModal(personne: Personne, errorMessage: string = ''): Promise<void> {
+  async openEditModal(utilisateur: Utilisateur, errorMessage: string = ''): Promise<void> {
     const data = {
       title: 'Modifier une personne',
       fields: [
-        { name: 'libelle', label: 'Nom', type: 'text', required: true, defaultValue:"test" }
+        { name: 'nom', label: 'Nom', type: 'text', required: true, defaultValue: utilisateur.personne.nom },
+        { name: 'prenom', label: 'Prenoms', type: 'text', required: true, defaultValue: utilisateur.personne.prenom },
+        { name: 'email', label: 'Email', type: 'email', required: true, defaultValue: utilisateur.personne.email },
+        { name: 'numeroTelephone', label: 'Numero de téléphone', type: 'text', required: true, defaultValue: utilisateur.personne.numeroTelephone },
+        { name: 'dateDeNaissance', label: 'Date de naissance', type: 'date', required: true, defaultValue: utilisateur.personne.dateDeNaissance ? new Date(utilisateur.personne.dateDeNaissance).toISOString().split('T')[0] : "" },
+        { name: 'lieuDeNaissance', label: 'Lieu de naissance', type: 'text', required: true, defaultValue: utilisateur.personne.lieuDeNaissance },
+        { name: 'dateEmbauche', label: "Date d'embauche", type: 'date', required: true, defaultValue: utilisateur.dateEmbauche ? new Date(utilisateur.dateEmbauche).toISOString().split('T')[0] : "" },
+        {
+          name: 'genre', label: 'Genre', type: 'select', required: true, defaultValue: utilisateur.personne.genre,
+          options: [
+            { value: "Homme", label: "Homme" },
+            { value: "Femme", label: "Femme" }
+          ]
+        },
       ],
       submitText: 'Modifier',
       errorMessage: errorMessage
@@ -176,21 +186,25 @@ export class PersonneComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        
-        // Fusionner les données existantes de la personne avec les modifications
-        const updatedData = { ...personne, libelle: result.libelle };
-        console.log(updatedData);
 
+        // Fusionner les données existantes de la personne avec les modifications
+        const updatedData = {
+          ...utilisateur, personne: {...utilisateur.personne, nom: result.nom, prenom: result.prenom, dateDeNaissance: result.dateDeNaissance,
+          lieuDeNaissance: result.lieuDeNaissance, genre: result.genre, numeroTelephone: result.numeroTelephone,
+          email: result.email}, dateEmbauche: result.dateEmbauche
+        };
+        
         // Attendre la mise à jour via le service
         const updatedPersonne = await firstValueFrom(this.personneService.updatePersonne(updatedData));
+        console.log(updatedPersonne);
 
         // Mettre à jour la liste locale
-        const index = this.personnes.findIndex(mq => mq._id === personne._id);
+        const index = this.utilisateurs.findIndex(mq => mq._id === utilisateur._id);
         if (index !== -1) {
-          this.personnes[index] = updatedPersonne;
+          this.utilisateurs[index] = updatedPersonne;
           this.updatePagination(); // Rafraîchir la liste affichée
         }
       }
@@ -198,29 +212,29 @@ export class PersonneComponent {
       console.error('Erreur lors de la modification:', error.message);
       alert('Erreur lors de la modification: ' + error.message);
       // Réouvrir la modale en passant le message d'erreur
-      await this.openEditModal(personne, error.message);
+      await this.openEditModal(utilisateur, error.message);
     }
   }
 
 
   // Méthode appelée lorsqu'on clique sur "Modifier"
-  async editPersonne(personne: Personne) {
-    await this.openEditModal(personne);
+  async editUtilisateur(utilisateur: Utilisateur) {
+    await this.openEditModal(utilisateur);
   }
 
   // Ouvrir la modale de confirmation avant de supprimer un employé
-  openDeleteConfirmation(personne: Personne): void {
+  openDeleteConfirmation(utilisateur: Utilisateur): void {
     const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ personne.nom }" comme personne ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${utilisateur.personne.nom}" comme mécanicien ? Cette action est irréversible.`
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.deletePersonne(personne._id); // Si l'utilisateur confirme, supprimer l'employé
+        this.deleteUtilisateur(utilisateur._id); // Si l'utilisateur confirme, supprimer l'employé
       } else {
         console.log('Suppression annulée');
       }
@@ -228,21 +242,21 @@ export class PersonneComponent {
   }
 
   // Fonction de suppression d'un employé
-  async deletePersonne(personneId: string) {
-  
+  async deleteUtilisateur(utilisateurId: string) {
+
     try {
       // Appel API pour supprimer la personne
-      const deletedPersonne = await lastValueFrom(this.personneService.deletePersonne(personneId));
+      const deletedUtilisateur = await lastValueFrom(this.personneService.deletePersonne(utilisateurId));
 
       // Vérification si la suppression a bien été effectuée
-      if (deletedPersonne && deletedPersonne.dateSuppression) {
+      if (deletedUtilisateur && deletedUtilisateur?.dateSuppression) {
         // Mise à jour locale en modifiant l'état au lieu de supprimer
-        const index = this.personnes.findIndex(mq => mq._id === personneId);
+        const index = this.utilisateurs.findIndex(mq => mq._id === utilisateurId);
         if (index !== -1) {
-          this.personnes[index] = deletedPersonne; // Mettre à jour l'objet avec la version renvoyée
+          this.utilisateurs[index] = deletedUtilisateur; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
-      } 
+      }
 
     } catch (error: any) {
       console.error('Erreur lors de la suppression:', error);
@@ -250,8 +264,8 @@ export class PersonneComponent {
       alert(errorMessage); // Affiche l'erreur à l'utilisateur
     }
   }
-  
-  
+
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

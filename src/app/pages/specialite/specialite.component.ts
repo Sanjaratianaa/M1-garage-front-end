@@ -12,18 +12,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { ServiceService } from 'src/app/services/services/service.service';
 import { SousServiceService } from 'src/app/services/services/sousService.service';
 import { Specialite, SpecialiteService } from 'src/app/services/personne/specialite.service';
-import { PersonneComponent } from '../personne/personne.component';
+import { PersonneService } from 'src/app/services/personne/personne.service';
+import { SpecialiteModalComponent } from './add-specialite/specialite-modal.component';
+import { DeleteConfirmationModalComponent } from 'src/app/components/modal-generique/confirm-modal/delete-confirmation-modal.component';
 
 
 @Component({
-  selector: 'app-prix-sousservice',
+  selector: 'app-specialite',
   standalone: true,
-  templateUrl: './prixSousService.component.html',
+  templateUrl: './specialite.component.html',
   imports: [MatListModule, MatCardModule, DatePipe, MatIconModule, MaterialModule, FormsModule, CommonModule, MatButtonModule],
 
 })
 export class SpecialiteComponent {
-  columns: string[] = ['service', 'sous service', 'duree', 'Date', 'prixUnitaire', 'Manager', 'Date d\'enregistrement', 'actions'];
+  columns: string[] = ['Service', 'Specialite', 'Mecanicien', 'Date d\'enregistrement', 'Manager', 'Date suppression', 'Manager Suppression', 'Statut', 'actions'];
 
   specialites: Specialite[];
   services: any[] = [];
@@ -32,7 +34,7 @@ export class SpecialiteComponent {
 
   paginatedSpecialites: Specialite[] = [];
 
-  newSpecialite: any = {id_sous_service: '', id_service: '', id_mecanicien: ''};
+  newSpecialite: any = { id_sous_service: '', id_service: '', id_mecanicien: '' };
 
   // Paramètres de pagination
   pageSize = 5;
@@ -40,11 +42,11 @@ export class SpecialiteComponent {
   pageSizeOptions = [5, 10, 20];
 
   constructor(
-    private dialog: MatDialog, 
+    private dialog: MatDialog,
     private specialiteService: SpecialiteService,
-    private serviceService: ServiceService, 
+    private serviceService: ServiceService,
     private sousServiceService: SousServiceService,
-    private mecanicienService: PersonneComponent
+    private mecanicienService: PersonneService
   ) { }
 
   ngOnInit() {
@@ -52,13 +54,18 @@ export class SpecialiteComponent {
     this.getAllSpecialite();
     this.getAllServicesActives();
     this.getAllSousServicesActives();
+    this.getAllMecaniciensActives();
   }
 
-  getAllMecaniciens() {
-    this.mecanicienService.getAllPersonnes().subscribe({
+  getAllMecaniciensActives() {
+    this.mecanicienService.getActiveByRole("mécanicien").subscribe({
       next: (mecaniciens) => {
-        
+
         console.log(mecaniciens);
+        this.mecaniciens = mecaniciens.map(mecanicien => ({
+          value: mecanicien._id,
+          label: `${mecanicien.personne.prenom} ${mecanicien.personne.nom}`
+        }));
 
         // this.mecaniciens = mecaniciens;
       },
@@ -78,40 +85,40 @@ export class SpecialiteComponent {
         this.updatePagination();
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des prix des sous services:', error.message);
-        alert('Impossible de charger les prix sous services. Veuillez réessayer plus tard.');
+        console.error('Erreur lors du chargement du liste des specialites:', error.message);
+        alert('Impossible de charger la liste des specialites. Veuillez réessayer plus tard.');
       }
     });
   }
 
   getAllServicesActives() {
     this.serviceService.getServicesActives().subscribe({
-        next: (services) => {
-            this.services = services.map(service => ({
-                value: service._id,
-                label: service.libelle
-            }));
-        },
-        error: (error) => {
-            console.error('Erreur lors du chargement des services:', error.message);
-            alert('Impossible de charger les services. Veuillez réessayer plus tard.');
-        }
+      next: (services) => {
+        this.services = services.map(service => ({
+          value: service._id,
+          label: service.libelle
+        }));
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des services:', error.message);
+        alert('Impossible de charger les services. Veuillez réessayer plus tard.');
+      }
     });
   }
 
   getAllSousServicesActives() {
     this.sousServiceService.getSousServicesActives().subscribe({
-        next: (sousServices) => {
-            this.sousServices = sousServices.map(sousService => ({
-                value: sousService._id,
-                label: sousService.libelle,
-                serviceId: sousService.service._id
-            }));
-        },
-        error: (error) => {
-            console.error('Erreur lors du chargement des sous Services:', error.message);
-            alert('Impossible de charger les sous Services. Veuillez réessayer plus tard.');
-        }
+      next: (sousServices) => {
+        this.sousServices = sousServices.map(sousService => ({
+          value: sousService._id,
+          label: sousService.libelle,
+          serviceId: sousService.service._id
+        }));
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des sous Services:', error.message);
+        alert('Impossible de charger les sous Services. Veuillez réessayer plus tard.');
+      }
     });
   }
 
@@ -126,9 +133,10 @@ export class SpecialiteComponent {
     if (this.newSpecialite) {
       console.log(this.newSpecialite);
       try {
-        const prix = await firstValueFrom(this.specialiteService.addSpecialite(this.newSpecialite.id_sous_service, this.newSpecialite.date, this.newSpecialite.prix));
-        console.log('prix ajoutée avec succès:', prix);
-        this.specialites.push(prix);
+        const specialite = await firstValueFrom(this.specialiteService.addSpecialite(this.newSpecialite.id_sous_service, this.newSpecialite.id_mecanicien));
+        console.log('specialite ajoutée avec succès:', specialite);
+
+        this.specialites.push(specialite);
 
         // Calculer le nombre total d'éléments dans la page actuelle
         const startIndex = this.currentPage * this.pageSize;
@@ -143,8 +151,8 @@ export class SpecialiteComponent {
         }
 
         this.updatePagination();
-        this.newSpecialite = {id_sous_service: '', date: null, prix: 0};
-        return prix;
+        this.newSpecialite = { id_sous_service: '', id_service: '', id_mecanicien: '' };
+        return specialite;
       } catch (error: any) {
         console.error('Erreur lors de l’ajout de la service:', error);
         const errorMessage = error.error && error.error.message ? error.error.message : error.toString();
@@ -155,8 +163,9 @@ export class SpecialiteComponent {
   }
 
   async openModal(errorMessage: string = '') {
+    this.newSpecialite = { id_sous_service: '', id_service: '', id_mecanicien: '' };
     const data = {
-      title: 'Ajouter un prix de sous-service',
+      title: 'Ajouter une spécialité à un mécanicien',
       fields: [
         {
           name: 'id_service', label: 'Service', type: 'select', required: true,
@@ -167,25 +176,15 @@ export class SpecialiteComponent {
           options: this.sousServices, defaultValue: this.newSpecialite.id_sous_service
         },
         {
-          name: "prix",
-          label: "Prix en Ar",
-          type: "number",
-          required: true,
-          defaultValue: this.newSpecialite.prix  // Valeur par défaut pour le champ prix
-        },
-        {
-          name: "date",
-          label: "Date",
-          type: "date",
-          required: true,
-          defaultValue: this.newSpecialite.date  // Valeur par défaut pour le champ date
+          name: 'id_mecanicien', label: 'Mecanicien', type: 'select', required: true,
+          options: this.mecaniciens, defaultValue: this.newSpecialite.id_mecanicien
         }
       ],
       submitText: 'Ajouter',
       errorMessage: errorMessage
     };
 
-    const dialogRef = this.dialog.open(PrixModalComponent, {
+    const dialogRef = this.dialog.open(SpecialiteModalComponent, {
       width: '400px',
       data: data,
     });
@@ -205,40 +204,30 @@ export class SpecialiteComponent {
   }
 
   // Méthode pour ouvrir le modal en mode édition
-  async openEditModal(prixSousService: Specialite, errorMessage: string = ''): Promise<void> {
+  async openEditModal(specialite: Specialite, errorMessage: string = ''): Promise<void> {
 
-    console.log(prixSousService);
+    console.log(specialite);
     const data = {
-      title: 'Modifier un prix de sous-service',
+      title: 'Modifier une spécialité',
       fields: [
         {
           name: 'id_service', label: 'Service', type: 'select', required: true,
-          options: this.services, defaultValue: prixSousService.sousService.service._id 
+          options: this.services, defaultValue: specialite.sousService.service._id
         },
         {
           name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
-          options: this.sousServices, defaultValue: prixSousService.sousService._id 
+          options: this.sousServices, defaultValue: specialite.sousService._id
         },
         {
-          name: "prix",
-          label: "Prix en Ar",
-          type: "number",
-          required: true,
-          defaultValue: prixSousService.prixUnitaire  // Valeur par défaut pour le champ prix
-        },
-        {
-          name: "date",
-          label: "Date",
-          type: "date",
-          required: true,
-          defaultValue: prixSousService.date ? new Date(prixSousService.date).toISOString().split('T')[0] : ""   // Valeur par défaut pour le champ date
+          name: 'id_mecanicien', label: 'Mecanicien', type: 'select', required: true,
+          options: this.mecaniciens, defaultValue: specialite.mecanicien?._id
         }
       ],
       submitText: 'Modifier',
       errorMessage: errorMessage
     };
 
-    const dialogRef = this.dialog.open(PrixModalComponent, {
+    const dialogRef = this.dialog.open(SpecialiteModalComponent, {
       width: '400px',
       data: data,
     });
@@ -246,22 +235,21 @@ export class SpecialiteComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        this.newSpecialite = result;
-        // Fusionner les données existantes de la prixSousService avec les modifications
-        const updatedData = { ...prixSousService, sousService: this.newSpecialite.id_sous_service, 
-          prixUnitaire: this.newSpecialite.prix, date: this.newSpecialite.date};
+        // Fusionner les données existantes de la specialite avec les modifications
+        const updatedData = {
+          ...specialite, sousService: result.id_sous_service,
+          mecanicien: result.id_mecanicien
+        };
         console.log(updatedData);
 
-        this.newSpecialite = {id_sous_service: '', date: null, prix: 0};
-
-        // Attendre la mise à jour via le prixSousService
+        // Attendre la mise à jour via le specialite
         const updatedService = await firstValueFrom(this.specialiteService.updateSpecialite(updatedData));
 
         // Mettre à jour la liste locale
-        const index = this.specialites.findIndex(mq => mq._id === prixSousService._id);
+        const index = this.specialites.findIndex(mq => mq._id === specialite._id);
         if (index !== -1) {
           this.specialites[index] = updatedService;
           this.updatePagination(); // Rafraîchir la liste affichée
@@ -271,17 +259,61 @@ export class SpecialiteComponent {
       console.error('Erreur lors de la modification:', error.message);
       alert('Erreur lors de la modification: ' + error.message);
       // Réouvrir la modale en passant le message d'erreur
-      await this.openEditModal(prixSousService, error.message);
+      await this.openEditModal(specialite, error.message);
     }
   }
 
-
   // Méthode appelée lorsqu'on clique sur "Modifier"
-  async editPrix(prixSousService: Specialite) {
-    await this.openEditModal(prixSousService);
+  async editSpecialite(specialite: Specialite) {
+    await this.openEditModal(specialite);
   }
 
-  
+  // Ouvrir la modale de confirmation avant de supprimer un employé
+  openDeleteConfirmation(specialite: Specialite): void {
+    const dialogRef = this.dialog.open(DeleteConfirmationModalComponent, {
+      width: '400px',
+      data: {
+        title: 'Confirmer la suppression',
+        message: `Êtes-vous sûr de vouloir supprimer le specialité "${specialite.sousService.libelle}" comme specialité pour le "${specialite.mecanicien?.personne.prenom} ${specialite.mecanicien?.personne.nom}" ? 
+            Cette action est irréversible.`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log("hamafa eoo")
+        this.deleteSpecialite(specialite._id); // Si l'utilisateur confirme, supprimer l'employé
+      } else {
+        console.log('Suppression annulée');
+      }
+    });
+  }
+
+  // Fonction de suppression d'un employé
+  async deleteSpecialite(specialiteId: string) {
+
+    try {
+      // Appel API pour supprimer la service
+      const deletedSpecialite = await lastValueFrom(this.specialiteService.deleteSpecialite(specialiteId));
+      console.log(deletedSpecialite);
+
+      // Vérification si la suppression a bien été effectuée
+      if (deletedSpecialite && deletedSpecialite.dateSuppression) {
+        // Mise à jour locale en modifiant l'état au lieu de supprimer
+        const index = this.specialites.findIndex(mq => mq._id === specialiteId);
+        if (index !== -1) {
+          this.specialites[index] = deletedSpecialite; // Mettre à jour l'objet avec la version renvoyée
+          this.updatePagination(); // Rafraîchir la liste affichée
+        }
+      }
+
+    } catch (error: any) {
+      console.error('Erreur lors de la suppression:', error);
+      const errorMessage = error.error?.message || 'Erreur inconnue lors de la suppression.';
+      alert(errorMessage); // Affiche l'erreur à l'utilisateur
+    }
+  }
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

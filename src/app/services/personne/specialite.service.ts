@@ -6,7 +6,7 @@ import { environment } from 'src/environnements/environnement'; // Import de lâ€
 
 export interface Specialite {
     _id: string;
-    mecanicien: { id: string, nom: string, prenom: string } | null;
+    mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
     sousService: {
         _id: string;
         libelle: string;
@@ -16,9 +16,9 @@ export interface Specialite {
         }
     }
     dateEnregistrement: Date | null;
-    manager: { id: string, nom: string, prenom: string } | null;
+    manager: { _id: string, personne: {nom: string, prenom: string} } | null;
     dateSuppression: Date | null;
-    managerSuppression: { id: string, nom: string, prenom: string } | null;
+    managerSuppression: { _id: string, personne: {nom: string, prenom: string} } | null;
     etat: string;
 }
 

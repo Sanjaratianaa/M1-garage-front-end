@@ -36,7 +36,7 @@ export interface Field {
     MatNativeDateModule
   ],
 })
-export class PrixModalComponent implements OnInit {
+export class SpecialiteModalComponent implements OnInit {
   form: FormGroup;
   @Input() title: string = '';
   @Input() fields: any[] = [];
@@ -50,7 +50,7 @@ export class PrixModalComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<PrixModalComponent>,
+    public dialogRef: MatDialogRef<SpecialiteModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
