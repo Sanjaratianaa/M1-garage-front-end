@@ -52,6 +52,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/calendar/calendar.routes').then((m) => m.CalendarRoutes),
       },
+      {
+        path: 'specialite',
+        loadChildren: () =>
+          import('./pages/specialite/specialite.routes').then((m) => m.SpecialiteRoutes),
+      },
     ],
   },
   {

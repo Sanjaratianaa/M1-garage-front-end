@@ -14,9 +14,6 @@ export interface Personne {
     numeroTelephone: string;
     email: string;
     motDePasse: string;
-    idRole: string;
-    dateEmbauche: Date | any;
-    dateSuppression: Date | any;
     etat: string;
 }
 
@@ -27,6 +24,9 @@ export interface Utilisateur {
     etat: string;
     dateInscription: Date;
     matricule: string;
+    dateEmbauche: Date | any;
+    dateEnregistrement: Date |any;
+    dateSuppression: Date | any;
 }
 
 @Injectable({
@@ -34,6 +34,8 @@ export interface Utilisateur {
 })
 export class PersonneService {
     private apiUrl = environment.apiUrl + '/personne';
+
+    private utilisateurApiUrl = environment.apiUrl + '/utilisateur';
 
     constructor(private http: HttpClient) { }
 
@@ -55,11 +57,17 @@ export class PersonneService {
         );
     }
 
+    getAllByRole(role: string): Observable<Utilisateur[]> {
+        return this.http.get<Utilisateur[]>(`${environment.apiUrl}/utilisateur/utilisateurs-by-role?role=${role}`).pipe(
+            catchError(this.handleError)
+        );
+    }
+
     /**
      * Ajouter une nouvelle personne
      */
-    addPersonne(personneData: any): Observable<Personne> {
-        return this.http.post<Personne>(environment.apiUrl + '/auth/register', personneData).pipe(
+    addPersonne(personneData: any): Observable<Utilisateur> {
+        return this.http.post<Utilisateur>(environment.apiUrl + '/auth/register', personneData).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -67,8 +75,11 @@ export class PersonneService {
     /**
      * Modifier une personne existante
      */
-    updatePersonne(personne: Personne): Observable<Personne> {
-        return this.http.put<Personne>(`${this.apiUrl}/${personne._id}`, personne).pipe(
+    updatePersonne(utilisateur: Utilisateur): Observable<Utilisateur> {
+        this.http.put<Personne>(`${this.apiUrl}/${utilisateur.personne._id}`, utilisateur.personne).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+        return this.http.put<Utilisateur>(`${this.utilisateurApiUrl}/${utilisateur._id}`, utilisateur).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -76,8 +87,8 @@ export class PersonneService {
     /**
      * Supprimer une personne par ID
      */
-    deletePersonne(personneId: string): Observable<Personne> {
-        return this.http.delete<Personne>(`${this.apiUrl}/${personneId}`).pipe(
+    deletePersonne(utilisateurId: string): Observable<Utilisateur> {
+        return this.http.delete<Utilisateur>(`${this.utilisateurApiUrl}/${utilisateurId}`).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

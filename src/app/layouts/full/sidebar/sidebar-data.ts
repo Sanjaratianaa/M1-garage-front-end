@@ -8,7 +8,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
 
     if (userRole === 'manager') {
       return (
-        item.displayName === 'Employee' ||
+        item.displayName === 'Mecanicien' ||
         item.displayName === 'Dashboard' ||
         item.displayName === 'Service' ||
         item.displayName === 'Sous Service' ||
@@ -20,8 +20,9 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
         item.displayName === 'Pièce détachée' ||
-        item.displayName === 'Voiture'
-        );
+        item.displayName === 'Voiture' ||
+        item.displayName === 'Specialité'
+      );
 
     } else if (userRole === 'client') {
       return (
@@ -50,7 +51,8 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
         item.displayName === 'Pièce détachée' ||
-        item.displayName === 'Voiture'
+        item.displayName === 'Voiture' ||
+        item.displayName === 'Specialité'
       );
     }
 
@@ -105,7 +107,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       children: [
         {
           displayName: 'Piece',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:bill-list-line-duotone',
           route: '/voiture/piece',
         },
@@ -152,12 +154,18 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
 
     {
       divider: true,
-      navCap: 'Apps',
+      navCap: 'MECANICIEN',
     },
     {
-      displayName: 'Employee',
+      displayName: 'Mecanicien',
       iconName: 'solar:user-id-line-duotone',
       route: '/personne',
+      chip: true,
+    },
+    {
+      displayName: 'Specialité',
+      iconName: 'solar:bill-list-line-duotone',
+      route: '/specialite',
       chip: true,
     },
     {
@@ -559,7 +567,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Button',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/forms/forms-elements/button',
           external: true,
@@ -569,7 +577,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Checkbox',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/forms/forms-elements/checkbox',
           external: true,
@@ -579,7 +587,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Radio',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/forms/forms-elements/radio',
           external: true,
@@ -589,7 +597,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Datepicker',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/forms/forms-elements/datepicker',
           external: true,
@@ -659,7 +667,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       children: [
         {
           displayName: 'Basic Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/basic-table',
           external: true,
@@ -669,7 +677,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Dynamic Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/dynamic-table',
           external: true,
@@ -679,7 +687,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Expand Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/expand-table',
           external: true,
@@ -689,7 +697,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Filterable Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/filterable-table',
           external: true,
@@ -699,7 +707,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Footer Row Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/footer-row-table',
           external: true,
@@ -709,7 +717,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'HTTP Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/http-table',
           external: true,
@@ -719,7 +727,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Mix Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/mix-table',
           external: true,
@@ -729,7 +737,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Multi Header Footer',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/multi-header-footer-table',
           external: true,
@@ -739,7 +747,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Pagination Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/pagination-table',
           external: true,
@@ -749,7 +757,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Row Context Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/row-context-table',
           external: true,
@@ -759,7 +767,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Selection Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/selection-table',
           external: true,
@@ -769,7 +777,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Sortable Table',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/sortable-table',
           external: true,
@@ -779,7 +787,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Sticky Column',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/sticky-column-table',
           external: true,
@@ -789,7 +797,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Sticky Header Footer',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/tables/sticky-header-footer-table',
           external: true,
@@ -911,13 +919,13 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       children: [
         {
           displayName: 'Register',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: '/authentication/register',
         },
         {
           displayName: 'Side Register',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/authentication/boxed-register',
           external: true,
@@ -937,7 +945,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       children: [
         {
           displayName: 'Side Forgot Pwd',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/authentication/side-forgot-pwd',
           external: true,
@@ -947,7 +955,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Boxed Forgot Pwd',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/authentication/boxed-forgot-pwd',
           external: true,
@@ -967,7 +975,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       children: [
         {
           displayName: 'Side Two Steps',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/authentication/side-two-steps',
           external: true,
@@ -977,7 +985,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
         },
         {
           displayName: 'Boxed Two Steps',
-           subItemIcon: true,
+          subItemIcon: true,
           iconName: 'solar:round-alt-arrow-right-line-duotone',
           route: 'https://matdash-angular-main.netlify.app/authentication/boxed-two-steps',
           external: true,
