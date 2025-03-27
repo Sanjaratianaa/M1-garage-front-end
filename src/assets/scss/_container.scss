@@ -387,3 +387,23 @@ td.hljs-ln-line.hljs-ln-numbers {
   font-size: 20px;
   cursor: pointer;
 }
+
+.error-message-login {
+  color: red;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;  /* Centre horizontalement */
+  align-items: center;  /* Centre verticalement si nécessaire */
+  text-align: center; /* Centre le texte */
+  height: 50px; /* Ajustez selon le besoin */
+}
+
+.loading-icon.spin {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

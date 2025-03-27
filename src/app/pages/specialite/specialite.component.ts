@@ -163,7 +163,7 @@ export class SpecialiteComponent {
   }
 
   async openModal(errorMessage: string = '') {
-    this.newSpecialite = { id_sous_service: '', id_service: '', id_mecanicien: '' };
+    // this.newSpecialite = { id_sous_service: '', id_service: '', id_mecanicien: '' };
     const data = {
       title: 'Ajouter une spécialité à un mécanicien',
       fields: [

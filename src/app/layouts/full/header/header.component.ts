@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -39,7 +39,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private authService: AuthentificationService,
-  ) {}
+    private router: Router // Injection du Router
+  ) { }
 
   ngOnInit(): void {
     this.isLoggedIn = !!localStorage.getItem('token');
@@ -55,8 +56,15 @@ export class HeaderComponent implements OnInit {
   }
 
   logout(): void {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.reload(); 
+    const role = user.role.libelle;
+    if (role == "manager")
+      this.router.navigate(['/authentication/manager-login']);
+    else if (role == "mecanicien")
+      this.router.navigate(['/authentication/mecanicien-login']);
+    else
+      this.router.navigate(['/authentication/client-login']);
   }
 }

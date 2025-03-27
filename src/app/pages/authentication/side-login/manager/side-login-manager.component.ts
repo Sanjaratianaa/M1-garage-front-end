@@ -6,17 +6,19 @@ import { MaterialModule } from 'src/app/material.module';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthentificationService  } from 'src/app/services/authentification/authentification.service';
-import { NgIf } from '@angular/common'; // Import NgIf
+import { CommonModule, NgIf } from '@angular/common'; // Import NgIf
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-side-login-manager',
   standalone: true,
-  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf, TablerIconsModule],
+  imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, NgIf, TablerIconsModule, MatIconModule, CommonModule],
   templateUrl: './side-login-manager.component.html',
 })
 export class AppSideLoginManagerComponent {
   errorMessage = '';
+  isLoading: boolean = false;
 
   constructor(private router: Router, private authService: AuthentificationService) {}
 
@@ -35,6 +37,7 @@ export class AppSideLoginManagerComponent {
 
   submit() {
     if (this.form.valid) {
+      this.isLoading = true;
       this.authService.login(this.form.value.email!, this.form.value.password!).subscribe({
         next: (response) => {
 
@@ -60,6 +63,7 @@ export class AppSideLoginManagerComponent {
           this.errorMessage = error.message;
         }
       });
+      this.isLoading = false;
     } else {
       this.errorMessage = 'Please fill in all required fields.';
     }
