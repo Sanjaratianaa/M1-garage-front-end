@@ -50,7 +50,7 @@ export const routes: Routes = [
       {
         path: 'rendez-vous',
         loadChildren: () =>
-          import('./pages/calendar/calendar.routes').then((m) => m.CalendarRoutes),
+          import('./pages/rendez-vous/rendez-vous.routes').then((m) => m.RendezVousRoutes),
       },
       {
         path: 'specialite',

@@ -4,27 +4,37 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
 
-export interface PrixSousService {
+export interface RendezVous {
     _id: string;
-    sousService: {
-        _id: string;
-        libelle: string;
-        service: { 
-            _id: string;
+    voiture: { _id: string, numeroImmatriculation: string, annee: string} | null;
+    mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
+    services: [
+        {
+            sousSpecialite: string;
             libelle: string;
-        },
-        duree: number | 0
-    }
-    date: Date | null;
-    prixUnitaire: number | 0;
-    dateEnregistrement: Date | null;
+            service: { 
+                _id: string;
+                mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
+                heureDebut: Date | null;
+                heureFin: Date | null;
+                quantiteEstimee: string;
+            }
+        }
+    ]
+    dateHeureDemande: Date | null;
+    dateRendezVous: Date | null;
+    heureDebut: Date | null;
+    heureFin: Date | null;
+    validateur: { _id: string },
+    remarque: string | null;
+    etat: string;
 }
 
 @Injectable({
     providedIn: 'root'
 })
-export class PrixSousServiceService {
-    private apiUrl = environment.apiUrl + '/prixSousServices'; // URL API depuis le fichier d’environnement
+export class RendezVousService {
+    private apiUrl = environment.apiUrl + '/specialites';
 
     constructor(private http: HttpClient) { }
 
@@ -35,25 +45,22 @@ export class PrixSousServiceService {
     /**
      * Récupérer toutes les sousServices
      */
-    getPrixSousServices(): Observable<PrixSousService[]> {
+    getSpecialites(): Observable<RendezVous[]> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.get<PrixSousService[]>(this.apiUrl, { headers }).pipe(
+        return this.http.get<RendezVous[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError)
         );
     }
 
-    /**
-     * Récupérer un sousService
-     */
-    getPrixSousService(sousServiceId: string): Observable<PrixSousService> {
+    getSpecialitesActives(): Observable<RendezVous[]> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.get<PrixSousService>(`${this.apiUrl}/${sousServiceId}`, { headers }).pipe(
+        return this.http.get<RendezVous[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError)
         );
     }
@@ -61,44 +68,43 @@ export class PrixSousServiceService {
     /**
      * Ajouter une nouvelle sousService
      */
-    addPrixSousService(idSousService: string, date: Date, prixUnitaire: number): Observable<PrixSousService> {
+    addSpecialite(idSousService: string, idMecanicien: string): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        const prixSousServiceData = {
+        const specialiteData = {
             sousService: idSousService,
-            date: date,
-            prixUnitaire: prixUnitaire
+            mecanicien: idMecanicien
         };
 
-        return this.http.post<PrixSousService>(this.apiUrl, prixSousServiceData, { headers }).pipe(
+        return this.http.post<RendezVous>(this.apiUrl, specialiteData, { headers }).pipe(
             catchError(this.handleError)
         );
     }
 
     /**
-     * Modifier une sousService existante
+     * Modifier une specialite existante
      */
-    updatePrixSousService(sousService: PrixSousService): Observable<PrixSousService> {
+    updateSpecialite(specialite: RendezVous): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.put<PrixSousService>(`${this.apiUrl}/${sousService._id}`, sousService, { headers }).pipe(
+        return this.http.put<RendezVous>(`${this.apiUrl}/${specialite._id}`, specialite, { headers }).pipe(
             catchError(this.handleError)
         );
     }
 
     /**
-     * Supprimer une sousService par ID
+     * Supprimer une specialite par ID
      */
-    deletePrixSousService(sousServiceId: string): Observable<PrixSousService> {
+    deleteSpecialite(specialiteId: string): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.delete<PrixSousService>(`${this.apiUrl}/${sousServiceId}`, { headers }).pipe(
+        return this.http.delete<RendezVous>(`${this.apiUrl}/${specialiteId}`, { headers }).pipe(
             catchError(this.handleError)
         );
     }
