@@ -22,7 +22,7 @@ import { RendezVous } from 'src/app/services/rendez-vous/rendez-vous.service';
     ]
 })
 export class DetailRendezVousComponent {
-    columns = ['sousSpecialite', 'quantite', 'prix', 'mecanicien'];
+    columns = ['sousSpecialite', 'raison', 'quantite', 'prix', 'mecanicien'];
     // Définir les colonnes pour le tableau
   displayedColumns: string[] = ['label', 'value'];
 

@@ -60,7 +60,7 @@ export class VoitureComponent {
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
     this.getAllVoitures();
-    this.getAllCayegorieActives();
+    this.getAllCategorieActives();
     this.getAllMarqueActives();
     this.getAllModeleActives();
     this.getAllTypeTransmissionActives();
@@ -80,7 +80,7 @@ export class VoitureComponent {
     });
   }
 
-  getAllCayegorieActives() {
+  getAllCategorieActives() {
     this.categorieService.getCategoriesActives().subscribe({
       next: (categories) => {
         this.categories = categories.map(categorie => ({

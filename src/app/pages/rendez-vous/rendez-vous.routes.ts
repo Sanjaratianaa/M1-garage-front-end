@@ -15,6 +15,10 @@ export const RendezVousRoutes: Routes = [
         path: '',
         component: RendezVousComponent,
       },
+      {
+        path: ':status',
+        component: HistoriqueRendezVousComponent,
+      },
     ],
   },
 ];

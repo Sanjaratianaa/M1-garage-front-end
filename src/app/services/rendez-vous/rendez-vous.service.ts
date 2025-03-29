@@ -56,6 +56,7 @@ export interface RendezVous {
     dateHeureDemande: Date;
     piecesAchetees: any[];
     remarque: string;
+    heureFin: string | any | null;
 }
 
 

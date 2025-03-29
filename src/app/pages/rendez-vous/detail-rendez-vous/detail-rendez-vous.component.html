@@ -22,6 +22,12 @@
                 <mat-cell *matCellDef="let service"> {{ service.sousSpecialite.libelle }} </mat-cell>
             </ng-container>
 
+            <!-- raison Column -->
+            <ng-container matColumnDef="raison">
+                <mat-header-cell *matHeaderCellDef> Raison </mat-header-cell>
+                <mat-cell *matCellDef="let service"> {{ service.raison }} </mat-cell>
+            </ng-container>
+
             <!-- Quantité Estimée Column -->
             <ng-container matColumnDef="quantite">
                 <mat-header-cell *matHeaderCellDef> Quantité Estimée </mat-header-cell>
@@ -38,7 +44,7 @@
             <ng-container matColumnDef="mecanicien">
                 <mat-header-cell *matHeaderCellDef> Mécanicien Assigné </mat-header-cell>
                 <mat-cell *matCellDef="let service">
-                    {{ service.mecanicien.nom }} {{ service.mecanicien.prenom }}
+                    {{ service.mecanicien?.nom || "--" }} {{ service.mecanicien?.prenom || "--" }}
                 </mat-cell>
             </ng-container>
 

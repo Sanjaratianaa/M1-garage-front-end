@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
 import { DeleteConfirmationModalComponent } from 'src/app/components/modal-generique/confirm-modal/delete-confirmation-modal.component';
 import { DetailRendezVousComponent } from '../detail-rendez-vous/detail-rendez-vous.component';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -24,6 +25,10 @@ import { DetailRendezVousComponent } from '../detail-rendez-vous/detail-rendez-v
 export class HistoriqueRendezVousComponent {
     displayedColumns: string[] = ['Date et heure demande', "Client", "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "Statut", 'actions'];
     listeRendezVous: RendezVous[];
+    status: string | null = null;
+    titre: string = '';
+    isValidable: boolean = false;
+    etats: string[] = ['en attente', 'validé', 'rejeté', 'annulé'];
 
     paginatedRendezVous: RendezVous[] = [];
 
@@ -35,15 +40,44 @@ export class HistoriqueRendezVousComponent {
     currentPage = 0;
     pageSizeOptions = [5, 10, 20];
 
-    constructor(private dialog: MatDialog, private rendezVousService: RendezVousService) { }
+    constructor(
+        private dialog: MatDialog,
+        private rendezVousService: RendezVousService,
+        private route: ActivatedRoute
+    ) { }
 
     ngOnInit() {
+        this.route.paramMap.subscribe(params => {
+            const status = params.get('status'); // Récupération de la variable
+            if(status)
+                this.status = status;
+            console.log('Status:', this.status);
+        });
+
         // Initialisez la pagination au chargement du composant
-        this.getAllRendezVouss();
+        if(this.status == "en-attente") {
+            this.getAllRendezVousEnAttente();
+            this.isValidable = true;
+        }
+        else 
+            this.getAllRendezVous();
     }
 
-    getAllRendezVouss() {
+    getAllRendezVous() {
         this.rendezVousService.getRendezVous().subscribe({
+            next: (listeRendezVous) => {
+                this.listeRendezVous = listeRendezVous;
+                this.updatePagination();
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des listeRendezVous:', error.message);
+                alert('Impossible de charger les listeRendezVous. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllRendezVousEnAttente() {
+        this.rendezVousService.getRendezVousByEtat("en attente").subscribe({
             next: (listeRendezVous) => {
                 this.listeRendezVous = listeRendezVous;
                 this.updatePagination();
@@ -107,12 +141,17 @@ export class HistoriqueRendezVousComponent {
         }
     }
 
+    updateStatus(rendezVous: any, newStatus: string) {
+        rendezVous.etat = newStatus;
+        
+      }
+
     openDetailsModal(rendezVous: RendezVous) {
         console.log(rendezVous);
         this.dialog.open(DetailRendezVousComponent, {
-          width: '500px',
-          data: rendezVous
+            width: '700px',
+            data: rendezVous
         });
-      }
+    }
 
 }

@@ -238,3 +238,53 @@
     -webkit-box-shadow: inset 0 0 15px 0 rgba(0, 0, 0, .5);
     box-shadow: inset 0 0 15px #00000080;
 }
+
+.legend-container {
+    display: flex;
+    flex-direction: column; /* Display items in a column */
+    gap: 10px; /* Space between items */
+    margin-top: 16px;
+}
+
+.legend-item {
+    /* display: flex; Remove the flex for individual items */
+    align-items: center; /* Vertically center the color and text */
+    gap: 8px; /* Space between color and text */
+    display: flex; /* Make the legend-item a flex container so the color and label still line up */
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; /* Make it a circle */
+}
+
+.sous-service-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    mat-form-field {
+        flex: 1; /* Allows fields to take up available space */
+        margin-right: 10px;
+    }
+
+    button {
+        margin-left: auto; /* Pushes the delete button to the right */
+    }
+}
+
+.sous-service-item > * {
+    margin-right: 5px;
+}
+
+.add-sous-service-button {
+    margin-top: 10px; /* Spacing above the "Add" button */
+}
+
+.sous-service-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes label and button to opposite ends */
+}

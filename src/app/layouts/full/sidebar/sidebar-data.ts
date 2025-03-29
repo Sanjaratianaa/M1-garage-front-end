@@ -22,7 +22,8 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Pièce détachée' ||
         item.displayName === 'Voiture' ||
         item.displayName === 'Specialité' ||
-        item.displayName === 'Historique Rendez-vous'
+        item.displayName === 'Historique Rendez-vous' ||
+        item.displayName === 'Demande en attente'
       );
 
     } else if (userRole === 'client') {
@@ -36,7 +37,9 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
         item.displayName === 'Pièce détachée' ||
-        item.displayName === 'Voiture'
+        item.displayName === 'Voiture' ||
+        item.displayName === 'Historique Rendez-vous' ||
+        item.displayName === 'Demande en attente'
       );
     } else if (userRole === 'mecanicien') {
       return (
@@ -178,6 +181,12 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       displayName: 'Prendre Rendez-vous',
       iconName: 'solar:bookmark-square-minimalistic-line-duotone',
       route: '/rendez-vous',
+      chip: true,
+    },
+    {
+      displayName: 'Demande en attente',
+      iconName: 'solar:document-text-line-duotone',
+      route: '/rendez-vous/en-attente',
       chip: true,
     },
     {
