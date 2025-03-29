@@ -47,9 +47,28 @@
             <mat-row *matRowDef="let row; columns: columns;"></mat-row>
         </table>
 
+        <h3>Détails de la Voiture</h3>
+        <mat-table [dataSource]="voitureDetails" class="mat-elevation-z8">
+            <!-- Colonne de la propriété -->
+            <ng-container matColumnDef="label">
+                <mat-header-cell *matHeaderCellDef> Propriété </mat-header-cell>
+                <mat-cell *matCellDef="let element">{{ element.label }}</mat-cell>
+            </ng-container>
+
+            <!-- Colonne de la valeur -->
+            <ng-container matColumnDef="value">
+                <mat-header-cell *matHeaderCellDef> Valeur </mat-header-cell>
+                <mat-cell *matCellDef="let element">{{ element.value }}</mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+
+
         <!-- Bouton de fermeture -->
         <div class="m-t-12 d-flex justify-content-end">
             <button mat-stroked-button color="warn" (click)="close()">Fermer</button>
-          </div>
+        </div>
     </mat-card-content>
 </mat-card>

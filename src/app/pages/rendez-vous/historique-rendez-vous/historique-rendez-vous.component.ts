@@ -11,17 +11,17 @@ import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
 import { DeleteConfirmationModalComponent } from 'src/app/components/modal-generique/confirm-modal/delete-confirmation-modal.component';
-import { DetailRendezVousComponent } from './detail-rendez-vous/detail-rendez-vous.component';
+import { DetailRendezVousComponent } from '../detail-rendez-vous/detail-rendez-vous.component';
 
 
 @Component({
     selector: 'app-rendez-vous',
     standalone: true,
-    templateUrl: './rendez-vous.component.html',
+    templateUrl: './historique-rendez-vous.component.html',
     imports: [MatListModule, MatCardModule, DatePipe, MatIconModule, MaterialModule, FormsModule, CommonModule, MatButtonModule],
 
 })
-export class RendezVousComponent {
+export class HistoriqueRendezVousComponent {
     displayedColumns: string[] = ['Date et heure demande', "Client", "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "Statut", 'actions'];
     listeRendezVous: RendezVous[];
 

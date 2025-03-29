@@ -84,6 +84,53 @@ export class RendezVousService {
         );
     }
 
+    /**
+     * Récupérer toutes les sousServices
+     */
+     getAllRendezVous(): Observable<RendezVous[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<RendezVous[]>(this.apiUrl, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
+     * Ajouter une nouvelle sousService
+     */
+    addRendezVous(rendezVousData: any): Observable<RendezVous> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+    
+        console.log("API URL:", this.apiUrl);
+        
+        const data = {
+            "client": "67e3071018c9673f291d3ad2",
+            "date": "3035-09-23T07:00",
+            "dateRendezVous": "3035-09-23T07:00",
+            "services": [
+                {
+                    "prixUnitaire": 0,
+                    "quantiteEstimee": 40,
+                    "raison": "Contrôle et remplacement des bougies",
+                    "sousSpecialite": "67e256cd811b3e52c586a970",
+                    "status": "en attente"
+                }
+            ],
+            "voiture": "67e2701349b59270464e2879"
+        }
+
+        console.log("data: ",rendezVousData);
+
+        return this.http.post<RendezVous>(this.apiUrl, rendezVousData, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
     getRendezVousByEtat(etat: string): Observable<RendezVous[]> {
 
         const headers = new HttpHeaders({
@@ -91,22 +138,6 @@ export class RendezVousService {
         });
 
         return this.http.get<RendezVous[]>(`${this.apiUrl}/parEtat/${etat}`, { headers }).pipe(
-            catchError(this.handleError) // Gestion des erreurs
-        );
-    }
-
-    /**
-     * Ajouter une nouvelle categorie
-     */
-    addRendezVous(libelle: string): Observable<RendezVous> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${this.getToken()}`
-        });
-
-        const categorieData = {
-            libelle: libelle, // Inclure seulement le libelle
-        };
-        return this.http.post<RendezVous>(this.apiUrl, categorieData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

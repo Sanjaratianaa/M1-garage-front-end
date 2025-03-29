@@ -27,7 +27,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
 
     } else if (userRole === 'client') {
       return (
-        item.displayName === 'Calendar' ||
+        item.displayName === 'Prendre Rendez-vous' ||
         item.displayName === 'Dashboard' ||
         item.navCap === 'Home' ||
         item.navCap === 'Voiture' ||
@@ -175,9 +175,9 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       navCap: 'RENDEZ-VOUS',
     },
     {
-      displayName: 'Calendar',
+      displayName: 'Prendre Rendez-vous',
       iconName: 'solar:bookmark-square-minimalistic-line-duotone',
-      route: '/calendar',
+      route: '/rendez-vous',
       chip: true,
     },
     {

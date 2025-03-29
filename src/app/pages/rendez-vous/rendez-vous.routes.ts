@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { RendezVousComponent } from './rendez-vous.component';
+import { HistoriqueRendezVousComponent } from './historique-rendez-vous/historique-rendez-vous.component';
+import { RendezVousComponent } from './rendez-vous/rendez-vous.component';
 // pages
 
 export const RendezVousRoutes: Routes = [
@@ -8,6 +9,10 @@ export const RendezVousRoutes: Routes = [
     children: [
       {
         path: 'historique-demande',
+        component: HistoriqueRendezVousComponent,
+      },
+      {
+        path: '',
         component: RendezVousComponent,
       },
     ],
