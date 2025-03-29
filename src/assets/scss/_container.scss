@@ -407,3 +407,42 @@ td.hljs-ln-line.hljs-ln-numbers {
   100% { transform: rotate(360deg); }
 }
 
+.status-pending {
+  background-color: orange;
+  color: black;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-approved {
+  background-color: green;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-rejected {
+  background-color: red;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-cancelled {
+  background-color: gray;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-default {
+  background-color: black;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}

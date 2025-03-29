@@ -1,0 +1,55 @@
+<mat-card class="cardWithShadow theme-card">
+    <mat-card-header>
+        <mat-card-title class="m-b-0">Détails du Rendez-vous</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="b-t-1 scrollable-modal">
+        <!-- Informations Générales -->
+        <p><strong>Client :</strong> {{ rendezVous.client.nom }} {{ rendezVous.client.prenom }}</p>
+        <p><strong>Téléphone :</strong> {{ rendezVous.client.numeroTelephone }}</p>
+        <p><strong>Date & Heure :</strong> {{ rendezVous.dateRendezVous | date: 'dd/MM/yyyy HH:mm:ss' }}</p>
+        <p><strong>Voiture :</strong> {{ rendezVous.voiture.marque.libelle }} - {{ rendezVous.voiture.modele.libelle }}
+        </p>
+        <p><strong>Immatriculation :</strong> {{ rendezVous.voiture.numeroImmatriculation }}</p>
+
+        <!-- Tableau des Services -->
+        <h3>Services</h3>
+        <table mat-table [dataSource]="rendezVous.services" class="mat-elevation-z8">
+
+            <!-- Sous Service Column -->
+            <ng-container matColumnDef="sousSpecialite">
+                <mat-header-cell *matHeaderCellDef> Sous Service </mat-header-cell>
+                <mat-cell *matCellDef="let service"> {{ service.sousSpecialite.libelle }} </mat-cell>
+            </ng-container>
+
+            <!-- Quantité Estimée Column -->
+            <ng-container matColumnDef="quantite">
+                <mat-header-cell *matHeaderCellDef> Quantité Estimée </mat-header-cell>
+                <mat-cell *matCellDef="let service"> {{ service.quantiteEstimee }} </mat-cell>
+            </ng-container>
+
+            <!-- Prix Unitaire Column -->
+            <ng-container matColumnDef="prix">
+                <mat-header-cell *matHeaderCellDef> Prix Unitaire </mat-header-cell>
+                <mat-cell *matCellDef="let service"> {{ service.prixUnitaire }} Ar </mat-cell>
+            </ng-container>
+
+            <!-- Mécanicien Assigné Column -->
+            <ng-container matColumnDef="mecanicien">
+                <mat-header-cell *matHeaderCellDef> Mécanicien Assigné </mat-header-cell>
+                <mat-cell *matCellDef="let service">
+                    {{ service.mecanicien.nom }} {{ service.mecanicien.prenom }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Table Header & Row Definitions -->
+            <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columns;"></mat-row>
+        </table>
+
+        <!-- Bouton de fermeture -->
+        <div class="m-t-12 d-flex justify-content-end">
+            <button mat-stroked-button color="warn" (click)="close()">Fermer</button>
+          </div>
+    </mat-card-content>
+</mat-card>
