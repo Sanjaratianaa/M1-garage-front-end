@@ -58,9 +58,8 @@ export class RendezVousComponent implements OnInit {
 
     newSousService: any = {
         voiture: null,
-        id_sous_service: [], // Array of sub-service IDs
+        id_sous_service: [],
         date: null,
-        // prix: 0,  // This isn't directly part of the RendezVous Schema, it's on services array.
     };
     selectedSousServices: any[] = [];
 
@@ -78,8 +77,6 @@ export class RendezVousComponent implements OnInit {
         this.getAllVoitures();
         this.getAllSousServicesActives();
         this.getAllRendezVous();
-
-        //this.rendezVousService.addRendezVous(null); //Remove this line. It does nothing
     }
 
     setView(view: CalendarView) {
@@ -295,17 +292,19 @@ export class RendezVousComponent implements OnInit {
                     };
 
                     console.log("Data to send to backend:", this.newSousService);
-
+    
                     this.rendezVousService.addRendezVous(this.newSousService).subscribe({
                         next: (response) => {
+                            console.log('Rendez-vous ajouté avec succès:', response);
                             this.getAllRendezVous();
+                            // Ici, tu peux afficher un message de succès ou fermer le modal
                         },
                         error: (error) => {
                             console.error('Erreur lors de l’ajout:', error.message);
-                            this.openModal(error.message.replace("Error: ", "")); // Call openModal directly
+                            this.openModal(error.message.replace("Error: ", "")); 
                         }
                     });
-
+                    
                 } catch (error: any) {
                     console.error('Erreur lors de l’ajout:', error.message);
                     this.openModal(error.message.replace("Error: ", "")); // Call openModal directly
