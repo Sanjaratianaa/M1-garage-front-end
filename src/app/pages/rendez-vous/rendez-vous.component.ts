@@ -78,8 +78,6 @@ export class RendezVousComponent {
         this.getAllVoitures();
         this.getAllSousServicesActives();
         this.getAllRendezVous();
-
-        this.rendezVousService.addRendezVous(null);
     } 
 
     setView(view: CalendarView) {
@@ -250,7 +248,16 @@ export class RendezVousComponent {
     
                     console.log("Data to send to backend:", this.newSousService);
     
-                    const test = this.rendezVousService.addRendezVous(this.newSousService);
+                    this.rendezVousService.addRendezVous(this.newSousService).subscribe({
+                        next: (response) => {
+                            console.log('Rendez-vous ajouté avec succès:', response);
+                            // Ici, tu peux afficher un message de succès ou fermer le modal
+                        },
+                        error: (error) => {
+                            throw new Error(error.message);
+                        }
+                    });
+                    
     
                 } catch (error: any) {
                     console.error('Erreur lors de l’ajout:', error.message);
