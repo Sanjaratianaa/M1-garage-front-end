@@ -16,7 +16,15 @@ import { RendezVousModalComponent } from './add-rendez-vous-modal/rendez-vous-mo
 
 import { ServiceService } from 'src/app/services/services/service.service';
 import { SousServiceService } from 'src/app/services/services/sousService.service';
-import { VoitureService } from 'src/app/services/caracteristiques/voiture.sevice';
+import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voiture.sevice';
+import { RendezVous, RendezVousService } from 'src/app/services/personne/rendez-vous.service';
+import { PrixSousServiceService } from 'src/app/services/services/prixSousService.service';
+import { consumerPollProducersForChange } from '@angular/core/primitives/signals';
+
+interface VoitureSelectItem {
+    value: string;
+    label: string;
+}
 
 @Component({
     selector: 'app-rendez-vous',
@@ -43,57 +51,57 @@ export class RendezVousComponent {
     activeDayIsOpen: boolean = true;
     refresh = new Subject<void>();
 
-    services: any[] = [];
     sousServices: any[] = [];
-    voitures: any[] = [];
+    sousServicesObject: any[] = [];
+    voitures: VoitureSelectItem[] = [];
+    prixSousServices: any[];
 
-    newPrixSousService: any = {
-        id_sous_service: [],
+    newSousService: any = {
+        voiture : null,
+        id_sous_service: [], // Array of sub-service IDs
         date: null,
-        voiture: null
+        // prix: 0,  // This isn't directly part of the RendezVous Schema, it's on services array.
     };
-
-    options = [
-        { value: 'Homme', label: 'Homme' },
-        { value: 'Femme', label: 'Femme' },
-        { value: 'Autre', label: 'Autre' }
-      ];
+    selectedSousServices: any[] = [];
 
     constructor(
         private dialog: MatDialog,
-        private serviceService: ServiceService, 
+        private serviceService: ServiceService,
         private sousServiceService: SousServiceService,
-        private voitureService: VoitureService
+        private voitureService: VoitureService,
+        private rendezVousService: RendezVousService,
+        private prixSousServiceService: PrixSousServiceService
     ) {}
 
     ngOnInit() {
-        // Initialisez la pagination au chargement du composant
-        this.getAllServicesActives();
+        this.getAllPrix();
+        this.getAllVoitures();
         this.getAllSousServicesActives();
-      }
+        this.getAllRendezVous();
+
+        this.rendezVousService.addRendezVous(null);
+    } 
 
     setView(view: CalendarView) {
         this.view = view;
     }
 
-    getAllServicesActives() {
-        this.serviceService.getServicesActives().subscribe({
-            next: (services) => {
-                this.services = services.map(service => ({
-                    value: service._id,
-                    label: service.libelle
-                }));
-            },
-            error: (error) => {
-                console.error('Erreur lors du chargement des services:', error.message);
-                alert('Impossible de charger les services. Veuillez réessayer plus tard.');
-            }
+    getAllPrix() {
+        this.prixSousServiceService.getPrixSousServices().subscribe({
+          next: (prixSousServices) => {
+            this.prixSousServices = prixSousServices;
+          },
+          error: (error) => {
+            console.error('Erreur lors du chargement des prix des sous services:', error.message);
+            alert('Impossible de charger les prix sous services. Veuillez réessayer plus tard.');
+          }
         });
       }
-    
+
     getAllSousServicesActives() {
         this.sousServiceService.getSousServicesActives().subscribe({
             next: (sousServices) => {
+                this.sousServicesObject = sousServices;
                 this.sousServices = sousServices.map(sousService => ({
                     value: sousService._id,
                     label: sousService.libelle,
@@ -108,27 +116,32 @@ export class RendezVousComponent {
     }
 
     getAllVoitures() {
-        const userString = localStorage.getItem('user');
+        this.voitureService.getVoituresByClient().subscribe({
+            next: (voitures: Voiture[]) => { // Correctly receive an array of Voiture objects
+                this.voitures = voitures.map((voiture: Voiture) => ({ // Correctly iterate over the voitures array
+                    value: voiture._id,
+                    label: voiture.numeroImmatriculation
+                }));
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des voitures:', error.message);
+                alert('Impossible de charger les voitures. Veuillez réessayer plus tard.');
+            }
+        });
+    }
 
-        if(userString) {
-            const user = JSON.parse(userString);
+    getAllRendezVous() {
+        this.rendezVousService.getAllRendezVous().subscribe({
+            next: (rendezVous: RendezVous[]) => {
 
-            this.voitureService.getVoituresById(user.id).subscribe({
-                next: (voitures) => {
-                    this.voitures = voitures.map(voiture => ({
-                        value: voiture._id,
-                        label: voiture.numeroImmatriculation
-                    }));
-                },
-                error: (error) => {
-                    console.error('Erreur lors du chargement des voitures:', error.message);
-                    alert('Impossible de charger les voitures. Veuillez réessayer plus tard.');
-                }
-            });
-
-        }
-        
-      }
+                // this.rendezVousService.addRendezVousTest();
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des voitures:', error.message);
+                alert('Impossible de charger les voitures. Veuillez réessayer plus tard.');
+            }
+        });
+    }
 
    dayClicked(event: any): void {  // Keep event type as 'any'
         const { day } = event;
@@ -165,51 +178,85 @@ export class RendezVousComponent {
 
     async openModal(errorMessage: string = '') {
         const data = {
-          title: 'Ajouter un prix de sous-service',
-          fields: [
-            {
-              name: 'id_service', label: 'Service', type: 'select', required: true,
-              options: this.services, defaultValue: this.newPrixSousService.id_service
-            },
-            {
-              name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
-              options: this.sousServices, defaultValue: this.newPrixSousService.id_sous_service
-            },
-            {
-              name: "prix",
-              label: "Prix en Ar",
-              type: "number",
-              required: true,
-              defaultValue: this.newPrixSousService.prix  // Valeur par défaut pour le champ prix
-            },
-            {
-              name: "date",
-              label: "Date souhaité pour le rendez-vous",
-              type: "date",
-              required: true,
-              defaultValue: this.newPrixSousService.date  // Valeur par défaut pour le champ date
-            }
-          ],
-          submitText: 'Ajouter',
-          errorMessage: errorMessage
+            title: 'Prendre un rendez-vous',
+            fields: [
+                {
+                    name: 'voiture', label: 'Voiture', type: 'select', required: true,
+                    options: this.voitures, defaultValue: this.newSousService.voiture
+                },
+                {
+                    name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
+                    options: this.sousServices, defaultValue: this.newSousService.id_sous_service,
+                },
+                {
+                    name: "date",
+                    label: "Date souhaité pour le rendez-vous",
+                    type: "date",
+                    required: true,
+                    defaultValue: this.newSousService.date
+                }
+            ],
+            submitText: 'Ajouter',
+            errorMessage: errorMessage
         };
     
         const dialogRef = this.dialog.open(RendezVousModalComponent, {
-          width: '400px',
-          data: data,
+            width: '400px',
+            data: data,
         });
     
         dialogRef.afterClosed().subscribe(async result => {
-          if (result) {
-            try {
-              console.log('Données du formulaire:', result);
-              this.newPrixSousService = result;
-            //   await this.addNewPrixSousServiceAsync();
-            } catch (error: any) {
-              console.error('Erreur lors de l’ajout:', error.message);
-              await this.openModal(error.message.replace("Error: ", ""));
+            if (result) {
+                try {
+                    console.log('Données du formulaire:', result);
+
+                    const userString = localStorage.getItem('user');
+                    let user;
+                    if (userString !== null) {
+                        user =  JSON.parse(userString);
+                    } else {
+                        console.log("No User in local storage. Can not associate appointment");
+                        return
+                    }
+    
+                    const servicesArray = result.id_sous_service.map((sousServiceId: string) => {
+
+                        const sousServiceObject = this.sousServicesObject.find(ss => ss._id === sousServiceId); 
+                        const prixSousServiceObject = this.prixSousServices.find(pss => pss.sousService._id === sousServiceId);
+
+                        if(sousServiceObject) {
+                            return {
+                                sousSpecialite: sousServiceId,
+                                raison: sousServiceObject.libelle || "",
+                                quantiteEstimee: sousServiceObject.duree || 1,
+                                prixUnitaire: prixSousServiceObject ? prixSousServiceObject.prixUnitaire || 0 : 0,
+                                status: "en attente"    
+                            };
+                        } else {
+                            return null;
+                        }
+                        
+                    });
+    
+                    // Update newSousService with the constructed services array and date
+                    delete result.id_sous_service
+
+                    this.newSousService = {
+                        ...result,
+                        services: servicesArray,
+                        dateRendezVous: result.date,
+                        client: user.idPersonne
+                    };
+    
+                    console.log("Data to send to backend:", this.newSousService);
+    
+                    const test = this.rendezVousService.addRendezVous(this.newSousService);
+    
+                } catch (error: any) {
+                    console.error('Erreur lors de l’ajout:', error.message);
+                    await this.openModal(error.message.replace("Error: ", ""));
+                }
             }
-          }
         });
-      }
+    }
 }

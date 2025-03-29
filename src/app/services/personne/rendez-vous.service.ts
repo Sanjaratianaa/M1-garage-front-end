@@ -18,6 +18,8 @@ export interface RendezVous {
                 heureDebut: Date | null;
                 heureFin: Date | null;
                 quantiteEstimee: string;
+                prixUnitaire: Number | null;
+                prixTotal: Number | null;
             }
         }
     ]
@@ -34,7 +36,7 @@ export interface RendezVous {
     providedIn: 'root'
 })
 export class RendezVousService {
-    private apiUrl = environment.apiUrl + '/specialites';
+    private apiUrl = environment.apiUrl + '/rendezVous';
 
     constructor(private http: HttpClient) { }
 
@@ -45,7 +47,7 @@ export class RendezVousService {
     /**
      * Récupérer toutes les sousServices
      */
-    getSpecialites(): Observable<RendezVous[]> {
+    getAllRendezVous(): Observable<RendezVous[]> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
@@ -55,30 +57,36 @@ export class RendezVousService {
         );
     }
 
-    getSpecialitesActives(): Observable<RendezVous[]> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${this.getToken()}`
-        });
-
-        return this.http.get<RendezVous[]>(this.apiUrl + "/active", { headers }).pipe(
-            catchError(this.handleError)
-        );
-    }
-
     /**
      * Ajouter une nouvelle sousService
      */
-    addSpecialite(idSousService: string, idMecanicien: string): Observable<RendezVous> {
+    addRendezVous(rendezVousData: any): Observable<RendezVous> {
         const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.getToken()}`
         });
+    
+        console.log("API URL:", this.apiUrl);
+        
+        const data = {
+            "client": "67e3071018c9673f291d3ad2",
+            "date": "3035-09-23T07:00",
+            "dateRendezVous": "3035-09-23T07:00",
+            "services": [
+                {
+                    "prixUnitaire": 0,
+                    "quantiteEstimee": 40,
+                    "raison": "Contrôle et remplacement des bougies",
+                    "sousSpecialite": "67e256cd811b3e52c586a970",
+                    "status": "en attente"
+                }
+            ],
+            "voiture": "67e2701349b59270464e2879"
+        }
 
-        const specialiteData = {
-            sousService: idSousService,
-            mecanicien: idMecanicien
-        };
+        console.log("data: ",data);
 
-        return this.http.post<RendezVous>(this.apiUrl, specialiteData, { headers }).pipe(
+        return this.http.post<RendezVous>(this.apiUrl, data, { headers }).pipe(
             catchError(this.handleError)
         );
     }

@@ -44,8 +44,8 @@ export class RendezVousModalComponent implements OnInit {
   @Input() errorMessage: string = '';
   @Output() saveData = new EventEmitter<any>();
 
-  filteredSousServices: any[] = [];
-  servicesOptions: any[] = [];
+  allSousServices: any[] = [];
+  voituresOptions: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -68,31 +68,21 @@ export class RendezVousModalComponent implements OnInit {
         validators.push(Validators.required);
       }
 
-      // Si un `defaultValue` est défini dans le champ, l'utiliser ; sinon, un champ vide
-      controls[field.name] = [field.defaultValue || '', validators];
+      // Handle array of selected subservices
+      if (field.name === 'id_sous_service') {
+        controls[field.name] = [[], validators]; // Initialize as empty array
+      } else {
+        controls[field.name] = [field.defaultValue || '', validators];
+      }
     });
 
     this.form = this.fb.group(controls);
 
     // Initialisation des options pour le service
-    this.servicesOptions = this.data.fields.find((f: Field) => f.name === 'id_service')?.options || [];
-    this.filteredSousServices = [];
-
-    // Mettre à jour les sous-services en fonction du service sélectionné
-    if (this.form.get('id_service')?.value) {
-      this.updateSousServices(this.form.get('id_service')?.value);
-    }
-
-    this.form.get('id_service')?.valueChanges.subscribe(serviceId => {
-      this.updateSousServices(serviceId);
-    });
-  }
-
-  updateSousServices(serviceId: string) {
-    const sousServiceField = this.data.fields.find((f: Field) => f.name === 'id_sous_service');
-    if (sousServiceField) {
-      this.filteredSousServices = sousServiceField.options.filter((sousService: any) => sousService.serviceId === serviceId);
-    }
+    this.voituresOptions = this.data.fields.find((f: Field) => f.name === 'voiture')?.options || [];
+    this.allSousServices = this.data.fields.find((f: Field) => f.name === 'id_sous_service')?.options || [];
+    
+    // You don't need the filteredSousServices logic anymore, as all options are available.
   }
 
   submit() {
