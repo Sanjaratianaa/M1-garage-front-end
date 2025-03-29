@@ -259,3 +259,32 @@
     height: 20px;
     border-radius: 50%; /* Make it a circle */
 }
+
+.sous-service-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    mat-form-field {
+        flex: 1; /* Allows fields to take up available space */
+        margin-right: 10px;
+    }
+
+    button {
+        margin-left: auto; /* Pushes the delete button to the right */
+    }
+}
+
+.sous-service-item > * {
+    margin-right: 5px;
+}
+
+.add-sous-service-button {
+    margin-top: 10px; /* Spacing above the "Add" button */
+}
+
+.sous-service-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Pushes label and button to opposite ends */
+}

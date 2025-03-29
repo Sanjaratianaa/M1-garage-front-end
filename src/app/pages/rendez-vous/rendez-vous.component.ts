@@ -5,20 +5,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { FormsModule } from '@angular/forms';
-import { CalendarView, CalendarModule, CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
+import { CalendarView, CalendarModule, CalendarEvent } from 'angular-calendar';
 import { Subject } from 'rxjs';
-import { isSameDay, isSameMonth, subDays, addDays, endOfMonth, isPast, addHours, endOfDay, startOfDay } from 'date-fns';
+import { isSameDay, isSameMonth } from 'date-fns';
 import { MatDialog } from '@angular/material/dialog';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { addMonths, subMonths } from 'date-fns';
 import { RendezVousModalComponent } from './add-rendez-vous-modal/rendez-vous-modal.component';
 
-import { ServiceService } from 'src/app/services/services/service.service';
 import { SousServiceService } from 'src/app/services/services/sousService.service';
 import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voiture.sevice';
 import { RendezVous, RendezVousService } from 'src/app/services/personne/rendez-vous.service';
 import { PrixSousServiceService } from 'src/app/services/services/prixSousService.service';
+import { Router } from '@angular/router'; 
 
 interface VoitureSelectItem {
     value: string;
@@ -73,11 +73,11 @@ export class RendezVousComponent implements OnInit {
 
     constructor(
         private dialog: MatDialog,
-        private serviceService: ServiceService,
         private sousServiceService: SousServiceService,
         private voitureService: VoitureService,
         private rendezVousService: RendezVousService,
-        private prixSousServiceService: PrixSousServiceService
+        private prixSousServiceService: PrixSousServiceService,
+        private router: Router,
     ) { }
 
     ngOnInit() {
@@ -122,8 +122,8 @@ export class RendezVousComponent implements OnInit {
 
     getAllVoitures() {
         this.voitureService.getVoituresByClient().subscribe({
-            next: (voitures: Voiture[]) => { // Correctly receive an array of Voiture objects
-                this.voitures = voitures.map((voiture: Voiture) => ({ // Correctly iterate over the voitures array
+            next: (voitures: Voiture[]) => { 
+                this.voitures = voitures.map((voiture: Voiture) => ({
                     value: voiture._id,
                     label: voiture.numeroImmatriculation
                 }));
@@ -205,10 +205,10 @@ export class RendezVousComponent implements OnInit {
         console.log('Event', event);
         console.log('Action', action);
 
-        // You can also access the original RendezVous data from the 'meta' property:
         if (event.meta && event.meta.rendezVousData) {
             const rendezVousData = event.meta.rendezVousData;
             console.log('RendezVous Data', rendezVousData);
+            this.router.navigate(['/rendez-vous', rendezVousData._id]);
 
             // Implement your logic to display event details here (e.g., open a modal).
         }
@@ -236,86 +236,85 @@ export class RendezVousComponent implements OnInit {
                     options: this.voitures, defaultValue: this.newSousService.voiture
                 },
                 {
-                    name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
-                    options: this.sousServices, defaultValue: this.newSousService.id_sous_service,
-                },
-                {
                     name: "date",
                     label: "Date souhaité pour le rendez-vous",
                     type: "date",
                     required: true,
                     defaultValue: this.newSousService.date
-                }
+                },
+                {
+                    name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
+                    options: this.sousServices, defaultValue: this.newSousService.id_sous_service,
+                },
             ],
             submitText: 'Ajouter',
             errorMessage: errorMessage
         };
-
+    
         const dialogRef = this.dialog.open(RendezVousModalComponent, {
-            width: '400px',
+            width: '600px', 
             data: data,
         });
-
-        dialogRef.afterClosed().subscribe(result => {  // Remove 'async' keyword here
+    
+        dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 try {
                     console.log('Données du formulaire:', result);
-
+    
                     const userString = localStorage.getItem('user');
                     let user;
                     if (userString !== null) {
                         user = JSON.parse(userString);
                     } else {
                         console.log("No User in local storage. Can not associate appointment");
-                        return
+                        return;
                     }
-
-                    const servicesArray = result.id_sous_service.map((sousServiceId: string) => {
-
+    
+                    const servicesArray = result.sousServicesArray.map((sousServiceItem: any) => {
+                        const sousServiceId = sousServiceItem.id;
                         const sousServiceObject = this.sousServicesObject.find(ss => ss._id === sousServiceId);
                         const prixSousServiceObject = this.prixSousServices.find(pss => pss.sousService._id === sousServiceId);
-
+    
                         if (sousServiceObject) {
                             return {
                                 sousSpecialite: sousServiceId,
-                                raison: sousServiceObject.libelle || "",  // Use libelle directly
-                                quantiteEstimee: sousServiceObject.duree || 1,
+                                raison: sousServiceItem.reason, // from form
+                                quantiteEstimee: sousServiceItem.quantite, // from form
                                 prixUnitaire: prixSousServiceObject ? prixSousServiceObject.prixUnitaire || 0 : 0,
                                 status: "en attente"
                             };
                         } else {
                             return null;
                         }
-
-                    });
-
-                    // Update newSousService with the constructed services array and date
-                    delete result.id_sous_service
-
+                    }).filter((item: any) => item !== null);
+    
+    
+                    delete result.sousServicesArray;
+                    delete result.id_sous_service;
+    
                     this.newSousService = {
                         ...result,
                         services: servicesArray,
                         dateRendezVous: result.date,
                         client: user.idPersonne
                     };
-
+    
                     console.log("Data to send to backend:", this.newSousService);
     
-                    this.rendezVousService.addRendezVous(this.newSousService).subscribe({
-                        next: (response) => {
-                            console.log('Rendez-vous ajouté avec succès:', response);
-                            this.getAllRendezVous();
-                            // Ici, tu peux afficher un message de succès ou fermer le modal
-                        },
-                        error: (error) => {
-                            console.error('Erreur lors de l’ajout:', error.message);
-                            this.openModal(error.message.replace("Error: ", "")); 
-                        }
-                    });
-                    
+                    // this.rendezVousService.addRendezVous(this.newSousService).subscribe({
+                    //     next: (response) => {
+                    //         console.log('Rendez-vous ajouté avec succès:', response);
+                    //         this.getAllRendezVous();
+                    //     },
+                    //     error: (error) => {
+                    //         console.error('Erreur lors de l’ajout:', error.message);
+                    //         this.openModal(error.message.replace("Error: ", ""));
+                    //     }
+                    // });
+    
                 } catch (error: any) {
                     console.error('Erreur lors de l’ajout:', error.message);
-                    this.openModal(error.message.replace("Error: ", "")); // Call openModal directly
+                    this.openModal(error.message.replace("Error: ", ""));
                 }
             }
         });

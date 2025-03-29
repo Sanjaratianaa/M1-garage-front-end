@@ -56,6 +56,19 @@ export class RendezVousService {
     }
 
     /**
+     * Récupérer toutes les sousServices
+     */
+    getRendezVousById(id: string): Observable<RendezVous> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<RendezVous>(`${this.apiUrl}/${id}`, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
      * Ajouter une nouvelle sousService
      */
     addRendezVous(rendezVousData: any): Observable<RendezVous> {
