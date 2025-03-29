@@ -63,6 +63,14 @@ export class RendezVousComponent implements OnInit {
     };
     selectedSousServices: any[] = [];
 
+    legendItems = [
+        { label: 'En attente', color: '#f7b801' },
+        { label: 'Validé', color: '#8cb369' },
+        { label: 'Rejeté', color: '#d90429' },
+        { label: 'Annulé', color: '#6f1d1b' },
+        { label: 'Terminé', color: '#8ac926' }
+      ];
+
     constructor(
         private dialog: MatDialog,
         private serviceService: ServiceService,
@@ -136,7 +144,7 @@ export class RendezVousComponent implements OnInit {
 
                 this.events = rendezVous.map(rv => {
 
-                    const serviceDescriptions = rv.services.map(service => service.raison);
+                    const serviceDescriptions = rv.services.map(service => service.sousSpecialite?.libelle);
                     const eventColor = this.getEventColor(rv.etat);
 
                     return {
@@ -166,7 +174,7 @@ export class RendezVousComponent implements OnInit {
             case 'validé':
                 return { primary: '#8cb369', secondary: '#8cb36933' };
             case 'rejeté':
-                return { primary: '#660708', secondary: '#66070833' };
+                return { primary: '#d90429', secondary: '#d9042933' };
             case 'annulé':
                 return { primary: '#6f1d1b', secondary: '#6f1d1b33' };
             case 'terminé':
@@ -270,7 +278,7 @@ export class RendezVousComponent implements OnInit {
                         if (sousServiceObject) {
                             return {
                                 sousSpecialite: sousServiceId,
-                                libelle: sousServiceObject.libelle || "",  // Use libelle directly
+                                raison: sousServiceObject.libelle || "",  // Use libelle directly
                                 quantiteEstimee: sousServiceObject.duree || 1,
                                 prixUnitaire: prixSousServiceObject ? prixSousServiceObject.prixUnitaire || 0 : 0,
                                 status: "en attente"

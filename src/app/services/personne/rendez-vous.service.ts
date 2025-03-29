@@ -10,7 +10,7 @@ export interface RendezVous {
     mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
     services: [
         {
-            sousSpecialite: string;
+            sousSpecialite: { _id: string, duree: Number, libelle: string } | null;
             _id: string;
             mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
             heureDebut: Date | null;
