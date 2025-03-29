@@ -50,7 +50,8 @@
                   "with": "src/environnements/environnement.prod.ts"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "buildOptimizer": true
             },
             "development": {
               "optimization": false,

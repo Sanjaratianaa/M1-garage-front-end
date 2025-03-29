@@ -11,16 +11,14 @@ export interface RendezVous {
     services: [
         {
             sousSpecialite: string;
-            libelle: string;
-            service: { 
-                _id: string;
-                mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
-                heureDebut: Date | null;
-                heureFin: Date | null;
-                quantiteEstimee: string;
-                prixUnitaire: Number | null;
-                prixTotal: Number | null;
-            }
+            _id: string;
+            mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
+            heureDebut: Date | null;
+            heureFin: Date | null;
+            raison: string;
+            quantiteEstimee: string;
+            prixUnitaire: Number | null;
+            prixTotal: Number | null;
         }
     ]
     dateHeureDemande: Date | null;

@@ -33,10 +33,12 @@
     <mat-card-content class="mat-mdc-card-content">
         <div>
             <mwl-calendar-month-view
-            [view]="view"
             [viewDate]="viewDate"
-            [events]="events" 
+            [events]="events"
             (dayClicked)="dayClicked($event)"
+            (eventClicked)="handleEvent('Clicked', $event.event)"
+            [activeDayIsOpen]="activeDayIsOpen"
+            (refresh)="refresh.next()"
             >
             </mwl-calendar-month-view>
         </div>
