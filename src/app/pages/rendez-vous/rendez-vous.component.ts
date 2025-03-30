@@ -140,8 +140,6 @@ export class RendezVousComponent implements OnInit {
             next: (rendezVous: RendezVous[]) => {
                 this.rendezVous = rendezVous;
 
-                console.log(this.rendezVous);
-
                 this.events = rendezVous.map(rv => {
 
                     const serviceDescriptions = rv.services.map(service => service.sousSpecialite?.libelle);
@@ -199,8 +197,6 @@ export class RendezVousComponent implements OnInit {
     }
 
     handleEvent(action: string, event: CalendarEvent): void {
-        // Here, you can access the 'event' object (which is a CalendarEvent)
-        // and the 'action' (which will be 'Clicked' in this case).
 
         console.log('Event', event);
         console.log('Action', action);
@@ -208,9 +204,9 @@ export class RendezVousComponent implements OnInit {
         if (event.meta && event.meta.rendezVousData) {
             const rendezVousData = event.meta.rendezVousData;
             console.log('RendezVous Data', rendezVousData);
-            this.router.navigate(['/rendez-vous', rendezVousData._id]);
-
-            // Implement your logic to display event details here (e.g., open a modal).
+            this.router.navigate(['/rendez-vous', rendezVousData._id], {
+                state: { rendezVous: rendezVousData }
+            });
         }
     }
 
@@ -301,16 +297,16 @@ export class RendezVousComponent implements OnInit {
     
                     console.log("Data to send to backend:", this.newSousService);
     
-                    // this.rendezVousService.addRendezVous(this.newSousService).subscribe({
-                    //     next: (response) => {
-                    //         console.log('Rendez-vous ajouté avec succès:', response);
-                    //         this.getAllRendezVous();
-                    //     },
-                    //     error: (error) => {
-                    //         console.error('Erreur lors de l’ajout:', error.message);
-                    //         this.openModal(error.message.replace("Error: ", ""));
-                    //     }
-                    // });
+                    this.rendezVousService.addRendezVous(this.newSousService).subscribe({
+                        next: (response) => {
+                            console.log('Rendez-vous ajouté avec succès:', response);
+                            this.getAllRendezVous();
+                        },
+                        error: (error) => {
+                            console.error('Erreur lors de l’ajout:', error.message);
+                            this.openModal(error.message.replace("Error: ", ""));
+                        }
+                    });
     
                 } catch (error: any) {
                     console.error('Erreur lors de l’ajout:', error.message);

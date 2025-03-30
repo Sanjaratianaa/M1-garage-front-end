@@ -27,6 +27,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
     } else if (userRole === 'client') {
       return (
         item.displayName === 'Rendez-Vous' ||
+        item.displayName === 'Interventions' ||
         item.displayName === 'Dashboard' ||
         item.navCap === 'Home' ||
         item.navCap === 'Voiture' ||
@@ -174,13 +175,9 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       route: '/rendez-vous',
     },
     {
-      displayName: 'Notes',
-      iconName: 'solar:document-text-line-duotone',
-      route: 'https://matdash-angular-main.netlify.app/apps/notes',
-      chip: true,
-      external: true,
-      chipClass: 'bg-secondary text-white',
-      chipContent: 'PRO',
+      displayName: 'Interventions',
+      iconName: 'solar:widget-4-line-duotone',
+      route: '/rendez-vous/interventions',
     },
     {
       displayName: 'Tickets',
