@@ -21,12 +21,15 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Type de Transmission' ||
         item.displayName === 'Pièce détachée' ||
         item.displayName === 'Voiture' ||
-        item.displayName === 'Specialité'
+        item.displayName === 'Specialité' ||
+        item.displayName === 'Historique Rendez-vous' ||
+        item.displayName === 'Planning Rendez-vous' ||
+        item.displayName === 'Demande en attente'
       );
 
     } else if (userRole === 'client') {
       return (
-        item.displayName === 'Rendez-Vous' ||
+        item.displayName === 'Prendre Rendez-vous' ||
         item.displayName === 'Dashboard' ||
         item.navCap === 'Home' ||
         item.navCap === 'Voiture' ||
@@ -35,11 +38,14 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
         item.displayName === 'Pièce détachée' ||
-        item.displayName === 'Voiture'
+        item.displayName === 'Voiture' ||
+        item.displayName === 'Historique Rendez-vous' ||
+        item.displayName === 'Demande en attente'
       );
     } else if (userRole === 'mecanicien') {
       return (
-        item.displayName === 'Rendez-Vous' ||
+        item.displayName === 'Planning Rendez-vous' ||
+        item.displayName === 'Calendar' ||
         item.displayName === 'Dashboard' ||
         item.displayName === 'Service' ||
         item.displayName === 'Sous Service' ||
@@ -168,19 +174,34 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       route: '/specialite',
       chip: true,
     },
+
     {
-      displayName: 'Rendez-Vous',
-      iconName: 'solar:bookmark-square-minimalistic-line-duotone',
-      route: '/rendez-vous',
+      divider: true,
+      navCap: 'RENDEZ-VOUS',
     },
     {
-      displayName: 'Notes',
-      iconName: 'solar:document-text-line-duotone',
-      route: 'https://matdash-angular-main.netlify.app/apps/notes',
+      displayName: 'Prendre Rendez-vous',
+      iconName: 'solar:bookmark-square-minimalistic-line-duotone',
+      route: '/rendez-vous',
       chip: true,
-      external: true,
-      chipClass: 'bg-secondary text-white',
-      chipContent: 'PRO',
+    },
+    {
+      displayName: 'Planning Rendez-vous',
+      iconName: 'solar:bookmark-square-minimalistic-line-duotone',
+      route: '/rendez-vous',
+      chip: true,
+    },
+    {
+      displayName: 'Demande en attente',
+      iconName: 'solar:document-text-line-duotone',
+      route: '/rendez-vous/en-attente',
+      chip: true,
+    },
+    {
+      displayName: 'Historique Rendez-vous',
+      iconName: 'solar:document-text-line-duotone',
+      route: '/rendez-vous/historique-demande',
+      chip: true,
     },
     {
       displayName: 'Tickets',

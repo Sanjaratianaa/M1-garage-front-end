@@ -387,3 +387,62 @@ td.hljs-ln-line.hljs-ln-numbers {
   font-size: 20px;
   cursor: pointer;
 }
+
+.error-message-login {
+  color: red;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;  /* Centre horizontalement */
+  align-items: center;  /* Centre verticalement si nécessaire */
+  text-align: center; /* Centre le texte */
+  height: 50px; /* Ajustez selon le besoin */
+}
+
+.loading-icon.spin {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.status-pending {
+  background-color: orange;
+  color: black;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-approved {
+  background-color: green;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-rejected {
+  background-color: red;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-cancelled {
+  background-color: gray;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-default {
+  background-color: black;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}

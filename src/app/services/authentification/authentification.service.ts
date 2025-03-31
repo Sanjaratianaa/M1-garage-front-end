@@ -103,7 +103,7 @@ export class AuthentificationService {
         if (error.error instanceof ErrorEvent) {
             errorMessage = `Error: ${error.error.message}`;
         } else {
-            errorMessage = `Error Code: ${error.status}\nMessage: ${error.error.message || error.message}`; //Improved error
+            errorMessage = `${error.error.message || error.message}`; //Improved error
         }
 
         console.error(errorMessage);

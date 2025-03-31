@@ -13,14 +13,22 @@ export class NoAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): boolean {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    if (!token) {
-      console.log('NoAuthGuard - Allowed Access');
-      return true;
-    } else {
-      console.log('NoAuthGuard - Redirecting to Dashboard');
-      this.router.navigate(['/dashboard']); // Redirect to dashboard
-      return false;
+    if (!token || !user?.exp) {
+      // console.log('✅ NoAuthGuard - Allowed Access to login pages');
+      return true; // Permet d’accéder aux pages de login
     }
+
+    const currentTime = Math.floor(Date.now() / 1000); // Temps actuel en secondes
+
+    if (user.exp > currentTime) {
+      // console.log('🔄 NoAuthGuard - Valid token, Redirecting to Dashboard');
+      this.router.navigate(['/dashboard']);
+      return false; // Bloque l’accès aux pages de login
+    }
+
+    // console.log('✅ NoAuthGuard - Token expired, Allowed Access to login pages');
+    return true; // Si le token est expiré, on laisse l’accès aux pages de login
   }
 }

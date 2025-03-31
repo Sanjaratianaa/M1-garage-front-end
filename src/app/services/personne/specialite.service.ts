@@ -6,7 +6,7 @@ import { environment } from 'src/environnements/environnement'; // Import de lâ€
 
 export interface Specialite {
     _id: string;
-    mecanicien: { _id: string, personne: {nom: string, prenom: string} } | null;
+    mecanicien: { _id: string, personne: {_id: string, nom: string, prenom: string} } | null;
     sousService: {
         _id: string;
         libelle: string;
@@ -53,6 +53,16 @@ export class SpecialiteService {
         });
 
         return this.http.get<Specialite[]>(this.apiUrl + "/active", { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    getSpecialitesActivesBySousService(idSousService: string): Observable<Specialite[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Specialite[]>(this.apiUrl + "/mecanicien/" + idSousService, { headers }).pipe(
             catchError(this.handleError)
         );
     }
