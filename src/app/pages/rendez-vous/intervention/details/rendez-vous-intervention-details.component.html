@@ -1,0 +1,168 @@
+<div class="rendez-vous-intervention-details">
+    <main class="pageWrapper maxWidth">
+        <app-breadcrumb>
+            <div class="bg-white rounded p-20 m-b-30">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h4 class="page-title m-0 f-s-18 f-w-600">Rendez-vous interventions</h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="d-flex align-items-center justify-content-lg-end">
+                            <mat-card-title class="mat-mdc-card-title m-b-0">
+                                <span
+                                    class="rounded p-x-8 p-y-2 text-primary bg-light-primary f-s-12 f-w-500">Details</span>
+                            </mat-card-title>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </app-breadcrumb>
+  
+      <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+        <mat-tab-group mat-stretch-tabs="false" animationDuration="0ms" class="mat-primary">
+  
+          <mat-tab label="Details">
+            <ng-template mat-tab-label>
+              <div class="d-flex align-items-center">
+                <mat-icon class="icon-20 m-r-8 d-flex">description</mat-icon>
+                Details
+              </div>
+            </ng-template>
+            <mat-card-content class="p-y-24">
+              <form [formGroup]="detailsForm">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Title</mat-label>
+                  <input matInput formControlName="title">
+                </mat-form-field>
+  
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Description</mat-label>
+                  <textarea matInput formControlName="description"></textarea>
+                </mat-form-field>
+  
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Assignee</mat-label>
+                  <input matInput formControlName="assignee">
+                </mat-form-field>
+  
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Status</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option value="open">Open</mat-option>
+                    <mat-option value="inprogress">In Progress</mat-option>
+                    <mat-option value="closed">Closed</mat-option>
+                  </mat-select>
+                </mat-form-field>
+  
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Date</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="date">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+  
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Heure Debut</mat-label>
+                  <input matInput type="time" formControlName="heureDebut">
+                </mat-form-field>
+  
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Heure Fin</mat-label>
+                  <input matInput type="time" formControlName="heureFin">
+                </mat-form-field>
+  
+                <button mat-flat-button color="primary" (click)="saveDetails()">Save Details</button>
+              </form>
+            </mat-card-content>
+          </mat-tab>
+  
+          <mat-tab label="Services">
+            <ng-template mat-tab-label>
+              <div class="d-flex align-items-center">
+                <mat-icon class="icon-20 m-r-8 d-flex">build</mat-icon>
+                Services
+              </div>
+            </ng-template>
+            <mat-card-content class="p-y-24">
+              <div *ngIf="intervention && intervention.services">
+                <div *ngFor="let service of intervention.services">
+                  <mat-card class="m-b-16">
+                    <mat-card-content>
+                      <mat-card-title>{{ service.raison }}</mat-card-title>
+  
+                      <mat-form-field appearance="outline" class="w-50 m-r-8">
+                        <mat-label>Quantité Finale</mat-label>
+                        <input matInput type="number" [(ngModel)]="service.quantiteFinale" (change)="saveServices()">
+                      </mat-form-field>
+  
+                      <mat-form-field appearance="outline" class="w-50 m-r-8">
+                        <mat-label>Heure Debut</mat-label>
+                        <input matInput type="time" [(ngModel)]="service.heureDebut" (change)="saveServices()">
+                      </mat-form-field>
+  
+                      <mat-form-field appearance="outline" class="w-50 m-r-8">
+                        <mat-label>Heure Fin</mat-label>
+                        <input matInput type="time" [(ngModel)]="service.heureFin" (change)="saveServices()">
+                      </mat-form-field>
+  
+                      <mat-form-field appearance="outline" class="w-50 m-r-8">
+                        <mat-label>Prix Unitaire</mat-label>
+                        <input matInput type="number" [(ngModel)]="service.prixUnitaire" (change)="saveServices()">
+                      </mat-form-field>
+  
+                      <mat-form-field appearance="outline" class="w-50 m-r-8">
+                        <mat-label>Prix Total</mat-label>
+                        <input matInput type="number" [(ngModel)]="service.prixTotal" (change)="saveServices()">
+                      </mat-form-field>
+  
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Commentaire</mat-label>
+                        <textarea matInput [(ngModel)]="service.commentaire" (change)="saveServices()"></textarea>
+                      </mat-form-field>
+  
+                      <mat-form-field appearance="outline" class="w-50 m-r-8">
+                        <mat-label>Status</mat-label>
+                        <mat-select [(ngModel)]="service.status" (valueChange)="saveServices()">
+                          <mat-option value="en cours">En Cours</mat-option>
+                          <mat-option value="en attente">En Attente</mat-option>
+                          <mat-option value="suspendue">Suspendue</mat-option>
+                          <mat-option value="terminé">Terminé</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
+              <div *ngIf="!intervention || !intervention.services">
+                No services available.
+              </div>
+              <button mat-flat-button color="primary" (click)="saveServices()">Save Services</button>
+            </mat-card-content>
+          </mat-tab>
+  
+          <mat-tab label="Notes">
+            <ng-template mat-tab-label>
+              <div class="d-flex align-items-center">
+                <mat-icon class="icon-20 m-r-8 d-flex">note</mat-icon>
+                Notes
+              </div>
+            </ng-template>
+            <mat-card-content class="p-y-24">
+              <form [formGroup]="notesForm">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Notes</mat-label>
+                  <textarea matInput formControlName="notes"></textarea>
+                </mat-form-field>
+              </form>
+              <button mat-flat-button color="primary">Save Notes</button>
+            </mat-card-content>
+          </mat-tab>
+  
+        </mat-tab-group>
+  
+        <mat-card-actions>
+          <button mat-flat-button (click)="goBack()">Back to List</button>
+        </mat-card-actions>
+      </mat-card>
+    </main>
+  </div>

@@ -8,6 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
+import { Router } from '@angular/router';
 
 // Define the interface for your intervention data
 export interface Intervention {
@@ -20,6 +23,9 @@ export interface Intervention {
   };
   status: string;
   date: Date;
+  heureDebut?: string; // Optional property
+  heureFin?: string;   // Optional property
+  services?: any[];
 }
 
 @Component({
@@ -42,9 +48,8 @@ export interface Intervention {
 })
 export class RendezVousInterventionComponent implements OnInit {
 
-  displayedColumns: string[] = ['id', 'title', 'assignee', 'status', 'date', 'action'];
+  displayedColumns: string[] = ['id', 'title', 'assignee', 'status', 'date', 'debut', 'fin', 'action'];
 
-  // Sample Data
   interventionsData: Intervention[] = [
     {
       id: 1,
@@ -52,7 +57,9 @@ export class RendezVousInterventionComponent implements OnInit {
       description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
       assignee: { name: 'Alice', imageUrl: '/assets/images/profile/user-1.jpg' },
       status: 'inprogress',
-      date: new Date('2024-05-01')
+      date: new Date('2024-05-01'),
+      heureDebut: '09:00',
+      heureFin: '10:00'
     },
     {
       id: 2,
@@ -68,7 +75,9 @@ export class RendezVousInterventionComponent implements OnInit {
       description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
       assignee: { name: 'Smith', imageUrl: '/assets/images/profile/user-3.jpg' },
       status: 'closed',
-      date: new Date('2024-05-02')
+      date: new Date('2024-05-02' ,  ),
+      heureDebut: '14:00',
+      heureFin: '15:00'
     },
     {
       id: 4,
@@ -84,7 +93,9 @@ export class RendezVousInterventionComponent implements OnInit {
       description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
       assignee: { name: 'Chris', imageUrl: '/assets/images/profile/user-5.jpg' },
       status: 'open',
-      date: new Date('2024-05-04')
+      date: new Date('2024-05-04'),
+      heureDebut: '11:00',
+      heureFin: '12:00'
     }
   ];
   dataSource = new MatTableDataSource<Intervention>(this.interventionsData);
@@ -95,6 +106,17 @@ export class RendezVousInterventionComponent implements OnInit {
   interventionsClosed = this.interventionsData.filter(t => t.status === 'closed').length;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
+
+  pageSize = 5;
+  currentPage = 0;
+  pageSizeOptions = [5, 10, 20];
+
+  selectedIntervention: Intervention | null = null;
+
+  constructor(
+    private dialog: MatDialog,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.dataSource.paginator = this.paginator;
@@ -107,5 +129,59 @@ export class RendezVousInterventionComponent implements OnInit {
       case 'closed': return 'bg-light-error';
       default: return 'bg-light';
     }
+  }
+
+  onRowClick(intervention: Intervention): void {
+    this.selectedIntervention = intervention;
+    if (!intervention.heureDebut || !intervention.heureFin) {
+      this.openModal();
+    }
+  }
+
+  onEditClick(intervention: Intervention): void {
+    this.selectedIntervention = intervention;
+    if (!intervention.heureDebut) {
+      this.openModal();
+    } else {
+      this.router.navigate(['/rendez-vous/interventions-details', intervention.id]);
+    }
+  }
+
+  async openModal(errorMessage: string = '') {
+    const data = {
+      title: 'Confirmation Intervention',
+      fields: [
+        { name: 'heureDebut', label: 'Heure de début', type: 'time', defaultValue: this.selectedIntervention?.heureDebut || "" },
+        { name: 'heureFin', label: 'Heure de fin', type: 'time', defaultValue: this.selectedIntervention?.heureFin || "" },
+      ],
+      submitText: 'Ajouter',
+      errorMessage: errorMessage,
+    };
+
+    const dialogRef = this.dialog.open(GenericModalComponent, {
+      width: '400px',
+      data: data,
+    });
+
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result) {
+        try {
+
+          console.log('Données du formulaire:', result);
+
+          if (this.selectedIntervention) {
+            this.selectedIntervention.heureDebut = result.heureDebut;
+            this.selectedIntervention.heureFin = result.heureFin;
+          }
+
+          // Refresh the table data
+          this.dataSource.data = [...this.interventionsData];
+          
+        } catch (error: any) {
+          console.error('Erreur lors de l’ajout:', error.message);
+          await this.openModal(error.message.replace("Error: ", ""));
+        }
+      }
+    });
   }
 }
