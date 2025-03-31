@@ -194,24 +194,6 @@
                 </mat-card-content>
             </mat-tab>
 
-            <mat-tab label="Notes">
-                <ng-template mat-tab-label>
-                    <div class="d-flex align-items-center">
-                        <mat-icon class="icon-20 m-r-8 d-flex">note</mat-icon>
-                        Notes
-                    </div>
-                </ng-template>
-                <mat-card-content class="p-y-24">
-                    <form [formGroup]="notesForm">
-                        <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>Notes</mat-label>
-                            <textarea matInput formControlName="notes"></textarea>
-                        </mat-form-field>
-                    </form>
-                    <button mat-flat-button color="primary">Save Notes</button>
-                </mat-card-content>
-            </mat-tab>
-
           </mat-tab-group>
 
           <mat-card-actions>

@@ -41,7 +41,7 @@ export class HistoriqueRendezVousComponent {
     titre: string = '';
     isValidable: boolean = false;
     isAdmin: boolean = false;
-    etats: string[] = ['en attente', 'validé', 'rejeté', 'annulé'];
+    etats: string[] = ['en attente', 'validé', 'rejeté', 'annulé', 'terminé'];
 
     paginatedRendezVous: RendezVous[] = [];
 

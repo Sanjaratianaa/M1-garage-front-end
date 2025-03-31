@@ -10,6 +10,7 @@ export interface Personne {
     prenom: string;
     numeroTelephone: string;
     email: string;
+    genre: string;
 }
 
 export interface Voiture {
@@ -44,6 +45,7 @@ export interface Service {
     quantiteEstimee: number;
     prixUnitaire: number;
     mecaniciensDisponibles: any[];
+    status: string;
 }
 
 export interface RendezVous {
@@ -58,8 +60,8 @@ export interface RendezVous {
     piecesAchetees: any[];
     remarque: string;
     heureFin: string | any | null;
+    heureDebut: string | any | null;
 }
-
 
 @Injectable({
     providedIn: 'root'
@@ -82,6 +84,19 @@ export class RendezVousService {
         });
 
         return this.http.get<RendezVous[]>(`${this.apiUrl}/liste/parClient`, { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
+     * Récupérer toutes les rendezVous by mecanicien
+     */
+    getRendezVousByMecanicien(): Observable<RendezVous[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<RendezVous[]>(`${this.apiUrl}/parMecanicien`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
