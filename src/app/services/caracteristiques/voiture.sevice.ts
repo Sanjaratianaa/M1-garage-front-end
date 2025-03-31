@@ -72,6 +72,15 @@ export class VoitureService {
     }
 
     /**
+     * Récupérer une voiture
+     */
+    getVoituresById(voitureId: string): Observable<Voiture> {
+        return this.http.get<Voiture>(this.apiUrl + "/one/" + voitureId, {headers: this.headers}).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
      * Ajouter une nouvelle voiture
      */
     addVoiture(idMarque: string, idModele: string, idCategorie: string, idTypeTransmission: string, annee: number,

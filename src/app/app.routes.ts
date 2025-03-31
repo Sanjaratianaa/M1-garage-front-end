@@ -53,11 +53,6 @@ export const routes: Routes = [
           import('./pages/rendez-vous/rendez-vous.routes').then((m) => m.RendezVousRoutes),
       },
       {
-        path: 'calendar',
-        loadChildren: () =>
-          import('./pages/calendar/calendar.routes').then((m) => m.CalendarRoutes),
-      },
-      {
         path: 'specialite',
         loadChildren: () =>
           import('./pages/specialite/specialite.routes').then((m) => m.SpecialiteRoutes),

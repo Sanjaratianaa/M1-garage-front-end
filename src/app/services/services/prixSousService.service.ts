@@ -46,6 +46,19 @@ export class PrixSousServiceService {
     }
 
     /**
+     * Récupérer un sousService
+     */
+    getPrixSousService(sousServiceId: string): Observable<PrixSousService> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<PrixSousService>(`${this.apiUrl}/${sousServiceId}`, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
      * Ajouter une nouvelle sousService
      */
     addPrixSousService(idSousService: string, date: Date, prixUnitaire: number): Observable<PrixSousService> {

@@ -198,7 +198,10 @@ export class RendezVousComponent implements OnInit {
         if (event.meta && event.meta.rendezVousData) {
             const rendezVousData = event.meta.rendezVousData;
             console.log('RendezVous Data', rendezVousData);
-            this.router.navigate(['/rendez-vous', rendezVousData._id]);
+            this.router.navigate(['/rendez-vous/details/', rendezVousData._id], {
+                state: { rendezVous: rendezVousData}
+            });
+
 
             // Implement your logic to display event details here (e.g., open a modal).
         }

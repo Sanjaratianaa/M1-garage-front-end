@@ -42,10 +42,10 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Historique Rendez-vous' ||
         item.displayName === 'Demande en attente'
       );
-    } else if (userRole === 'mecanicien') {
+    } else if (userRole === 'mecanicien' || userRole === 'mécanicien') {
       return (
+        item.displayName === 'Interventions' ||
         item.displayName === 'Planning Rendez-vous' ||
-        item.displayName === 'Calendar' ||
         item.displayName === 'Dashboard' ||
         item.displayName === 'Service' ||
         item.displayName === 'Sous Service' ||
@@ -178,6 +178,12 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
     {
       divider: true,
       navCap: 'RENDEZ-VOUS',
+    },
+    {
+      displayName: 'Interventions',
+      iconName: 'solar:widget-4-line-duotone',
+      route: '/rendez-vous/interventions',
+      chip: true,
     },
     {
       displayName: 'Prendre Rendez-vous',
