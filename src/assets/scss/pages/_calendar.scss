@@ -280,7 +280,7 @@
 }
 
 .add-sous-service-button {
-    margin-top: 10px;
+    margin-top: 10px; /* Spacing above the "Add" button */
 }
 
 .sous-service-header {
@@ -356,4 +356,5 @@
         padding-top: 4px !important;
         padding-bottom: 4px !important;
     }
+    justify-content: space-between; /* Pushes label and button to opposite ends */
 }

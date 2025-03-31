@@ -55,6 +55,25 @@ export class RendezVousModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
+  // ngOnInit() {
+  //   if (!this.data || !this.data.fields) {
+  //     console.log('Aucun champ fourni pour le formulaire dynamique.');
+  //     return;
+  //   }
+
+  //   this.allSousServices = this.data.fields.find((f: Field) => f.name === 'id_sous_service')?.options || [];
+  //   this.voituresOptions = this.data.fields.find((f: Field) => f.name === 'voiture')?.options || [];
+
+  //   this.form = this.fb.group({
+  //     voiture: [this.data.fields.find((f: Field) => f.name === 'voiture')?.defaultValue || '', Validators.required],
+  //     date: [this.data.fields.find((f: Field) => f.name === 'date')?.defaultValue || '', Validators.required],
+  //     sousServicesArray: this.fb.array([]), // Initialize as empty FormArray
+  //   });
+
+  //   // Initialize FormArray with at least one sous-service entry
+  //   this.addSousService();
+  // }
+
   ngOnInit() {
     if (!this.data || !this.data.fields) {
       console.log('Aucun champ fourni pour le formulaire dynamique.');
@@ -64,14 +83,29 @@ export class RendezVousModalComponent implements OnInit {
     this.allSousServices = this.data.fields.find((f: Field) => f.name === 'id_sous_service')?.options || [];
     this.voituresOptions = this.data.fields.find((f: Field) => f.name === 'voiture')?.options || [];
 
+    // Si un rendez-vous est fourni, on pré-remplit les champs
+    const rv = this.data.rendezVous || {}; 
+    console.log(rv);
+
     this.form = this.fb.group({
-      voiture: [this.data.fields.find((f: Field) => f.name === 'voiture')?.defaultValue || '', Validators.required],
-      date: [this.data.fields.find((f: Field) => f.name === 'date')?.defaultValue || '', Validators.required],
-      sousServicesArray: this.fb.array([]), // Initialize as empty FormArray
+      voiture: [rv.voiture?._id || '', Validators.required],
+      date: [rv.dateRendezVous ? new Date(rv.dateRendezVous).toISOString().slice(0, 16) : '', Validators.required],
+      sousServicesArray: this.fb.array([])
     });
 
-    // Initialize FormArray with at least one sous-service entry
-    this.addSousService();
+    // Pré-remplir les sous-services si disponibles
+    if (rv.services && rv.services.length > 0) {
+      rv.services.forEach((service: any) => {
+        console.log(service);
+        this.sousServicesFormArray.push(this.fb.group({
+          id: [service.sousSpecialite._id, Validators.required],
+          quantite: [service.quantiteEstimee || 1, Validators.min(1)],
+          reason: [service.raison || '', Validators.required]
+        }));
+      });
+    } else {
+      this.addSousService(); // Ajoute un sous-service vide si aucun n'est fourni
+    }
   }
 
   get sousServicesFormArray() {

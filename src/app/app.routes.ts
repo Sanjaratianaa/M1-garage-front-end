@@ -13,7 +13,7 @@ export const routes: Routes = [
   {
     path: '',
     component: FullComponent,
-    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'dashboard',

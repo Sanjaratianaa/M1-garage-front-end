@@ -52,29 +52,6 @@ export class SousServiceComponent {
     colors: string[] = ['#FF5722', '#4CAF50', '#2196F3', '#FFEB3B'];
     columns = ['service', 'libelle', 'duree', 'Prix', 'Manager', 'Date d\'enregistrement', 'Manager Suppression', 'Date Suppression', 'Statut', 'actions'];
 
-    // services = [
-    //     { id: 1, nom: 'Mécanique', icon: 'build', backgroundColor: '#FF5722' },   // Orange #FF5722 #4CAF50 #2196F3 #FFEB3B
-    //     { id: 2, nom: 'Carrosserie', icon: 'build', backgroundColor: '#4CAF50' },   // Vert
-    //     { id: 3, nom: 'Peinture', icon: 'build', backgroundColor: '#2196F3' },    // Bleu
-    //     { id: 4, nom: 'Électronique', icon: 'build', backgroundColor: '#FFEB3B' },  // Jaune
-    //     { id: 5, nom: 'Mécanique 2', icon: 'build', backgroundColor: '#FF5722' },   // Orange
-    //     { id: 6, nom: 'Carrosserie 2', icon: 'build', backgroundColor: '#4CAF50' },   // Vert
-    //     { id: 7, nom: 'Peinture 3', icon: 'build', backgroundColor: '#2196F3' },    // Bleu
-    //     { id: 8, nom: 'Électronique 4', icon: 'build', backgroundColor: '#FFEB3B' }  // Jaune
-    // ];
-
-
-
-    // sousServices = [
-    //     { id: 1, nom: 'Vidange', description: 'Changement d’huile', serviceId: 1, serviceNom: "Mécanique" },
-    //     { id: 2, nom: 'Freinage', description: 'Réparation des freins', serviceId: 1, serviceNom: "Mécanique" },
-    //     { id: 3, nom: 'Tôlerie', description: 'Réparation de la carrosserie', serviceId: 2, serviceNom: "Carrosserie" },
-    //     { id: 4, nom: 'Peinture complète', description: 'Peinture complète du véhicule', serviceId: 3, serviceNom: "Peinture" },
-    //     { id: 5, nom: 'Diagnostic électronique', description: 'Analyse des pannes électroniques', serviceId: 4, serviceNom: "Électronique" },
-    // ];
-
-
-
     constructor(private dialog: MatDialog, private serviceService: ServiceService, private souServiceService: SousServiceService) { }
 
     ngOnInit() {

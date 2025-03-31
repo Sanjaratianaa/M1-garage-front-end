@@ -3,12 +3,21 @@ import { RendezVousComponent } from './rendez-vous.component';
 import { RendezVousDetailComponent } from './rendez-vous-detail/rendez-vous-detail.component';
 import { RendezVousInterventionComponent } from './intervention/rendez-vous-intervention.component';
 import { RendezVousInterventionDetailsComponent } from './intervention/details/rendez-vous-intervention-details.component';
+import { HistoriqueRendezVousComponent } from './historique-rendez-vous/historique-rendez-vous.component';
 // pages
 
 export const RendezVousRoutes: Routes = [
   {
     path: '',
     children: [
+      {
+        path: 'historique-demande',
+        component: HistoriqueRendezVousComponent,
+      },
+      {
+        path: ':status',
+        component: HistoriqueRendezVousComponent,
+      },
       {
         path: '',
         component: RendezVousComponent,
@@ -22,9 +31,10 @@ export const RendezVousRoutes: Routes = [
         component: RendezVousInterventionDetailsComponent,
       },
       {
-        path: ':id',
+        path: 'details/:id',
         component: RendezVousDetailComponent,
       },
     ],
   }, 
-];
+]
+
