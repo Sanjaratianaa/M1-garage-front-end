@@ -13,7 +13,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { addMonths, subMonths } from 'date-fns';
 import { SousServiceService } from 'src/app/services/services/sousService.service';
 import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voiture.sevice';
-import { PrixSousServiceService } from 'src/app/services/services/prixSousService.service';
 import { Router } from '@angular/router';
 import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
 import { RendezVousModalComponent } from '../add-rendez-vous-modal/rendez-vous-modal.component';
@@ -84,8 +83,8 @@ export class RendezVousComponent implements OnInit {
             this.idPersonne = user.idPersonne;
             this.isClient = true;
             this.getAllVoitures();
+            this.getAllSousServicesActives();
         }
-        this.getAllSousServicesActives();
         this.getAllRendezVous();
     }
 

@@ -14,7 +14,14 @@ import { DeleteConfirmationModalComponent } from 'src/app/components/modal-gener
 import { DetailRendezVousComponent } from '../detail-rendez-vous/detail-rendez-vous.component';
 import { ActivatedRoute } from '@angular/router';
 import { SpecialiteService } from 'src/app/services/personne/specialite.service';
+import { SousServiceService } from 'src/app/services/services/sousService.service';
+import { VoitureService, Voiture } from 'src/app/services/caracteristiques/voiture.sevice';
+import { RendezVousModalComponent } from '../add-rendez-vous-modal/rendez-vous-modal.component';
 
+interface VoitureSelectItem {
+    value: string;
+    label: string;
+}
 
 @Component({
     selector: 'app-rendez-vous',
@@ -24,6 +31,10 @@ import { SpecialiteService } from 'src/app/services/personne/specialite.service'
 
 })
 export class HistoriqueRendezVousComponent {
+    sousServices: any[] = [];
+    sousServicesObject: any[] = [];
+    voitures: VoitureSelectItem[] = [];
+
     displayedColumns: string[] = [];
     listeRendezVous: RendezVous[];
     status: string | null = null;
@@ -46,7 +57,9 @@ export class HistoriqueRendezVousComponent {
         private dialog: MatDialog,
         private rendezVousService: RendezVousService,
         private route: ActivatedRoute,
-        private specialiteService: SpecialiteService
+        private specialiteService: SpecialiteService,
+        private sousServiceService: SousServiceService,
+        private voitureService: VoitureService,
     ) { }
 
     ngOnInit() {
@@ -61,6 +74,10 @@ export class HistoriqueRendezVousComponent {
         const role = user.role.libelle;
         if (role === "manager")
             this.isAdmin = true;
+        else if(role === "client") {
+            this.getAllVoitures();
+            this.getAllSousServicesActives();
+        }
 
         // Initialisez la pagination au chargement du composant
         if (this.status == "en-attente") {
@@ -73,6 +90,39 @@ export class HistoriqueRendezVousComponent {
         this.displayedColumns = this.isAdmin ? ['Date et heure demande', "Client", "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "Statut", 'actions']
             : ['Date et heure demande', "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "Statut", 'actions'];
 
+    }
+
+    getAllSousServicesActives() {
+        this.sousServiceService.getSousServicesActives().subscribe({
+            next: (sousServices) => {
+                this.sousServicesObject = sousServices;
+                this.sousServices = sousServices.map(sousService => ({
+                    value: sousService._id,
+                    label: sousService.libelle,
+                    serviceId: sousService.service._id
+                }));
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des sous Services:', error.message);
+                alert('Impossible de charger les sous Services. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllVoitures() {
+        this.voitureService.getVoituresByClient().subscribe({
+            next: (voitures: Voiture[]) => {
+                this.voitures = voitures.map((voiture: Voiture) => ({
+                    value: voiture._id,
+                    label: voiture.numeroImmatriculation
+
+                }));
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des voitures:', error.message);
+                alert('Impossible de charger les voitures. Veuillez réessayer plus tard.');
+            }
+        });
     }
 
     getAllRendezVous() {
@@ -201,6 +251,47 @@ export class HistoriqueRendezVousComponent {
             }
         } catch (error: any) {
             await this.openAnswerDetailsModal(rendezVous, error.message);
+        }
+    }
+
+    async openEditModal(rendezVous: RendezVous, errorMessage: string = '') {
+        const data = {
+            title: 'Modifier un rendez-vous',
+            rendezVous: rendezVous, 
+            fields: [
+                {
+                    name: 'voiture', label: 'Voiture', type: 'select', required: true,
+                    options: this.voitures
+                },
+                {
+                    name: "date",
+                    label: "Date souhaité pour le rendez-vous",
+                    type: "date",
+                    required: true
+                },
+                {
+                    name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
+                    options: this.sousServices
+                },
+            ],
+            submitText: 'Modifier',
+            errorMessage: errorMessage
+        };
+
+        const dialogRef = this.dialog.open(RendezVousModalComponent, {
+            width: '600px',
+            data: data,
+        });
+
+        const result = await firstValueFrom(dialogRef.afterClosed());
+
+        try {
+            if (result) {
+                console.log('Données du formulaire:', result);
+            }
+        } catch (error: any) {
+            console.error('Erreur lors de l’ajout:', error.message);
+            await this.openEditModal(rendezVous, error.message.replace("Error: ", ""));
         }
     }
 
