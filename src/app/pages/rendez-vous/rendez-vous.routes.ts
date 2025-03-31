@@ -15,14 +15,6 @@ export const RendezVousRoutes: Routes = [
         component: HistoriqueRendezVousComponent,
       },
       {
-        path: ':status',
-        component: HistoriqueRendezVousComponent,
-      },
-      {
-        path: '',
-        component: RendezVousComponent,
-      },
-      {
         path: 'interventions',
         component: RendezVousInterventionComponent,
       },
@@ -34,7 +26,14 @@ export const RendezVousRoutes: Routes = [
         path: 'details/:id',
         component: RendezVousDetailComponent,
       },
+      {
+        path: ':status', // Cette route dynamique doit être après les autres routes fixes
+        component: HistoriqueRendezVousComponent,
+      },
+      {
+        path: '', // La route par défaut doit être en dernier
+        component: RendezVousComponent,
+      },
     ],
   }, 
-]
-
+];
