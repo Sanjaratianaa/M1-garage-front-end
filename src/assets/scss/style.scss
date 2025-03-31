@@ -28,3 +28,8 @@
 //     overflow: hidden; // Bloque le scroll sur le body
 //     margin: 0;
 // }
+
+::ng-deep .mat-dialog-container {
+    max-width: none;  /* Désactive la largeur maximale */
+    width: 900px;     /* Définissez la largeur souhaitée */
+}

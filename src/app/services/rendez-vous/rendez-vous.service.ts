@@ -37,12 +37,13 @@ export interface SousSpecialite {
 }
 
 export interface Service {
+    _id: string;
     sousSpecialite: SousSpecialite;
     raison: string;
     mecanicien: Personne;
     quantiteEstimee: number;
     prixUnitaire: number;
-    _id: string;
+    mecaniciensDisponibles: any[];
 }
 
 export interface RendezVous {
@@ -80,7 +81,7 @@ export class RendezVousService {
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.get<RendezVous[]>(this.apiUrl, { headers }).pipe(
+        return this.http.get<RendezVous[]>(`${this.apiUrl}/liste/parClient`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -88,7 +89,7 @@ export class RendezVousService {
     /**
      * Récupérer toutes les sousServices
      */
-     getAllRendezVous(): Observable<RendezVous[]> {
+    getAllRendezVous(): Observable<RendezVous[]> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
@@ -106,9 +107,9 @@ export class RendezVousService {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.getToken()}`
         });
-    
+
         console.log("API URL:", this.apiUrl);
-        
+
         const data = {
             "client": "67e3071018c9673f291d3ad2",
             "date": "3035-09-23T07:00",
@@ -125,7 +126,7 @@ export class RendezVousService {
             "voiture": "67e2701349b59270464e2879"
         }
 
-        console.log("data: ",rendezVousData);
+        console.log("data: ", rendezVousData);
 
         return this.http.post<RendezVous>(this.apiUrl, rendezVousData, { headers }).pipe(
             catchError(this.handleError)
@@ -144,27 +145,49 @@ export class RendezVousService {
     }
 
     /**
-     * Modifier une categorie existante
+     * Modifier une rendezVous existante
      */
-    updateRendezVous(categorie: RendezVous): Observable<RendezVous> {
+    updateRendezVous(rendezVous: RendezVous): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.put<RendezVous>(`${this.apiUrl}/${categorie._id}`, categorie, { headers }).pipe(
+        return this.http.put<RendezVous>(`${this.apiUrl}/${rendezVous._id}`, rendezVous, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     /**
-     * Supprimer une categorie par ID
+     * Modifier une rendezVous existante
      */
-    deleteRendezVous(categorieId: string): Observable<RendezVous> {
+    answerRendezVous(idRendezVous: string, action: string, commentaire: string, services: Service[], nouveauMecanicienId: string): Observable<RendezVous[]> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.delete<RendezVous>(`${this.apiUrl}/${categorieId}`, { headers }).pipe(
+        const actions: any[] = [
+            {
+                action: action,
+                commentaire: commentaire,
+                services: services,
+                nouveauMecanicienId: nouveauMecanicienId
+            }
+        ];
+
+        return this.http.put<RendezVous[]>(`${this.apiUrl}/repondre/${idRendezVous}`, {actions}, { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
+     * Supprimer une rendezVous par ID
+     */
+    deleteRendezVous(rendezVousId: string): Observable<RendezVous> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<RendezVous>(`${this.apiUrl}/${rendezVousId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

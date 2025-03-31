@@ -23,6 +23,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Voiture' ||
         item.displayName === 'Specialité' ||
         item.displayName === 'Historique Rendez-vous' ||
+        item.displayName === 'Planning Rendez-vous' ||
         item.displayName === 'Demande en attente'
       );
 
@@ -43,6 +44,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
       );
     } else if (userRole === 'mecanicien') {
       return (
+        item.displayName === 'Planning Rendez-vous' ||
         item.displayName === 'Calendar' ||
         item.displayName === 'Dashboard' ||
         item.displayName === 'Service' ||
@@ -179,6 +181,12 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
     },
     {
       displayName: 'Prendre Rendez-vous',
+      iconName: 'solar:bookmark-square-minimalistic-line-duotone',
+      route: '/rendez-vous',
+      chip: true,
+    },
+    {
+      displayName: 'Planning Rendez-vous',
       iconName: 'solar:bookmark-square-minimalistic-line-duotone',
       route: '/rendez-vous',
       chip: true,

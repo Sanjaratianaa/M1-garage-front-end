@@ -36,7 +36,6 @@ interface VoitureSelectItem {
         CalendarModule,
     ],
     templateUrl: './rendez-vous.component.html',
-    // styleUrls: ['./calendar.component.scss'],
     schemas: [NO_ERRORS_SCHEMA],
 })
 export class RendezVousComponent implements OnInit {
@@ -52,6 +51,8 @@ export class RendezVousComponent implements OnInit {
     sousServicesObject: any[] = [];
     voitures: VoitureSelectItem[] = [];
     rendezVous: any[] = [];
+    isClient: boolean = false;
+    idPersonne: string;
 
     newSousService: any = {
         voiture: null,
@@ -73,12 +74,17 @@ export class RendezVousComponent implements OnInit {
         private sousServiceService: SousServiceService,
         private voitureService: VoitureService,
         private rendezVousService: RendezVousService,
-        private prixSousServiceService: PrixSousServiceService,
         private router: Router,
     ) { }
 
     ngOnInit() {
-        this.getAllVoitures();
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const role = user.role.libelle;
+        if (role === "client") {
+            this.idPersonne = user.idPersonne;
+            this.isClient = true;
+            this.getAllVoitures();
+        }
         this.getAllSousServicesActives();
         this.getAllRendezVous();
     }
@@ -110,6 +116,7 @@ export class RendezVousComponent implements OnInit {
                 this.voitures = voitures.map((voiture: Voiture) => ({
                     value: voiture._id,
                     label: voiture.numeroImmatriculation
+
                 }));
             },
             error: (error) => {
@@ -134,7 +141,7 @@ export class RendezVousComponent implements OnInit {
                     return {
                         start: rv.dateRendezVous ? new Date(rv.dateRendezVous) : new Date(),
                         end: rv?.heureFin ? new Date(rv.heureFin) : undefined,
-                        title: `Rendez-vous pour: ${rv.voiture?.numeroImmatriculation || 'N/A'} - ${serviceDescriptions.join(', ')}`,
+                        title: this.isClient && this.idPersonne === rv.client._id ? `Rendez-vous pour: ${rv.voiture?.numeroImmatriculation || 'N/A'} - ${serviceDescriptions.join(', ')}` : `Rendez-vous pour: ${ rv.client.nom } ${ rv.client.prenom } - ${rv.voiture?.numeroImmatriculation || 'N/A'} - ${serviceDescriptions.join(', ')}`,
                         allDay: false,
                         meta: {
                             rendezVousData: rv
@@ -278,7 +285,7 @@ export class RendezVousComponent implements OnInit {
 
                 const rendezVous = await firstValueFrom(this.rendezVousService.addRendezVous(this.newSousService));
                 console.log(rendezVous);
-                
+
                 // Ajouter le nouveau rendez-vous à la liste existante
                 this.rendezVous.push(rendezVous);
 
