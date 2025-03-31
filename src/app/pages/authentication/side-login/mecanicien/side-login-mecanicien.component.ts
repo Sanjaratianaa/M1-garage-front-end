@@ -21,8 +21,8 @@ export class AppSideLoginMecanicienComponent {
   constructor(private router: Router, private authService: AuthentificationService) {}
 
   form = new FormGroup({
-    email: new FormControl('layah@example.com', [Validators.required, Validators.email]),
-    password: new FormControl('securePassword123', [Validators.required, Validators.minLength(6)]),
+    email: new FormControl('noah@example.com', [Validators.required, Validators.email]),
+    password: new FormControl('noah1234', [Validators.required, Validators.minLength(6)]),
   });
 
   get f() {

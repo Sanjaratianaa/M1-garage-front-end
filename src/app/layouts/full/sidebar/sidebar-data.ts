@@ -38,9 +38,10 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Pièce détachée' ||
         item.displayName === 'Voiture'
       );
-    } else if (userRole === 'mecanicien') {
+    } else if (userRole === 'mecanicien' || userRole === 'mécanicien') {
       return (
         item.displayName === 'Rendez-Vous' ||
+        item.displayName === 'Interventions' ||
         item.displayName === 'Dashboard' ||
         item.displayName === 'Service' ||
         item.displayName === 'Sous Service' ||

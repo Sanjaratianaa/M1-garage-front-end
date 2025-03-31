@@ -44,7 +44,6 @@ export interface Intervention {
   ],
   templateUrl: './rendez-vous-intervention.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-//   styleUrls: ['./rendez-vous-intervention.component.scss']
 })
 export class RendezVousInterventionComponent implements OnInit {
 

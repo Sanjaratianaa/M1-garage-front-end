@@ -18,7 +18,6 @@
           </div>
       </app-breadcrumb>
 
-      <!-- Summary Cards -->
       <div class="row">
           <div class="col-sm-6 col-lg-3">
               <mat-card
@@ -50,7 +49,6 @@
           </div>
       </div>
 
-      <!-- Search Input and Add Ticket Button -->
       <mat-card class="mat-mdc-card mdc-card cardWithShadow">
           <mat-card-content class="mat-mdc-card-content">
               <div class="row justify-content-between gap-16">
@@ -71,13 +69,11 @@
                   <table mat-table [dataSource]="dataSource" class="mat-mdc-table w-100 f-w-500 no-wrap"
                       role="table">
 
-                      <!-- ID Column -->
                       <ng-container matColumnDef="id">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Id</th>
                           <td mat-cell *matCellDef="let intervention">{{ intervention.id }}</td>
                       </ng-container>
 
-                      <!-- Title Column -->
                       <ng-container matColumnDef="title">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Title</th>
                           <td mat-cell *matCellDef="let intervention">
@@ -86,7 +82,6 @@
                           </td>
                       </ng-container>
 
-                      <!-- Assignee Column -->
                       <ng-container matColumnDef="assignee">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Assigned To</th>
                           <td mat-cell *matCellDef="let intervention">
@@ -98,7 +93,6 @@
                           </td>
                       </ng-container>
 
-                      <!-- Status Column -->
                       <ng-container matColumnDef="status">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Status</th>
                           <td mat-cell *matCellDef="let intervention">
@@ -109,7 +103,6 @@
                           </td>
                       </ng-container>
 
-                      <!-- Date Column -->
                       <ng-container matColumnDef="date">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Date</th>
                           <td mat-cell *matCellDef="let intervention" class="f-s-14">
@@ -117,7 +110,6 @@
                           </td>
                       </ng-container>
 
-                      <!-- Debut Column -->
                       <ng-container matColumnDef="debut">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Debut</th>
                           <td mat-cell *matCellDef="let intervention" class="f-s-14">
@@ -125,7 +117,6 @@
                           </td>
                       </ng-container>
 
-                      <!-- Fin Column -->
                       <ng-container matColumnDef="fin">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Fin</th>
                           <td mat-cell *matCellDef="let intervention" class="f-s-14">
@@ -133,7 +124,6 @@
                           </td>
                       </ng-container>
 
-                      <!-- Action Column -->
                       <ng-container matColumnDef="action">
                           <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Action</th>
                           <td mat-cell *matCellDef="let intervention" class="action-link">
