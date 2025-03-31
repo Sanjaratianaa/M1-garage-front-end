@@ -68,7 +68,7 @@ export class CategorieComponent {
     if (this.newCategorie) {
       console.log(this.newCategorie);
       try {
-        const categorie = await firstValueFrom(this.categorieService.addCategorie(this.newCategorie));
+        const categorie = await firstValueFrom(this.categorieService.addCategorie(this.newCategorie.trim()));
         console.log('Categorie ajoutée avec succès:', categorie);
         this.categories.push(categorie);
 
@@ -149,7 +149,7 @@ export class CategorieComponent {
         console.log('Modification enregistrée:', result);
         
         // Fusionner les données existantes de la categorie avec les modifications
-        const updatedData = { ...categorie, libelle: result.libelle };
+        const updatedData = { ...categorie, libelle: result.libelle.trim() };
         console.log(updatedData);
 
         // Attendre la mise à jour via le service

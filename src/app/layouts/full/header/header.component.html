@@ -20,7 +20,7 @@
 
   <span class="flex-1-auto"></span>
 
-  <a href="https://adminmart.com/product/matdash-material-angular-dashboard-template/?ref=56" target="_blank" mat-flat-button>Check Pro Template</a>
+  <p *ngIf="isLoggedIn" style="font-size: 12px; font-weight: bold; color: #333;">Welcome, {{ userName }}!</p>
 
   <!-- --------------------------------------------------------------- -->
   <!-- profile Dropdown -->
@@ -44,7 +44,7 @@
     </button>
 
     <div class="p-x-12 m-t-12">
-      <a [routerLink]="['/authentication/login']" mat-stroked-button class="w-100">Logout</a>
+      <button mat-stroked-button (click)="logout()">Logout</button>
     </div>
   </mat-menu>
 </mat-toolbar>

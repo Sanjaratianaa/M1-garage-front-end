@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -22,11 +22,32 @@ export class CategorieService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les categories
      */
     getCategories(): Observable<Categorie[]> {
-        return this.http.get<Categorie[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Categorie[]>(this.apiUrl, { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
+     * Récupérer toutes les categories avtives
+     */
+    getCategoriesActives(): Observable<Categorie[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<Categorie[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -41,10 +62,14 @@ export class CategorieService {
      * Ajouter une nouvelle categorie
      */
     addCategorie(libelle: string): Observable<Categorie> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const categorieData = {
             libelle: libelle, // Inclure seulement le libelle
         };
-        return this.http.post<Categorie>(this.apiUrl, categorieData).pipe(
+        return this.http.post<Categorie>(this.apiUrl, categorieData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -53,7 +78,11 @@ export class CategorieService {
      * Modifier une categorie existante
      */
     updateCategorie(categorie: Categorie): Observable<Categorie> {
-        return this.http.put<Categorie>(`${this.apiUrl}/${categorie._id}`, categorie).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<Categorie>(`${this.apiUrl}/${categorie._id}`, categorie, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -62,7 +91,11 @@ export class CategorieService {
      * Supprimer une categorie par ID
      */
     deleteCategorie(categorieId: string): Observable<Categorie> {
-        return this.http.delete<Categorie>(`${this.apiUrl}/${categorieId}`).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<Categorie>(`${this.apiUrl}/${categorieId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

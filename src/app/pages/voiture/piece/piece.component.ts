@@ -69,7 +69,7 @@ export class PieceComponent {
     if (this.newPiece) {
       console.log(this.newPiece);
       try {
-        const piece = await firstValueFrom(this.pieceService.addPiece(this.newPiece));
+        const piece = await firstValueFrom(this.pieceService.addPiece(this.newPiece.trim()));
         console.log('Piece ajoutée avec succès:', piece);
         this.pieces.push(piece);
 
@@ -150,7 +150,7 @@ export class PieceComponent {
         console.log('Modification enregistrée:', result);
         
         // Fusionner les données existantes de la piece avec les modifications
-        const updatedData = { ...piece, libelle: result.libelle };
+        const updatedData = { ...piece, libelle: result.libelle.trim() };
         console.log(updatedData);
 
         // Attendre la mise à jour via le service

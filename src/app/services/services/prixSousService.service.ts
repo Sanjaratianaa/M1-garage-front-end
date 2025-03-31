@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -28,12 +28,33 @@ export class PrixSousServiceService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les sousServices
      */
     getPrixSousServices(): Observable<PrixSousService[]> {
-        return this.http.get<PrixSousService[]>(this.apiUrl).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<PrixSousService[]>(this.apiUrl, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
+     * Récupérer un sousService
+     */
+    getPrixSousService(sousServiceId: string): Observable<PrixSousService> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<PrixSousService>(`${this.apiUrl}/${sousServiceId}`, { headers }).pipe(
+            catchError(this.handleError)
         );
     }
 
@@ -41,13 +62,18 @@ export class PrixSousServiceService {
      * Ajouter une nouvelle sousService
      */
     addPrixSousService(idSousService: string, date: Date, prixUnitaire: number): Observable<PrixSousService> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const prixSousServiceData = {
-            sousService: idSousService, 
+            sousService: idSousService,
             date: date,
             prixUnitaire: prixUnitaire
         };
-        return this.http.post<PrixSousService>(this.apiUrl, prixSousServiceData).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+
+        return this.http.post<PrixSousService>(this.apiUrl, prixSousServiceData, { headers }).pipe(
+            catchError(this.handleError)
         );
     }
 
@@ -55,8 +81,12 @@ export class PrixSousServiceService {
      * Modifier une sousService existante
      */
     updatePrixSousService(sousService: PrixSousService): Observable<PrixSousService> {
-        return this.http.put<PrixSousService>(`${this.apiUrl}/${sousService._id}`, sousService).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<PrixSousService>(`${this.apiUrl}/${sousService._id}`, sousService, { headers }).pipe(
+            catchError(this.handleError)
         );
     }
 
@@ -64,8 +94,12 @@ export class PrixSousServiceService {
      * Supprimer une sousService par ID
      */
     deletePrixSousService(sousServiceId: string): Observable<PrixSousService> {
-        return this.http.delete<PrixSousService>(`${this.apiUrl}/${sousServiceId}`).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<PrixSousService>(`${this.apiUrl}/${sousServiceId}`, { headers }).pipe(
+            catchError(this.handleError)
         );
     }
 
@@ -74,7 +108,7 @@ export class PrixSousServiceService {
      */
     private handleError(error: HttpErrorResponse) {
         let errorMessage = error.error.message;
-        console.log("handle erreur: erreor message : " + errorMessage);
+        console.log("handle erreur: error message : " + errorMessage);
         return throwError(() => new Error(errorMessage));
     }
 }

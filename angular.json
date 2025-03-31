@@ -15,23 +15,20 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
-          "options": {
-            "allowedCommonJsDependencies": ["apexcharts", "bezier-easing"],
-            "outputPath": {
-              "base": "dist/Matdash"
-            },
-            "index": "src/index.html",
-            "polyfills": ["zone.js"],
-            "tsConfig": "tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
-            "styles": [
-              "src/styles.scss",
-              "src/assets/scss/style.scss"
-            ],
-            "scripts": [],
-            "browser": "src/main.ts"
+          "builder": "@angular-devkit/build-angular:browser",
+            "options": {
+              "outputPath": "dist/Matdash",
+              "index": "src/index.html",
+              "main": "src/main.ts",
+              "polyfills": ["zone.js"],
+              "tsConfig": "tsconfig.app.json",
+              "inlineStyleLanguage": "scss",
+              "assets": ["src/favicon.ico", "src/assets", "src/_redirects"],
+              "styles": [
+                  "src/styles.scss",
+                  "src/assets/scss/style.scss"
+              ],
+              "scripts": []
           },
           "configurations": {
             "production": {
@@ -47,7 +44,14 @@
                   "maximumError": "12mb"
                 }
               ],
-              "outputHashing": "all"
+              "fileReplacements": [
+                {
+                  "replace": "src/environnements/environnement.ts",
+                  "with": "src/environnements/environnement.prod.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "buildOptimizer": true
             },
             "development": {
               "optimization": false,

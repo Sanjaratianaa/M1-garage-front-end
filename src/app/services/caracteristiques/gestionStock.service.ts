@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -35,14 +35,27 @@ export interface GestionStock {
 })
 export class GestionStockService {
     private apiUrl = environment.apiUrl + '/stocks'; // URL API depuis le fichier d’environnement
+    private headers: HttpHeaders;
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {
+        this.getHeader();
+    }
+
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
+    private getHeader(): void {
+        this.headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+    }
 
     /**
      * Récupérer toutes les stocks
      */
     getGestionStocks(): Observable<GestionStock[]> {
-        return this.http.get<GestionStock[]>(this.apiUrl).pipe(
+        return this.http.get<GestionStock[]>(this.apiUrl, {headers: this.headers}).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -53,7 +66,7 @@ export class GestionStockService {
     addGestionStock(idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, entree: number, sortie: number, prixUnitaire: number): Observable<GestionStock> {
         const mouvementData = {
             piece: idPiece,
-            marquePiece: marquePiece,
+            marquePiece: marquePiece.trim().toUpperCase(),
             marqueVoiture: idMarque === '0' ? null : idMarque,
             modeleVoiture: idModele === '0' ? null : idModele,
             typeTransmission: idTypeTransmission === '0' ? null : idTypeTransmission,
@@ -61,7 +74,7 @@ export class GestionStockService {
             sortie: sortie,
             prixUnitaire: prixUnitaire
         };
-        return this.http.post<GestionStock>(this.apiUrl, mouvementData).pipe(
+        return this.http.post<GestionStock>(this.apiUrl, mouvementData, {headers: this.headers}).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -70,7 +83,7 @@ export class GestionStockService {
      * Modifier une stock existante
      */
     updateGestionStock(stock: GestionStock): Observable<GestionStock> {
-        return this.http.put<GestionStock>(`${this.apiUrl}/${stock._id}`, stock).pipe(
+        return this.http.put<GestionStock>(`${this.apiUrl}/${stock._id}`, stock, {headers: this.headers}).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -79,7 +92,7 @@ export class GestionStockService {
      * Supprimer une stock par ID
      */
     deleteGestionStock(stockId: string): Observable<GestionStock> {
-        return this.http.delete<GestionStock>(`${this.apiUrl}/${stockId}`).pipe(
+        return this.http.delete<GestionStock>(`${this.apiUrl}/${stockId}`, {headers: this.headers}).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -94,7 +107,7 @@ export class GestionStockService {
     }
 
     getStocks(): Observable<any[]> {
-        return this.http.get<any[]>(this.apiUrl + "/stocks").pipe(
+        return this.http.get<any[]>(this.apiUrl + "/stocks", {headers: this.headers}).pipe(
             catchError(this.handleError) // Prix des erreurs
         );
     }

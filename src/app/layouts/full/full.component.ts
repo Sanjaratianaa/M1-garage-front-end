@@ -14,8 +14,8 @@ import { TablerIconsModule } from 'angular-tabler-icons';
 import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { AppNavItemComponent } from './sidebar/nav-item/nav-item.component';
-import { navItems } from './sidebar/sidebar-data';
-import { AppTopstripComponent } from './top-strip/topstrip.component';
+import { getNavItemsForRole } from './sidebar/sidebar-data';
+import { NavItem } from './sidebar/nav-item/nav-item';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -32,15 +32,14 @@ const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
     NgScrollbarModule,
     TablerIconsModule,
     HeaderComponent,
-    AppTopstripComponent
   ],
   templateUrl: './full.component.html',
   styleUrls: [],
   encapsulation: ViewEncapsulation.None,
 })
 export class FullComponent implements OnInit {
-  navItems = navItems;
-
+  navItems: NavItem[] = []; // Change from const to let
+  userRole: string = 'client';//Add userRole
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
   resView = false;
@@ -86,7 +85,9 @@ export class FullComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadNavItems();
+  }
 
   ngOnDestroy() {
     this.layoutChangesSubscription.unsubscribe();
@@ -109,5 +110,37 @@ export class FullComponent implements OnInit {
   onSidenavOpenedChange(isOpened: boolean) {
     this.isCollapsedWidthFixed = !this.isOver;
     this.options.sidenavOpened = isOpened;
+  }
+
+  loadNavItems(): void {
+    this.navItems = getNavItemsForRole(this.userRole);
+
+    this.userRole = this.getUserRole();
+    this.navItems = getNavItemsForRole(this.userRole);
+
+  }
+
+  getUserRole(): string {
+    const userString = localStorage.getItem('user');
+
+    if (userString) {
+      try {
+        const user = JSON.parse(userString);
+
+        if (user && user.role && user.role.libelle) {
+          return user.role.libelle;
+        } else {
+          console.warn('User object or role.libelle is missing or invalid.  Returning default role.');
+          return 'client';
+        }
+
+      } catch (error) {
+        console.error('Error parsing user from localStorage:', error);
+        return 'client';
+      }
+    } else {
+      console.warn('No user found in localStorage.  Returning default role.');
+      return 'client';
+    }
   }
 }

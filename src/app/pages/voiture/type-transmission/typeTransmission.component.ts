@@ -67,7 +67,7 @@ export class TypeTransmissionComponent {
     if (this.newTypeTransmission) {
       console.log(this.newTypeTransmission);
       try {
-        const typeTransmission = await firstValueFrom(this.typeTransmissionService.addTypeTransmission(this.newTypeTransmission));
+        const typeTransmission = await firstValueFrom(this.typeTransmissionService.addTypeTransmission(this.newTypeTransmission.trim()));
         console.log('TypeTransmission ajoutée avec succès:', typeTransmission);
         this.typeTransmissions.push(typeTransmission);
 
@@ -148,7 +148,7 @@ export class TypeTransmissionComponent {
         console.log('Modification enregistrée:', result);
         
         // Fusionner les données existantes de la typeTransmission avec les modifications
-        const updatedData = { ...typeTransmission, libelle: result.libelle };
+        const updatedData = { ...typeTransmission, libelle: result.libelle.trim() };
         console.log(updatedData);
 
         // Attendre la mise à jour via le service

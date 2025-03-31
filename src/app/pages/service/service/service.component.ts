@@ -67,7 +67,7 @@ export class ServiceComponent {
     if (this.newService) {
       console.log(this.newService);
       try {
-        const service = await firstValueFrom(this.serviceService.addService(this.newService));
+        const service = await firstValueFrom(this.serviceService.addService(this.newService.trim()));
         console.log('Service ajoutée avec succès:', service);
         this.services.push(service);
 
@@ -148,7 +148,7 @@ export class ServiceComponent {
         console.log('Modification enregistrée:', result);
         
         // Fusionner les données existantes de la service avec les modifications
-        const updatedData = { ...service, libelle: result.libelle };
+        const updatedData = { ...service, libelle: result.libelle .trim()};
         console.log(updatedData);
 
         // Attendre la mise à jour via le service
@@ -231,4 +231,8 @@ export class ServiceComponent {
     console.log('Pagination changed: ', event);
   }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> gestion_rendez_vous

@@ -1,17 +1,20 @@
 import { Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
+import { AuthGuard } from './guard/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
+    redirectTo: '/authentication/client-login',
+    pathMatch: 'full'
+  },
+
+  {
+    path: '',
     component: FullComponent,
+    canActivate: [AuthGuard],
     children: [
-      {
-        path: '',
-        redirectTo: '/dashboard',
-        pathMatch: 'full',
-      },
       {
         path: 'dashboard',
         loadChildren: () =>
@@ -38,6 +41,21 @@ export const routes: Routes = [
         path: 'service',
         loadChildren: () =>
           import('./pages/service/service.routes').then((m) => m.ServiceRoutes),
+      },
+      {
+        path: 'personne',
+        loadChildren: () =>
+          import('./pages/personne/personne.routes').then((m) => m.PersonneRoutes),
+      },
+      {
+        path: 'rendez-vous',
+        loadChildren: () =>
+          import('./pages/rendez-vous/rendez-vous.routes').then((m) => m.RendezVousRoutes),
+      },
+      {
+        path: 'specialite',
+        loadChildren: () =>
+          import('./pages/specialite/specialite.routes').then((m) => m.SpecialiteRoutes),
       },
     ],
   },

@@ -13,9 +13,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MarqueService } from 'src/app/services/caracteristiques/marque.service';
 import { ModeleService } from 'src/app/services/caracteristiques/modele.service';
 import { TypeTransmissionService } from 'src/app/services/caracteristiques/typeTransmission.service';
+<<<<<<< HEAD
 import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voiture.service';
 import { CategorieService } from 'src/app/services/caracteristiques/categorie.service';
 import { DeleteConfirmationModalComponent } from 'src/app/components/modal-generique/confirm-modal/delete-confirmation-modal.component';
+=======
+import { CategorieService } from 'src/app/services/caracteristiques/categorie.service';
+import { DeleteConfirmationModalComponent } from 'src/app/components/modal-generique/confirm-modal/delete-confirmation-modal.component';
+import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voiture.sevice';
+>>>>>>> gestion_rendez_vous
 
 
 @Component({
@@ -367,4 +373,8 @@ export class VoitureComponent {
     console.log('Pagination changed: ', event);
   }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> gestion_rendez_vous

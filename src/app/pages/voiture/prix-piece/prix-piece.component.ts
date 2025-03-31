@@ -154,7 +154,7 @@ export class PrixPieceComponent {
     if (this.newPrixPiece) {
       console.log(this.newPrixPiece);
       try {
-        const prix = await firstValueFrom(this.prixPieceService.addPrixPiece(this.newPrixPiece.id_piece, this.newPrixPiece.marque_piece, this.newPrixPiece.id_marque, this.newPrixPiece.id_modele, this.newPrixPiece.id_type_transmission, this.newPrixPiece.prixUnitaire, this.newPrixPiece.date));
+        const prix = await firstValueFrom(this.prixPieceService.addPrixPiece(this.newPrixPiece.id_piece, this.newPrixPiece.marque_piece.trim(), this.newPrixPiece.id_marque, this.newPrixPiece.id_modele, this.newPrixPiece.id_type_transmission, this.newPrixPiece.prixUnitaire, this.newPrixPiece.date));
         console.log('PrixPiece ajoutée avec succès:', prix);
         this.prixPieces.push(prix);
 
@@ -269,13 +269,15 @@ export class PrixPieceComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
 
         // Fusionner les données existantes de la prixPiece avec les modifications
-        const updatedData = { ...prixPiece, piece: result.id_piece, marquePiece: result.marque_piece, marqueVoiture: result.id_marque,
-        prixUnitaire: result.prixUnitaire, date: result.date, modeleVoiture: result.id_modele, typeTransmission: result.id_type_transmission};
+        const updatedData = {
+          ...prixPiece, piece: result.id_piece, marquePiece: result.marque_piece.trim(), marqueVoiture: result.id_marque,
+          prixUnitaire: result.prixUnitaire, date: result.date, modeleVoiture: result.id_modele, typeTransmission: result.id_type_transmission
+        };
         console.log(updatedData);
 
         // Attendre la mise à jour via le prixSousService
@@ -314,5 +316,5 @@ export class PrixPieceComponent {
     // Vous pouvez ajouter ici une logique de récupération des données paginées depuis un serveur si nécessaire
     console.log('Pagination changed: ', event);
   }
-
 }
+

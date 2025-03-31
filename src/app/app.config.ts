@@ -4,17 +4,17 @@ import {
   importProvidersFrom,
 } from '@angular/core';
 import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
-import { routes } from './app.routes';
-import {
-  provideRouter,
-  withComponentInputBinding,
-  withInMemoryScrolling,
+  provideRouter, 
+  withComponentInputBinding, 
+  withInMemoryScrolling 
 } from '@angular/router';
+import { 
+  provideHttpClient, 
+  withInterceptorsFromDi 
+} from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration } from '@angular/platform-browser';
+import { routes } from './app.routes';
 
 // icons
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -26,6 +26,10 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 //Import all material modules
 import { MaterialModule } from './material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+// ✅ Import CalendarModule & Adapter
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -47,6 +51,15 @@ export const appConfig: ApplicationConfig = {
       MaterialModule,
       TablerIconsModule.pick(TablerIcons),
       NgScrollbarModule,
+      CalendarModule.forRoot({
+        provide: DateAdapter,
+        useFactory: () => {
+          const factory = adapterFactory as (config: { firstDayOfWeek: number }) => DateAdapter;
+          return factory({
+            firstDayOfWeek: 0,
+          });
+        },
+      })
     ),
   ],
 };

@@ -70,4 +70,8 @@ export class StockComponent {
     console.log('Pagination changed: ', event);
   }
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> gestion_rendez_vous

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environnements/environnement'; // Import de l’environnement
@@ -28,17 +28,29 @@ export class SousServiceService {
 
     constructor(private http: HttpClient) { }
 
+    private getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
     /**
      * Récupérer toutes les sousServices
      */
     getSousServices(): Observable<SousService[]> {
-        return this.http.get<SousService[]>(this.apiUrl).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<SousService[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
 
     getSousServicesActives(): Observable<SousService[]> {
-        return this.http.get<SousService[]>(this.apiUrl + "/active").pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<SousService[]>(this.apiUrl + "/active", { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -47,12 +59,16 @@ export class SousServiceService {
      * Ajouter une nouvelle sousService
      */
     addSousService(libelle: string, duree: number, idService: string): Observable<SousService> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
         const sousServiceData = {
             libelle: libelle, // Inclure seulement le libelle,
             duree: duree,
             service: idService
         };
-        return this.http.post<SousService>(this.apiUrl, sousServiceData).pipe(
+        return this.http.post<SousService>(this.apiUrl, sousServiceData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -61,7 +77,11 @@ export class SousServiceService {
      * Modifier une sousService existante
      */
     updateSousService(sousService: SousService): Observable<SousService> {
-        return this.http.put<SousService>(`${this.apiUrl}/${sousService._id}`, sousService).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<SousService>(`${this.apiUrl}/${sousService._id}`, sousService, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -70,7 +90,11 @@ export class SousServiceService {
      * Supprimer une sousService par ID
      */
     deleteSousService(sousServiceId: string): Observable<SousService> {
-        return this.http.delete<SousService>(`${this.apiUrl}/${sousServiceId}`).pipe(
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.delete<SousService>(`${this.apiUrl}/${sousServiceId}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
