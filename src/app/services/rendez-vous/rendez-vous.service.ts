@@ -125,22 +125,6 @@ export class RendezVousService {
 
         console.log("API URL:", this.apiUrl);
 
-        const data = {
-            "client": "67e3071018c9673f291d3ad2",
-            "date": "3035-09-23T07:00",
-            "dateRendezVous": "3035-09-23T07:00",
-            "services": [
-                {
-                    "prixUnitaire": 0,
-                    "quantiteEstimee": 40,
-                    "raison": "Contrôle et remplacement des bougies",
-                    "sousSpecialite": "67e256cd811b3e52c586a970",
-                    "status": "en attente"
-                }
-            ],
-            "voiture": "67e2701349b59270464e2879"
-        }
-
         console.log("data: ", rendezVousData);
 
         return this.http.post<RendezVous>(this.apiUrl, rendezVousData, { headers }).pipe(

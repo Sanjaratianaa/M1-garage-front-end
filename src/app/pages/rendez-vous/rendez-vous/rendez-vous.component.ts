@@ -262,7 +262,7 @@ export class RendezVousComponent implements OnInit {
                     if (sousServiceObject) {
                         return {
                             sousSpecialite: sousServiceId,
-                            raison: sousServiceItem.reason, // from form
+                            raison: sousServiceItem.raison, // from form
                             quantiteEstimee: sousServiceItem.quantite, // from form
                             prixUnitaire: sousServiceObject.prixUnitaire ? sousServiceObject.prixUnitaire : 0,
                             status: "en attente"

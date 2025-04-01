@@ -100,7 +100,7 @@ export class RendezVousModalComponent implements OnInit {
         this.sousServicesFormArray.push(this.fb.group({
           id: [service.sousSpecialite._id, Validators.required],
           quantite: [service.quantiteEstimee || 1, Validators.min(1)],
-          reason: [service.raison || '', Validators.required]
+          raison: [service.raison || '', Validators.required]
         }));
       });
     } else {
@@ -116,7 +116,7 @@ export class RendezVousModalComponent implements OnInit {
     return this.fb.group({
       id: ['', Validators.required],       // Sous-service ID
       quantite: [1, Validators.min(1)],     // Quantity (default 1, minimum 1)
-      reason: ['', Validators.required],   // Reason
+      raison: ['', Validators.required],   // Reason
     });
   }
 

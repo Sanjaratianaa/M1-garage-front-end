@@ -288,6 +288,35 @@ export class HistoriqueRendezVousComponent {
         try {
             if (result) {
                 console.log('Données du formulaire:', result);
+                const servicesArray = result.sousServicesArray.map((sousServiceItem: any) => {
+                    const sousServiceId = sousServiceItem.id;
+                    const sousServiceObject = this.sousServicesObject.find(ss => ss._id === sousServiceId);
+
+                    if (sousServiceObject) {
+                        return {
+                            sousSpecialite: sousServiceId,
+                            raison: sousServiceItem.raison, // from form
+                            quantiteEstimee: sousServiceItem.quantite, // from form
+                            prixUnitaire: sousServiceObject.prixUnitaire ? sousServiceObject.prixUnitaire : 0,
+                            status: "en attente"
+                        };
+                    } else {
+                        return null;
+                    }
+                }).filter((item: any) => item !== null);
+
+
+                delete result.sousServicesArray;
+                delete result.id_sous_service;
+
+                const updateRendezVous = {
+                    ...result,
+                    services: servicesArray,
+                    dateRendezVous: result.date,
+                    voiture: result.voiture
+                };
+
+                console.log("Data to send to backend:", updateRendezVous);
             }
         } catch (error: any) {
             console.error('Erreur lors de l’ajout:', error.message);
