@@ -162,12 +162,12 @@ export class RendezVousService {
     /**
      * Modifier une rendezVous existante
      */
-    updateRendezVous(rendezVous: RendezVous): Observable<RendezVous> {
+    updateRendezVous(id: string, rendezVous: any): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.put<RendezVous>(`${this.apiUrl}/${rendezVous._id}`, rendezVous, { headers }).pipe(
+        return this.http.put<RendezVous>(`${this.apiUrl}/${id}`, rendezVous, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
