@@ -43,9 +43,28 @@ export interface Service {
     raison: string;
     mecanicien: Personne;
     quantiteEstimee: number;
+    quantiteFinale: number | 0;
     prixUnitaire: number;
+    prixTotal: number | 0;
+    heureFin: string | any | null;
+    heureDebut: string | any | null;
     mecaniciensDisponibles: any[];
+    commentaire: string | null;
     status: string;
+}
+
+export interface Piece {
+    _id: string;
+    libelle: string;
+}
+
+export interface PiecesAchetees {
+    _id: string;
+    piece: Piece;
+    quantite: Number;
+    prixUnitaire: number;
+    prixTotal: number;
+    commentaire: string;
 }
 
 export interface RendezVous {
@@ -57,7 +76,7 @@ export interface RendezVous {
     dateRendezVous: Date;
     etat: string;
     dateHeureDemande: Date;
-    piecesAchetees: any[];
+    piecesAchetees: PiecesAchetees[];
     remarque: string;
     heureFin: string | any | null;
     heureDebut: string | any | null;
@@ -162,13 +181,15 @@ export class RendezVousService {
     /**
      * Modifier une rendezVous existante
      */
-    updateRendezVous(id: string, rendezVous: any): Observable<RendezVous> {
+    updateRendezVous(rendezVous: any): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        return this.http.put<RendezVous>(`${this.apiUrl}/${id}`, rendezVous, { headers }).pipe(
-            catchError(this.handleError) // Gestion des erreurs
+        console.log("Service za zaoooo ", `${this.apiUrl}/${rendezVous._id}`);
+
+        return this.http.put<RendezVous>(`${this.apiUrl}/${rendezVous._id}`, rendezVous, { headers }).pipe(
+            catchError(this.handleError)
         );
     }
 

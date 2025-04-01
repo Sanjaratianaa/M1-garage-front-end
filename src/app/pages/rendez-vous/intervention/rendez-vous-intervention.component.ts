@@ -11,6 +11,7 @@ import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 
 import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
 
@@ -114,7 +115,9 @@ export class RendezVousInterventionComponent implements OnInit {
     if (!rendezVous.heureDebut) {
       this.openModal();
     } else {
-      this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id]);
+      this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
+        state: { rendezVous: rendezVous}
+    });
     }
   }
 
@@ -122,8 +125,8 @@ export class RendezVousInterventionComponent implements OnInit {
     const data = {
       title: 'Confirmation Intervention',
       fields: [
-        { name: 'heureDebut', label: 'Heure de début', type: 'time', required: true, defaultValue: this.selectedRendezVous?.heureDebut || "" },
-        { name: 'heureFin', label: 'Heure de fin', type: 'time', defaultValue: this.selectedRendezVous?.heureFin || "" },
+        { name: 'heureDebut', label: 'Heure de début', type: 'datetime-local', required: true, defaultValue: this.selectedRendezVous?.heureDebut || "" },
+        { name: 'heureFin', label: 'Heure de fin', type: 'datetime-local', defaultValue: this.selectedRendezVous?.heureFin || "" },
       ],
       submitText: 'Ajouter',
       errorMessage: errorMessage,
@@ -136,21 +139,43 @@ export class RendezVousInterventionComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
-        try {
 
-          console.log('Données du formulaire:', result);
+        if(this.selectedRendezVous) {
+          const rendezVousId = this.selectedRendezVous._id;
+          try {
+  
+            console.log('Données du formulaire:', result);
 
-          if (this.selectedRendezVous) {
             this.selectedRendezVous.heureDebut = result.heureDebut;
             this.selectedRendezVous.heureFin = result.heureFin;
-          }
+            
+            const rendezVousUpdate = {
+                _id: rendezVousId,
+                heureDebut: result.heureDebut,
+                heureFin: result.heureFin
+            }
 
-          // Refresh the table data
-          this.dataSource.data = [...this.listeRendezVous];
-          
-        } catch (error: any) {
-          console.error('Erreur lors de l’ajout:', error.message);
-          await this.openModal(error.message.replace("Error: ", ""));
+            console.log("update: ", rendezVousUpdate);
+
+            const updatedRendezVous = await firstValueFrom(
+                this.rendezVousService.updateRendezVous(rendezVousUpdate)
+            );
+            console.log("Backend update successful:", updatedRendezVous);
+
+            const index = this.listeRendezVous.findIndex(rdv => rdv._id === rendezVousId);
+            if (index !== -1) {
+              this.listeRendezVous[index] = updatedRendezVous;
+            } else {
+                this.selectedRendezVous.heureDebut = updatedRendezVous.heureDebut;
+                this.selectedRendezVous.heureFin = updatedRendezVous.heureFin;
+            }
+
+            this.dataSource.data = [...this.listeRendezVous];
+            
+          } catch (error: any) {
+            console.error('Erreur lors de l’ajout:', error.message);
+            await this.openModal(error.message.replace("Error: ", ""));
+          }
         }
       }
     });
