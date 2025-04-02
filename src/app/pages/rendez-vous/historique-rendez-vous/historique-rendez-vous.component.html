@@ -62,7 +62,7 @@
                     <mat-header-cell *matHeaderCellDef> Statut </mat-header-cell>
                     <mat-cell *matCellDef="let rendezVous">
                         <div [ngClass]="getStatusClass(rendezVous.etat)" class="status-container"
-                            (click)="isValidable && isAdmin && rendezVous.etat === 'en attente' ? openAnswerDetailsModal(rendezVous) : null"
+                            (click)="isValidable && isAdmin && rendezVous.etat === 'en attente' ? openAnswerDetailsModal(rendezVous) : openCancelModal(rendezVous)"
                             [style.cursor]="isAdmin && rendezVous.etat === 'en attente' ? 'pointer' : 'default'">
                             <span>{{ rendezVous.etat }}</span>
                         </div>
@@ -91,7 +91,7 @@
             </mat-table>
 
             <!-- Pagination -->
-            <mat-paginator [length]="paginatedRendezVous.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+            <mat-paginator *ngIf="listeRendezVous && listeRendezVous.length > 5" [length]="listeRendezVous.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
                 (page)="onPaginateChange($event)">
             </mat-paginator>
         </ng-container>

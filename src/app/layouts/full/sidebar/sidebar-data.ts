@@ -20,15 +20,20 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Marque' ||
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
-        item.displayName === 'Pièce détachée' ||
         item.navCap === 'MECANICIEN' ||
         item.displayName === 'Mecanicien' ||
         item.displayName === 'Specialité' ||
         item.navCap === 'RENDEZ-VOUS' ||
         item.displayName === 'Historique Rendez-vous' ||
         item.displayName === 'Planning Rendez-vous' ||
-        item.displayName === 'Demande en attente'
+        item.displayName === 'Demande en attente' ||
+        item.navCap === 'Pièce détachée' ||
+        item.displayName === 'Piece' ||
+        item.displayName === 'Gestion Stock' ||
+        item.displayName === 'Stock Piece' ||
+        item.displayName === 'Gestion Prix Piece'
       );
+
 
     } else if (userRole === 'client') {
       return (
@@ -40,14 +45,16 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Marque' ||
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
-        item.displayName === 'Pièce détachée' ||
         item.navCap === 'RENDEZ-VOUS' ||
         item.displayName === 'Prendre Rendez-vous' ||
         item.displayName === 'Historique Rendez-vous' ||
         item.displayName === 'Demande en attente' ||
         item.navCap === 'Service' ||
         item.displayName === 'Service' ||
-        item.displayName === 'Sous Service' 
+        item.displayName === 'Sous Service' ||
+        item.navCap === 'Pièce détachée' ||
+        item.displayName === 'Piece' ||
+        item.displayName === 'Stock Piece' 
       );
     } else if (userRole === 'mecanicien' || userRole === 'mécanicien') {
       return (
@@ -61,7 +68,6 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Marque' ||
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
-        item.displayName === 'Pièce détachée' ||
         item.navCap === 'RENDEZ-VOUS' ||
         item.displayName === 'Interventions' ||
         item.displayName === 'Planning Rendez-vous' ||
@@ -70,7 +76,10 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Sous Service' ||
         item.navCap === 'MECANICIEN' ||
         item.displayName === 'Mecanicien' ||
-        item.displayName === 'Specialité' 
+        item.displayName === 'Specialité' ||
+        item.navCap === 'Pièce détachée' ||
+        item.displayName === 'Piece' ||
+        item.displayName === 'Stock Piece' 
 
       );
     }
@@ -119,37 +128,31 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       iconName: 'solar:bill-list-line-duotone',
       route: '/voiture/type-transmission',
     },
+
     {
-      displayName: 'Pièce détachée',
-      iconName: 'solar:widget-2-line-duotone',
-      route: '',
-      children: [
-        {
-          displayName: 'Piece',
-          subItemIcon: true,
-          iconName: 'solar:bill-list-line-duotone',
-          route: '/voiture/piece',
-        },
-        {
-          displayName: 'Gestion Stock',
-          subItemIcon: true,
-          iconName: 'solar:bill-list-line-duotone',
-          route: '/voiture/piece/gestion-stock',
-        },
-        {
-          displayName: 'Stock Piece',
-          subItemIcon: true,
-          iconName: 'solar:bill-list-line-duotone',
-          route: '/voiture/piece/stock',
-        },
-        {
-          displayName: 'Gestion Prix Piece',
-          subItemIcon: true,
-          iconName: 'solar:bill-list-line-duotone',
-          route: '/voiture/piece/prix',
-        },
-      ],
+      navCap: 'Pièce détachée',
+      divider: true
     },
+    {
+      displayName: 'Piece',
+      iconName: 'solar:widget-2-line-duotone',
+      route: '/voiture/piece',
+    },
+    {
+      displayName: 'Gestion Stock',
+      iconName: 'solar:bill-list-line-duotone',
+      route: '/voiture/piece/gestion-stock',
+    },
+    {
+      displayName: 'Stock Piece',
+      iconName: 'solar:widget-2-line-duotone',
+      route: '/voiture/piece/stock',
+    },
+    {
+      displayName: 'Gestion Prix Piece',
+      iconName: 'solar:bill-list-line-duotone',
+      route: '/voiture/piece/prix',
+    }, 
 
     {
       navCap: 'Service',
@@ -168,7 +171,7 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
     {
       displayName: 'Prix Sous Service',
       iconName: 'fluent-mdl2:service-off',
-      route: '/service/prix-sous-service',
+      route: '/service/prix-sous-service', 
     },
 
     {

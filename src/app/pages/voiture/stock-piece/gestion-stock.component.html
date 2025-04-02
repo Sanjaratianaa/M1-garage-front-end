@@ -86,7 +86,7 @@
     </mat-table>
 
     <!-- Pagination -->
-    <mat-paginator [length]="stocks.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+    <mat-paginator *ngIf="stocks && stocks.length > 5" [length]="stocks.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
       (page)="onPaginateChange($event)">
     </mat-paginator>
   </mat-card-content>

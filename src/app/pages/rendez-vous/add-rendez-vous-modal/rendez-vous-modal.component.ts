@@ -55,25 +55,6 @@ export class RendezVousModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
-  // ngOnInit() {
-  //   if (!this.data || !this.data.fields) {
-  //     console.log('Aucun champ fourni pour le formulaire dynamique.');
-  //     return;
-  //   }
-
-  //   this.allSousServices = this.data.fields.find((f: Field) => f.name === 'id_sous_service')?.options || [];
-  //   this.voituresOptions = this.data.fields.find((f: Field) => f.name === 'voiture')?.options || [];
-
-  //   this.form = this.fb.group({
-  //     voiture: [this.data.fields.find((f: Field) => f.name === 'voiture')?.defaultValue || '', Validators.required],
-  //     date: [this.data.fields.find((f: Field) => f.name === 'date')?.defaultValue || '', Validators.required],
-  //     sousServicesArray: this.fb.array([]), // Initialize as empty FormArray
-  //   });
-
-  //   // Initialize FormArray with at least one sous-service entry
-  //   this.addSousService();
-  // }
-
   ngOnInit() {
     if (!this.data || !this.data.fields) {
       console.log('Aucun champ fourni pour le formulaire dynamique.');

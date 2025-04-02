@@ -53,7 +53,7 @@ export class GenericModalComponent implements OnInit {
       return;
     }
 
-    // Construire le formulaire dynamique en fonction des `fields`
+    // Construire le formulaire dynamique en fonction des `fields`  
     const controls: { [key: string]: any[] } = {};  
     this.data.fields.forEach((field : Field) => {
       let validators = [];

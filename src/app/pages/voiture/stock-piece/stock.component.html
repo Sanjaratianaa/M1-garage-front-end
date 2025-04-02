@@ -54,7 +54,7 @@
         </ng-container>
   
         <ng-container matColumnDef="reste">
-          <mat-header-cell *matHeaderCellDef> Reste </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef> {{ isAdmin ? 'Reste' : 'Quantité(s)'}} </mat-header-cell>
           <mat-cell *matCellDef="let sctok"> {{ sctok.reste }} </mat-cell>
         </ng-container>
   
@@ -69,7 +69,7 @@
       </mat-table>
   
       <!-- Pagination -->
-      <mat-paginator [length]="stocks.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      <mat-paginator *ngIf="stocks && stocks.length > 5" [length]="stocks.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
         (page)="onPaginateChange($event)">
       </mat-paginator>
     </mat-card-content>

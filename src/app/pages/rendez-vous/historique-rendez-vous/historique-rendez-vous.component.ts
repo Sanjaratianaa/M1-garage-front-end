@@ -17,6 +17,7 @@ import { SpecialiteService } from 'src/app/services/personne/specialite.service'
 import { SousServiceService } from 'src/app/services/services/sousService.service';
 import { VoitureService, Voiture } from 'src/app/services/caracteristiques/voiture.sevice';
 import { RendezVousModalComponent } from '../add-rendez-vous-modal/rendez-vous-modal.component';
+import { AnnulationConfirmationModalComponent } from '../confirm-annulation-modal/confirm-annulation-modal.component';
 
 interface VoitureSelectItem {
     value: string;
@@ -333,6 +334,34 @@ export class HistoriqueRendezVousComponent {
         } catch (error: any) {
             console.error('Erreur lors de l’ajout:', error.message);
             await this.openEditModal(rendezVous, error.message.replace("Error: ", ""));
+        }
+    }
+
+    async openCancelModal(rendezVous: RendezVous, errorMessage: string = '') {
+        console.log(rendezVous);
+        try {
+
+            const dialogRef = this.dialog.open(AnnulationConfirmationModalComponent, {
+                width: '800px',
+                data: { errorMessage: errorMessage }
+            });
+
+            const result = await firstValueFrom(dialogRef.afterClosed());
+            if (result) {
+                console.log('Annulation Rendez-vous repondu', result);
+                if(result.confirmed) {
+                    const updateRendezVous = await firstValueFrom(this.rendezVousService.answerRendezVous(rendezVous._id, 'annulé', result.raison, [], ''));
+                    console.log(updateRendezVous);
+                    // Mettre à jour la liste locale
+                    const index = this.listeRendezVous.findIndex(mq => mq._id === rendezVous._id);
+                    if (index !== -1) {
+                        this.listeRendezVous[index] = updateRendezVous[0];
+                        this.updatePagination(); // Rafraîchir la liste affichée
+                    }
+                }
+            } 
+        } catch (error: any) {
+            await this.openCancelModal(rendezVous, error.message);
         }
     }
 
