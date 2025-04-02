@@ -84,6 +84,11 @@ export class RendezVousComponent implements OnInit {
             this.isClient = true;
             this.getAllVoitures();
             this.getAllSousServicesActives();
+        } else if(role === "mécanicien") {
+            this.legendItems = [
+                { label: 'En attente', color: '#f7b801' },
+                { label: 'Validé', color: '#8cb369' }
+            ];
         }
         this.getAllRendezVous();
     }

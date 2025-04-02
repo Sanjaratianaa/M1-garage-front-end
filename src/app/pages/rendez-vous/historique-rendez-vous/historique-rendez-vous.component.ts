@@ -41,6 +41,7 @@ export class HistoriqueRendezVousComponent {
     titre: string = '';
     isValidable: boolean = false;
     isAdmin: boolean = false;
+    isClient: boolean = false;
     etats: string[] = ['en attente', 'validé', 'rejeté', 'annulé', 'terminé'];
 
     paginatedRendezVous: RendezVous[] = [];
@@ -75,6 +76,7 @@ export class HistoriqueRendezVousComponent {
         if (role === "manager")
             this.isAdmin = true;
         else if(role === "client") {
+            this.isClient = true;
             this.getAllVoitures();
             this.getAllSousServicesActives();
         }
@@ -309,14 +311,24 @@ export class HistoriqueRendezVousComponent {
                 delete result.sousServicesArray;
                 delete result.id_sous_service;
 
-                const updateRendezVous = {
+                const _updateRendezVous = {
                     ...result,
                     services: servicesArray,
                     dateRendezVous: result.date,
-                    voiture: result.voiture
+                    voiture: result.voiture,
+                    _id: rendezVous._id
                 };
 
-                console.log("Data to send to backend:", updateRendezVous);
+                console.log("Data to send to backend:", _updateRendezVous);
+                const updateRendezVous = await firstValueFrom(this.rendezVousService.updateRendezVous(_updateRendezVous));
+                console.log(updateRendezVous);
+                // Mettre à jour la liste locale
+                const index = this.listeRendezVous.findIndex(mq => mq._id === rendezVous._id);
+                if (index !== -1) {
+                    console.log('Listes demandes Rendez-vous updateee');
+                    this.listeRendezVous[index] = updateRendezVous;
+                    this.updatePagination(); // Rafraîchir la liste affichée
+                }
             }
         } catch (error: any) {
             console.error('Erreur lors de l’ajout:', error.message);

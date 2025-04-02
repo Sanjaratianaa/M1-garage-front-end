@@ -3,7 +3,7 @@
 <!-- ============================================================== -->
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <mat-card-title>Piece</mat-card-title>
+    <mat-card-title>Pieces des voitures</mat-card-title>
     <!-- <mat-card-subtitle>This is test page</mat-card-subtitle> -->
   </mat-card-content>
 </mat-card>
@@ -13,7 +13,7 @@
 <!-- ============================================================== -->
 
 <!-- Ajout d'un nouvel employé -->
-<mat-card class="cardWithShadow">
+<mat-card class="cardWithShadow" *ngIf="isAdmin">
   <mat-card-content>
     <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Ajouter une nouvelle Piece</button>
   </mat-card-content>
@@ -91,7 +91,7 @@
     </mat-table>
 
     <!-- Pagination -->
-    <mat-paginator [length]="pieces.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+    <mat-paginator *ngIf="pieces && pieces.length > 5" [length]="pieces.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
       (page)="onPaginateChange($event)">
     </mat-paginator>
   </mat-card-content>

@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class ModeleComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   modeles: Modele[];
+  isAdmin: boolean = false;
 
   paginatedModeles: Modele[] = [];
 
@@ -41,6 +42,12 @@ export class ModeleComponent {
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
     this.getAllModeles();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager")
+      this.displayedColumns = ['Libelle'];
+    else
+      this.isAdmin = true;
   }
 
   getAllModeles() {

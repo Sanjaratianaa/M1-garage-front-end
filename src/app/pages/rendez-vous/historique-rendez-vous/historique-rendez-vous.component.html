@@ -19,7 +19,7 @@
             <mat-table [dataSource]="paginatedRendezVous" matSort class="mat-elevation-z8">
                 <ng-container matColumnDef="Date et heure demande">
                     <mat-header-cell *matHeaderCellDef> Date et heure demande </mat-header-cell>
-                    <mat-cell *matCellDef="let rendezVous"> {{ rendezVous.dateHeureDemande | date:'dd/MM/yyyy hh:mm:ss'
+                    <mat-cell *matCellDef="let rendezVous"> {{ rendezVous.dateHeureDemande | date:'dd/MM/yyyy HH:mm:ss'
                         }}
                     </mat-cell>
                 </ng-container>
@@ -33,7 +33,7 @@
 
                 <ng-container matColumnDef="Date du rendez-vous">
                     <mat-header-cell *matHeaderCellDef> Date du rendez-vous </mat-header-cell>
-                    <mat-cell *matCellDef="let rendezVous"> {{ rendezVous.dateRendezVous | date:'dd/MM/yyyy hh:mm:ss' }}
+                    <mat-cell *matCellDef="let rendezVous"> {{ rendezVous.dateRendezVous | date:'dd/MM/yyyy HH:mm:ss' }}
                     </mat-cell>
                 </ng-container>
 
@@ -62,7 +62,7 @@
                     <mat-header-cell *matHeaderCellDef> Statut </mat-header-cell>
                     <mat-cell *matCellDef="let rendezVous">
                         <div [ngClass]="getStatusClass(rendezVous.etat)" class="status-container"
-                            (click)="isAdmin && rendezVous.etat === 'en attente' ? openAnswerDetailsModal(rendezVous) : null"
+                            (click)="isValidable && isAdmin && rendezVous.etat === 'en attente' ? openAnswerDetailsModal(rendezVous) : null"
                             [style.cursor]="isAdmin && rendezVous.etat === 'en attente' ? 'pointer' : 'default'">
                             <span>{{ rendezVous.etat }}</span>
                         </div>
@@ -77,7 +77,8 @@
                             <button mat-icon-button color="accent" (click)="openDetailsModal(rendezVous)">
                                 <mat-icon>visibility</mat-icon>
                             </button>
-                            <button mat-icon-button color="primary" (click)="openEditModal(rendezVous)">
+                            <button mat-icon-button color="primary" (click)="openEditModal(rendezVous)"
+                                *ngIf="isValidable && isClient && rendezVous.etat === 'en attente'">
                                 <mat-icon>edit</mat-icon>
                             </button>
                         </div>
