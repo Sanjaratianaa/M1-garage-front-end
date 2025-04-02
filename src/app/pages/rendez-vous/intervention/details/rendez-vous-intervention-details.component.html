@@ -108,7 +108,7 @@
                 
                                             <mat-form-field appearance="outline" class="w-50 m-r-8">
                                                 <mat-label>Status</mat-label>
-                                                <mat-select [(ngModel)]="service.status" [disabled]="!isCurrentUser(service)">
+                                                <mat-select [(ngModel)]="service.tempStatus" [disabled]="!isCurrentUser(service)">
                                                     <mat-option value="en cours">En Cours</mat-option>
                                                     <mat-option value="en attente">En Attente</mat-option>
                                                     <mat-option value="suspendue">Suspendue</mat-option>

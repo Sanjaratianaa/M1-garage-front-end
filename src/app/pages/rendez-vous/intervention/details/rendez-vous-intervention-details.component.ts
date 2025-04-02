@@ -228,6 +228,7 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         this.prixPieceService.getPrixPieces().subscribe({
           next: (prixPieces) => {
             this.prixPieces = prixPieces;
+            console.log("Prix des pieces: ", this.prixPieces);
           },
           error: (error) => {
             console.error('Erreur lors du chargement des prixPieces:', error.message);

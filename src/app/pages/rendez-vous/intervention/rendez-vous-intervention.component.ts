@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
 import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service'; // Assuming RendezVous interface is also here or imported separately
+import { PaiementService } from 'src/app/services/paiement/paiement.service';
 
 @Component({
   selector: 'app-intervention-list',
@@ -59,7 +60,8 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   constructor(
     private dialog: MatDialog,
     private router: Router,
-    private rendezVousService: RendezVousService
+    private rendezVousService: RendezVousService,
+    private paiementService: PaiementService,
   ) { }
 
   ngOnInit() {
@@ -112,7 +114,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   onRowClick(rendezVous: RendezVous): void {
     this.selectedRendezVous = rendezVous;
 
-    if (!rendezVous.heureDebut || !rendezVous.heureFin) {
+    if (this.selectedRendezVous.etat !== "terminé" && !rendezVous.heureDebut || !rendezVous.heureFin) {
       this.openModal();
     }
   }
@@ -120,12 +122,14 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   onEditClick(rendezVous: RendezVous): void {
     this.selectedRendezVous = rendezVous;
 
-    if (!rendezVous.heureDebut) {
-      this.openModal();
-    } else {
-      this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
-        state: { rendezVous: rendezVous}
-    });
+    if(this.selectedRendezVous.etat !== "terminé") {
+      if (!rendezVous.heureDebut) {
+        this.openModal();
+      } else {
+        this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
+          state: { rendezVous: rendezVous}
+      });
+      }
     }
   }
 
@@ -159,11 +163,19 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
 
         this.verifyBeforeSubmit(this.selectedRendezVous, result.heureDebut, result.heureFin);
 
-        const rendezVousUpdatePayload = {
+        let rendezVousUpdatePayload: any = {
           _id: rendezVousId,
           heureDebut: result.heureDebut,
           heureFin: result.heureFin
         };
+
+        if (result.heureFin !== null && result.heureFin !== undefined && result.heureFin !== "") {
+          rendezVousUpdatePayload = {
+            ...rendezVousUpdatePayload,
+            etat: "terminé"
+          }
+          this.savePaiement(this.selectedRendezVous, result.heureFin);
+        }
 
         console.log("Payload for update: ", rendezVousUpdatePayload);
 
@@ -236,7 +248,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
       }
 
       // Vérifier si tous les services sont terminés
-      const incompleteServices = selectedRendezVous.services?.some(service => service.status !== 'Terminé');
+      const incompleteServices = selectedRendezVous.services?.some(service => service.status !== 'terminé');
       if (incompleteServices) {
         throw new Error("Tous les services doivent être terminés avant de clôturer le rendez-vous.");
       }
@@ -258,7 +270,68 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   
     return totalDuration;
   }
-  
+
+  calculateMontantTotal(rendezVous: RendezVous): number {
+    if (!rendezVous) {
+        console.error("Erreur : Aucun rendez-vous fourni.");
+        return 0;
+    }
+
+    const totalServices = rendezVous.services.reduce((total, service) => {
+        return total + (service.prixTotal || 0);
+    }, 0);
+
+    const totalPieces = rendezVous.piecesAchetees.reduce((total, piece) => {
+        return total + (piece.prixTotal || 0);
+    }, 0);
+
+    return totalServices + totalPieces;
+  }
+
+  async savePaiement(rendezVous: RendezVous, heureFin: Date): Promise<void> {
+    
+    if (!rendezVous) {
+        console.error("Erreur : Aucun rendez-vous sélectionné.");
+        return;
+    }
+
+    let paiementData: any = {
+        rendezVous: {
+            _id: rendezVous._id,
+        },
+        montant: this.calculateMontantTotal(rendezVous) || 0,
+        datePaiement: heureFin,
+    };
+
+    console.log(paiementData)
+
+    const userString = localStorage.getItem('user');
+    if (userString) {
+        try {
+            const user = JSON.parse(userString);
+            paiementData = {
+                ...paiementData,
+                mecanicien: {
+                    _id: user.idPersonne,
+                },
+                datePaiement: heureFin,
+            };
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+        }
+    }
+
+    console.log("paiementData >>>> ", paiementData);
+
+    try {
+        const updatedPaiement = await firstValueFrom(
+            this.paiementService.addPaiement(paiementData)
+        );
+        console.log("Backend save for paiement successful:", updatedPaiement);
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour du service :", error);
+    }
+  } 
 
   getAllRendezVous() {
     this.rendezVousService.getRendezVousByMecanicien().subscribe({
