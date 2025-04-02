@@ -41,13 +41,16 @@ export class CategorieComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
-    this.getAllCategories();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const role = user.role.libelle;
-    if (role != "manager")
+    if (role != "manager") {
       this.displayedColumns = ['Libelle'];
-    else
+      this.getAllCategoriesActives()
+    }
+    else {
       this.isAdmin = true;
+      this.getAllCategories();
+    }
   }
 
   getAllCategories() {
@@ -61,7 +64,19 @@ export class CategorieComponent {
         alert('Impossible de charger les categories. Veuillez réessayer plus tard.');
       }
     });
+  }
 
+  getAllCategoriesActives() {
+    this.categorieService.getCategoriesActives().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.updatePagination();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des categories:', error.message);
+        alert('Impossible de charger les categories. Veuillez réessayer plus tard.');
+      }
+    });
   }
 
   updatePagination() {

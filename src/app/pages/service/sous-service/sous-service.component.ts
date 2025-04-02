@@ -31,7 +31,7 @@ import { SousService, SousServiceService } from 'src/app/services/services/sousS
     ],
 })
 export class SousServiceComponent {
-
+    isAdmin: boolean = false;
     services: Service[];
     servicesActives: any[] = [];
     sousServices: SousService[];
@@ -39,7 +39,6 @@ export class SousServiceComponent {
 
     selectedService: Service | null;
     filteredSousServices: SousService[];
-    displayedColumns: string[] = ['libelle'];
 
     // Nouveau employé à ajouter
     newSousService: any = { libelle: '', id_service: 0, duree: 0 };
@@ -55,6 +54,13 @@ export class SousServiceComponent {
     constructor(private dialog: MatDialog, private serviceService: ServiceService, private souServiceService: SousServiceService) { }
 
     ngOnInit() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const role = user.role.libelle;
+        if (role == "manager")
+            this.isAdmin = true;
+        else
+            this.columns = ['service', 'libelle', 'duree', 'Prix', 'Date d\'enregistrement'];
+
         // Initialisez la pagination au chargement du composant
         this.getAllServices();
         this.getAllServicesActives();
@@ -111,7 +117,10 @@ export class SousServiceComponent {
     }
 
     getAllSousServices() {
-        this.souServiceService.getSousServices().subscribe({
+        const observable = this.isAdmin
+            ? this.souServiceService.getSousServices()
+            : this.souServiceService.getSousServicesActives();
+        observable.subscribe({
             next: (sousServices) => {
                 console.log(sousServices);
                 this.sousServices = sousServices;

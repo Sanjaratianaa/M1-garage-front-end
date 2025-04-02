@@ -1,6 +1,6 @@
 <mat-card class="cardWithShadow">
     <mat-card-content>
-        <mat-card-title>Sous service</mat-card-title>
+        <mat-card-title>Sous service disponible</mat-card-title>
         <!-- <mat-card-subtitle>This is test page</mat-card-subtitle> -->
     </mat-card-content>
 </mat-card>
@@ -10,7 +10,8 @@
     <mat-card-content>
         <div class="service-buttons">
             <!-- Card "Tous les services" -->
-            <mat-card class="service-card" (click)="selectService(null)" [ngStyle]="{ 'background-color': getColorForService(1) }">
+            <mat-card class="service-card" (click)="selectService(null)"
+                [ngStyle]="{ 'background-color': getColorForService(1) }">
                 <mat-card-header>
                     <mat-icon mat-card-avatar class="service-icon">expand_more</mat-icon>
                     <mat-card-title>Tous les services</mat-card-title>
@@ -43,12 +44,10 @@
             </div>
 
             <!-- Bouton d'ajout de sous-service(click)="openModal()"  -->
-            <div class="col-sm-4 d-flex align-items-center justify-content-end">
-                <!-- <a mat-button mat-flat-button color="primary" class="mdc-button mat-mdc-button mat-primary">
-                    <span class="mdc-button__label">Ajout nouveau sous service</span>
-                </a> -->
-                <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Ajout nouveau sous
-                    service</button>
+            <div class="col-sm-4 d-flex align-items-center justify-content-end"  *ngIf="isAdmin">
+                <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">
+                    Ajout nouveau sous service
+                </button>
             </div>
         </div>
     </mat-card-content>
@@ -82,11 +81,12 @@
                 <ng-container matColumnDef="Prix">
                     <mat-header-cell *matHeaderCellDef> Prix </mat-header-cell>
                     <mat-cell *matCellDef="let sousService"> {{ sousService.prixUnitaire }} Ar </mat-cell>
-                </ng-container>  
+                </ng-container>
 
                 <ng-container matColumnDef="Date d'enregistrement">
                     <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
-                    <mat-cell *matCellDef="let sousService"> {{ sousService.dateEnregistrement | date:'dd/MM/yyyy hh:mm:ss' }} </mat-cell>
+                    <mat-cell *matCellDef="let sousService"> {{ sousService.dateEnregistrement | date:'dd/MM/yyyy
+                        hh:mm:ss' }} </mat-cell>
                 </ng-container>
 
                 <ng-container matColumnDef="Manager">
@@ -99,7 +99,8 @@
                 <ng-container matColumnDef="Date Suppression">
                     <mat-header-cell *matHeaderCellDef> Date Suppression </mat-header-cell>
                     <mat-cell *matCellDef="let sousService">
-                        {{ sousService.dateSuppression ? (sousService.dateSuppression | date:'dd/MM/yyyy hh:mm:ss') : '-- --' }}
+                        {{ sousService.dateSuppression ? (sousService.dateSuppression | date:'dd/MM/yyyy hh:mm:ss') :
+                        '-- --' }}
                     </mat-cell>
                 </ng-container>
 
@@ -142,7 +143,8 @@
             </mat-table>
 
             <!-- Pagination -->
-            <mat-paginator [length]="filteredSousServices.length" [pageSizeOptions]="pageSizeOptions" showFirstLastButtons (page)="onPaginateChange($event)"></mat-paginator>
+            <mat-paginator *ngIf="filteredSousServices && filteredSousServices.length > 5" [length]="filteredSousServices.length" [pageSizeOptions]="pageSizeOptions"
+                showFirstLastButtons (page)="onPaginateChange($event)"></mat-paginator>
         </mat-card>
     </mat-card-content>
 </mat-card>
