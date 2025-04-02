@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class MarqueComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   marques: Marque[];
+  isAdmin: boolean = false;
 
   paginatedMarques: Marque[] = [];
 
@@ -40,7 +41,16 @@ export class MarqueComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
-    this.getAllMarques();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager") {
+      this.displayedColumns = ['Libelle'];
+      this.getAllMarquesActives();
+    }
+    else {
+      this.isAdmin = true;
+      this.getAllMarques();
+    }
   }
 
   getAllMarques() {
@@ -54,7 +64,19 @@ export class MarqueComponent {
         alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
       }
     });
+  }
 
+  getAllMarquesActives() {
+    this.marqueService.getMarquesActives().subscribe({
+      next: (marques) => {
+        this.marques = marques;
+        this.updatePagination();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des marques:', error.message);
+        alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+      }
+    });
   }
 
   updatePagination() {

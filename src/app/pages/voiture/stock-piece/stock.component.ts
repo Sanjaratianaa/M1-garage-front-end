@@ -20,6 +20,7 @@ import { GestionStockService } from 'src/app/services/caracteristiques/gestionSt
 export class StockComponent {
   displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "entree", "sortie", "reste", "prixUnitaire"];
   stocks: any[];
+  isAdmin: boolean = false;
 
   paginatedStocks: any[] = [];
 
@@ -32,6 +33,12 @@ export class StockComponent {
   ) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager")
+      this.displayedColumns = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "reste", "prixUnitaire"];
+    else
+    this.isAdmin = true;
     // Initialisez la pagination au chargement du composant
     this.getStocks();
   }

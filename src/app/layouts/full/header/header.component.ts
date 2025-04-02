@@ -62,7 +62,7 @@ export class HeaderComponent implements OnInit {
     const role = user.role.libelle;
     if (role == "manager")
       this.router.navigate(['/authentication/manager-login']);
-    else if (role == "mecanicien")
+    else if (role == "mécanicien")
       this.router.navigate(['/authentication/mecanicien-login']);
     else
       this.router.navigate(['/authentication/client-login']);

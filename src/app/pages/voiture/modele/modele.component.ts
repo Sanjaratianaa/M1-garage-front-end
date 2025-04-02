@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class ModeleComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   modeles: Modele[];
+  isAdmin: boolean = false;
 
   paginatedModeles: Modele[] = [];
 
@@ -40,11 +41,20 @@ export class ModeleComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager")
+      this.displayedColumns = ['Libelle'];
+    else
+      this.isAdmin = true;
     this.getAllModeles();
   }
 
   getAllModeles() {
-    this.modeleService.getModeles().subscribe({
+    const observable = this.isAdmin
+      ? this.modeleService.getModeles()
+      : this.modeleService.getModelesActives();
+    observable.subscribe({
       next: (modeles) => {
         this.modeles = modeles;
         this.updatePagination();
@@ -54,7 +64,6 @@ export class ModeleComponent {
         alert('Impossible de charger les modeles. Veuillez réessayer plus tard.');
       }
     });
-
   }
 
   updatePagination() {
@@ -144,10 +153,10 @@ export class ModeleComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        
+
         // Fusionner les données existantes de la modele avec les modifications
         const updatedData = { ...modele, libelle: result.libelle.trim() };
         console.log(updatedData);
@@ -182,7 +191,7 @@ export class ModeleComponent {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ modele.libelle }" comme modele ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${modele.libelle}" comme modele ? Cette action est irréversible.`
       }
     });
 
@@ -197,7 +206,7 @@ export class ModeleComponent {
 
   // Fonction de suppression d'un employé
   async deleteModele(modeleId: string) {
-  
+
     try {
       // Appel API pour supprimer la modele
       const deletedModele = await lastValueFrom(this.modeleService.deleteModele(modeleId));
@@ -210,7 +219,7 @@ export class ModeleComponent {
           this.modeles[index] = deletedModele; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
-      } 
+      }
 
     } catch (error: any) {
       console.error('Erreur lors de la suppression:', error);
@@ -218,8 +227,8 @@ export class ModeleComponent {
       alert(errorMessage); // Affiche l'erreur à l'utilisateur
     }
   }
-  
-  
+
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

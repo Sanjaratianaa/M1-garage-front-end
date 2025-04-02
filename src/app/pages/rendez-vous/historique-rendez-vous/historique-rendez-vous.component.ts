@@ -17,6 +17,7 @@ import { SpecialiteService } from 'src/app/services/personne/specialite.service'
 import { SousServiceService } from 'src/app/services/services/sousService.service';
 import { VoitureService, Voiture } from 'src/app/services/caracteristiques/voiture.sevice';
 import { RendezVousModalComponent } from '../add-rendez-vous-modal/rendez-vous-modal.component';
+import { AnnulationConfirmationModalComponent } from '../confirm-annulation-modal/confirm-annulation-modal.component';
 
 interface VoitureSelectItem {
     value: string;
@@ -41,7 +42,8 @@ export class HistoriqueRendezVousComponent {
     titre: string = '';
     isValidable: boolean = false;
     isAdmin: boolean = false;
-    etats: string[] = ['en attente', 'validé', 'rejeté', 'annulé'];
+    isClient: boolean = false;
+    etats: string[] = ['en attente', 'validé', 'rejeté', 'annulé', 'terminé'];
 
     paginatedRendezVous: RendezVous[] = [];
 
@@ -75,6 +77,7 @@ export class HistoriqueRendezVousComponent {
         if (role === "manager")
             this.isAdmin = true;
         else if(role === "client") {
+            this.isClient = true;
             this.getAllVoitures();
             this.getAllSousServicesActives();
         }
@@ -288,10 +291,77 @@ export class HistoriqueRendezVousComponent {
         try {
             if (result) {
                 console.log('Données du formulaire:', result);
+                const servicesArray = result.sousServicesArray.map((sousServiceItem: any) => {
+                    const sousServiceId = sousServiceItem.id;
+                    const sousServiceObject = this.sousServicesObject.find(ss => ss._id === sousServiceId);
+
+                    if (sousServiceObject) {
+                        return {
+                            sousSpecialite: sousServiceId,
+                            raison: sousServiceItem.raison, // from form
+                            quantiteEstimee: sousServiceItem.quantite, // from form
+                            prixUnitaire: sousServiceObject.prixUnitaire ? sousServiceObject.prixUnitaire : 0,
+                            status: "en attente"
+                        };
+                    } else {
+                        return null;
+                    }
+                }).filter((item: any) => item !== null);
+
+
+                delete result.sousServicesArray;
+                delete result.id_sous_service;
+
+                const _updateRendezVous = {
+                    ...result,
+                    services: servicesArray,
+                    dateRendezVous: result.date,
+                    voiture: result.voiture,
+                    _id: rendezVous._id
+                };
+
+                console.log("Data to send to backend:", _updateRendezVous);
+                const updateRendezVous = await firstValueFrom(this.rendezVousService.updateRendezVous(_updateRendezVous));
+                console.log(updateRendezVous);
+                // Mettre à jour la liste locale
+                const index = this.listeRendezVous.findIndex(mq => mq._id === rendezVous._id);
+                if (index !== -1) {
+                    console.log('Listes demandes Rendez-vous updateee');
+                    this.listeRendezVous[index] = updateRendezVous;
+                    this.updatePagination(); // Rafraîchir la liste affichée
+                }
             }
         } catch (error: any) {
             console.error('Erreur lors de l’ajout:', error.message);
             await this.openEditModal(rendezVous, error.message.replace("Error: ", ""));
+        }
+    }
+
+    async openCancelModal(rendezVous: RendezVous, errorMessage: string = '') {
+        console.log(rendezVous);
+        try {
+
+            const dialogRef = this.dialog.open(AnnulationConfirmationModalComponent, {
+                width: '800px',
+                data: { errorMessage: errorMessage }
+            });
+
+            const result = await firstValueFrom(dialogRef.afterClosed());
+            if (result) {
+                console.log('Annulation Rendez-vous repondu', result);
+                if(result.confirmed) {
+                    const updateRendezVous = await firstValueFrom(this.rendezVousService.answerRendezVous(rendezVous._id, 'annulé', result.raison, [], ''));
+                    console.log(updateRendezVous);
+                    // Mettre à jour la liste locale
+                    const index = this.listeRendezVous.findIndex(mq => mq._id === rendezVous._id);
+                    if (index !== -1) {
+                        this.listeRendezVous[index] = updateRendezVous[0];
+                        this.updatePagination(); // Rafraîchir la liste affichée
+                    }
+                }
+            } 
+        } catch (error: any) {
+            await this.openCancelModal(rendezVous, error.message);
         }
     }
 

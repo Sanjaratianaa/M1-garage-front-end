@@ -24,6 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class PersonneComponent {
   displayedColumns: string[] = ['Nom', "Prenoms", "Email", "Date Naissance", "Lieu Naissance", "Date Embauche", "Matricule", "Date Suppression", "Statut", 'actions'];
   utilisateurs: Utilisateur[];
+  isAdmin: boolean = false;
 
   paginatedUtilisateurs: Utilisateur[] = [];
 
@@ -38,12 +39,23 @@ export class PersonneComponent {
   constructor(private dialog: MatDialog, private personneService: PersonneService) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role == "manager")
+      this.isAdmin = true;
+    else
+      this.displayedColumns = ['Nom', "Prenoms", "Email", "Date Naissance", "Lieu Naissance", "Date Embauche", "Matricule"];
+
     // Initialisez la pagination au chargement du composant
     this.getAllEmployés();
   }
 
   getAllEmployés() {
-    this.personneService.getAllByRole('mécanicien').subscribe({
+    const observable = this.isAdmin
+      ? this.personneService.getAllByRole('mécanicien')
+      : this.personneService.getActiveByRole('mécanicien');
+
+    observable.subscribe({
       next: (utilisateurs) => {
         console.log(utilisateurs);
         this.utilisateurs = utilisateurs;
@@ -192,11 +204,13 @@ export class PersonneComponent {
 
         // Fusionner les données existantes de la personne avec les modifications
         const updatedData = {
-          ...utilisateur, personne: {...utilisateur.personne, nom: result.nom, prenom: result.prenom, dateDeNaissance: result.dateDeNaissance,
-          lieuDeNaissance: result.lieuDeNaissance, genre: result.genre, numeroTelephone: result.numeroTelephone,
-          email: result.email}, dateEmbauche: result.dateEmbauche
+          ...utilisateur, personne: {
+            ...utilisateur.personne, nom: result.nom, prenom: result.prenom, dateDeNaissance: result.dateDeNaissance,
+            lieuDeNaissance: result.lieuDeNaissance, genre: result.genre, numeroTelephone: result.numeroTelephone,
+            email: result.email
+          }, dateEmbauche: result.dateEmbauche
         };
-        
+
         // Attendre la mise à jour via le service
         const updatedPersonne = await firstValueFrom(this.personneService.updatePersonne(updatedData));
         console.log(updatedPersonne);

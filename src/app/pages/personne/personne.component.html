@@ -13,7 +13,7 @@
   <!-- ============================================================== -->
   
   <!-- Ajout d'un nouvel employé -->
-  <mat-card class="cardWithShadow">
+  <mat-card class="cardWithShadow" *ngIf="isAdmin">
     <mat-card-content>
       <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Ajouter un nouveau Mécanicien</button>
     </mat-card-content>
@@ -102,7 +102,7 @@
       </mat-table>
   
       <!-- Pagination -->
-      <mat-paginator *ngIf="utilisateurs" [length]="utilisateurs.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      <mat-paginator *ngIf="utilisateurs && utilisateurs.length > 5" [length]="utilisateurs.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
         (page)="onPaginateChange($event)">
       </mat-paginator>
     </mat-card-content>

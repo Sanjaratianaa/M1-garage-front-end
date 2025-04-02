@@ -10,6 +10,7 @@ export interface Personne {
     prenom: string;
     numeroTelephone: string;
     email: string;
+    genre: string;
 }
 
 export interface Voiture {
@@ -44,6 +45,7 @@ export interface Service {
     quantiteEstimee: number;
     prixUnitaire: number;
     mecaniciensDisponibles: any[];
+    status: string;
 }
 
 export interface RendezVous {
@@ -58,8 +60,8 @@ export interface RendezVous {
     piecesAchetees: any[];
     remarque: string;
     heureFin: string | any | null;
+    heureDebut: string | any | null;
 }
-
 
 @Injectable({
     providedIn: 'root'
@@ -87,6 +89,19 @@ export class RendezVousService {
     }
 
     /**
+     * Récupérer toutes les rendezVous by mecanicien
+     */
+    getRendezVousByMecanicien(): Observable<RendezVous[]> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<RendezVous[]>(`${this.apiUrl}/parMecanicien`, { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
      * Récupérer toutes les sousServices
      */
     getAllRendezVous(): Observable<RendezVous[]> {
@@ -109,22 +124,6 @@ export class RendezVousService {
         });
 
         console.log("API URL:", this.apiUrl);
-
-        const data = {
-            "client": "67e3071018c9673f291d3ad2",
-            "date": "3035-09-23T07:00",
-            "dateRendezVous": "3035-09-23T07:00",
-            "services": [
-                {
-                    "prixUnitaire": 0,
-                    "quantiteEstimee": 40,
-                    "raison": "Contrôle et remplacement des bougies",
-                    "sousSpecialite": "67e256cd811b3e52c586a970",
-                    "status": "en attente"
-                }
-            ],
-            "voiture": "67e2701349b59270464e2879"
-        }
 
         console.log("data: ", rendezVousData);
 

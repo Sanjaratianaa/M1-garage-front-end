@@ -9,7 +9,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';  // Assurez-vous que FormsModule est bien importé ici
 import { GenericModalComponent } from '../../../components/modal-generique/add-modal/modal.component';
 import { DeleteConfirmationModalComponent } from '../../../components/modal-generique/confirm-modal/delete-confirmation-modal.component';
-import { ServiceService } from 'src/app/services/services/service.service'; 
+import { ServiceService } from 'src/app/services/services/service.service';
 import { Service } from 'src/app/services/services/service.service';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class ServiceComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   services: Service[];
+  isAdmin: boolean = false;
 
   paginatedServices: Service[] = [];
 
@@ -39,12 +40,21 @@ export class ServiceComponent {
   constructor(private dialog: MatDialog, private serviceService: ServiceService) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role == "manager")
+      this.isAdmin = true;
+    else
+      this.displayedColumns = ['Libelle'];
     // Initialisez la pagination au chargement du composant
     this.getAllServices();
   }
 
   getAllServices() {
-    this.serviceService.getServices().subscribe({
+    const observable = this.isAdmin
+      ? this.serviceService.getServices()
+      : this.serviceService.getServicesActives();
+    observable.subscribe({
       next: (services) => {
         this.services = services;
         this.updatePagination();
@@ -143,12 +153,12 @@ export class ServiceComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        
+
         // Fusionner les données existantes de la service avec les modifications
-        const updatedData = { ...service, libelle: result.libelle .trim()};
+        const updatedData = { ...service, libelle: result.libelle.trim() };
         console.log(updatedData);
 
         // Attendre la mise à jour via le service
@@ -181,7 +191,7 @@ export class ServiceComponent {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ service.libelle }" comme service ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${service.libelle}" comme service ? Cette action est irréversible.`
       }
     });
 
@@ -196,7 +206,7 @@ export class ServiceComponent {
 
   // Fonction de suppression d'un employé
   async deleteService(serviceId: string) {
-  
+
     try {
       // Appel API pour supprimer la service
       const deletedService = await lastValueFrom(this.serviceService.deleteService(serviceId));
@@ -209,7 +219,7 @@ export class ServiceComponent {
           this.services[index] = deletedService; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
-      } 
+      }
 
     } catch (error: any) {
       console.error('Erreur lors de la suppression:', error);
@@ -217,8 +227,8 @@ export class ServiceComponent {
       alert(errorMessage); // Affiche l'erreur à l'utilisateur
     }
   }
-  
-  
+
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

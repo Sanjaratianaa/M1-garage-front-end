@@ -84,6 +84,11 @@ export class RendezVousComponent implements OnInit {
             this.isClient = true;
             this.getAllVoitures();
             this.getAllSousServicesActives();
+        } else if(role === "mécanicien") {
+            this.legendItems = [
+                { label: 'En attente', color: '#f7b801' },
+                { label: 'Validé', color: '#8cb369' }
+            ];
         }
         this.getAllRendezVous();
     }
@@ -262,7 +267,7 @@ export class RendezVousComponent implements OnInit {
                     if (sousServiceObject) {
                         return {
                             sousSpecialite: sousServiceId,
-                            raison: sousServiceItem.reason, // from form
+                            raison: sousServiceItem.raison, // from form
                             quantiteEstimee: sousServiceItem.quantite, // from form
                             prixUnitaire: sousServiceObject.prixUnitaire ? sousServiceObject.prixUnitaire : 0,
                             status: "en attente"

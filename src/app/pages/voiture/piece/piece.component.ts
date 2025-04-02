@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class PieceComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   pieces: Piece[];
+  isAdmin: boolean = false;
 
   paginatedPieces: Piece[] = [];
 
@@ -40,11 +41,20 @@ export class PieceComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager")
+      this.displayedColumns = ['Libelle'];
+    else
+    this.isAdmin = true;
     this.getAllPieces();
   }
 
   getAllPieces() {
-    this.pieceService.getPieces().subscribe({
+    const observable = this.isAdmin
+      ? this.pieceService.getPieces()
+      : this.pieceService.getPiecesActives();
+    observable.subscribe({
       next: (pieces) => {
         console.log(pieces);
         this.pieces = pieces;
@@ -145,10 +155,10 @@ export class PieceComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        
+
         // Fusionner les données existantes de la piece avec les modifications
         const updatedData = { ...piece, libelle: result.libelle.trim() };
         console.log(updatedData);
@@ -183,7 +193,7 @@ export class PieceComponent {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ piece.libelle }" comme piece ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${piece.libelle}" comme piece ? Cette action est irréversible.`
       }
     });
 
@@ -198,7 +208,7 @@ export class PieceComponent {
 
   // Fonction de suppression d'un employé
   async deletePiece(pieceId: string) {
-  
+
     try {
       // Appel API pour supprimer la piece
       const deletedPiece = await lastValueFrom(this.pieceService.deletePiece(pieceId));
@@ -211,7 +221,7 @@ export class PieceComponent {
           this.pieces[index] = deletedPiece; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
-      } 
+      }
 
     } catch (error: any) {
       console.error('Erreur lors de la suppression:', error);
@@ -219,8 +229,8 @@ export class PieceComponent {
       alert(errorMessage); // Affiche l'erreur à l'utilisateur
     }
   }
-  
-  
+
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

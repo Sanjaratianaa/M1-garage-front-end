@@ -27,9 +27,10 @@ import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voitu
 })
 export class VoitureComponent {
   displayedColumns: string[] = ["client", "marque", "modele", "categorie", "typeTransmission", "annee", "numeroImmatriculation", "kilometrage", 
-    "puissanceMoteur", "cylindree", "capaciteReservoir", "pressionPneusRecommande", "Date d'enregistrement", "Date Suppression", "Statut", "actions"
+    "puissanceMoteur", "cylindree", "capaciteReservoir", "pressionPneusRecommande", "Date d'enregistrement"
   ];
   voitures: Voiture[];
+  client: boolean = false;
 
   marques: any[];
   modeles: any[];
@@ -49,7 +50,7 @@ export class VoitureComponent {
   pageSizeOptions = [5, 10, 20];
 
   constructor(
-    private dialog: MatDialog,
+    private dialog: MatDialog, 
     private voitureService: VoitureService,
     private marqueService: MarqueService,
     private modeleService: ModeleService,
@@ -58,6 +59,15 @@ export class VoitureComponent {
   ) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role == "client") {
+      this.client = true;
+      this.displayedColumns = ["marque", "modele", "categorie", "typeTransmission", "annee", "numeroImmatriculation", "kilometrage", 
+        "puissanceMoteur", "cylindree", "capaciteReservoir", "pressionPneusRecommande", "Date d'enregistrement", "Date Suppression", "Statut", "actions"
+      ];
+    }
+
     // Initialisez la pagination au chargement du composant
     this.getAllVoitures();
     this.getAllCategorieActives();

@@ -24,6 +24,7 @@ import { TypeTransmission, TypeTransmissionService } from 'src/app/services/cara
 export class TypeTransmissionComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   typeTransmissions: TypeTransmission[];
+  isAdmin: boolean = false;
 
   paginatedTypeTransmissions: TypeTransmission[] = [];
 
@@ -38,12 +39,21 @@ export class TypeTransmissionComponent {
   constructor(private dialog: MatDialog, private typeTransmissionService: TypeTransmissionService) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager")
+      this.displayedColumns = ['Libelle'];
+    else
+    this.isAdmin = true;
     // Initialisez la pagination au chargement du composant
     this.getAllTypeTransmissions();
   }
 
   getAllTypeTransmissions() {
-    this.typeTransmissionService.getTypeTransmissions().subscribe({
+    const observable = this.isAdmin
+      ? this.typeTransmissionService.getTypeTransmissions()
+      : this.typeTransmissionService.getTypeTransmissionsActives();
+    observable.subscribe({
       next: (typeTransmissions) => {
         this.typeTransmissions = typeTransmissions;
         this.updatePagination();
@@ -143,10 +153,10 @@ export class TypeTransmissionComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        
+
         // Fusionner les données existantes de la typeTransmission avec les modifications
         const updatedData = { ...typeTransmission, libelle: result.libelle.trim() };
         console.log(updatedData);
@@ -181,7 +191,7 @@ export class TypeTransmissionComponent {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ typeTransmission.libelle }" comme typeTransmission ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${typeTransmission.libelle}" comme typeTransmission ? Cette action est irréversible.`
       }
     });
 
@@ -196,7 +206,7 @@ export class TypeTransmissionComponent {
 
   // Fonction de suppression d'un employé
   async deleteTypeTransmission(typeTransmissionId: string) {
-  
+
     try {
       // Appel API pour supprimer la typeTransmission
       const deletedTypeTransmission = await lastValueFrom(this.typeTransmissionService.deleteTypeTransmission(typeTransmissionId));
@@ -209,7 +219,7 @@ export class TypeTransmissionComponent {
           this.typeTransmissions[index] = deletedTypeTransmission; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
-      } 
+      }
 
     } catch (error: any) {
       console.error('Erreur lors de la suppression:', error);
@@ -217,8 +227,8 @@ export class TypeTransmissionComponent {
       alert(errorMessage); // Affiche l'erreur à l'utilisateur
     }
   }
-  
-  
+
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

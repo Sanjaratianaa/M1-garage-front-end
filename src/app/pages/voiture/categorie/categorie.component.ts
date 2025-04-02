@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class CategorieComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   categories: Categorie[];
+  isAdmin: boolean = false;
 
   paginatedCategories: Categorie[] = [];
 
@@ -40,7 +41,16 @@ export class CategorieComponent {
 
   ngOnInit() {
     // Initialisez la pagination au chargement du composant
-    this.getAllCategories();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role != "manager") {
+      this.displayedColumns = ['Libelle'];
+      this.getAllCategoriesActives()
+    }
+    else {
+      this.isAdmin = true;
+      this.getAllCategories();
+    }
   }
 
   getAllCategories() {
@@ -54,7 +64,19 @@ export class CategorieComponent {
         alert('Impossible de charger les categories. Veuillez réessayer plus tard.');
       }
     });
+  }
 
+  getAllCategoriesActives() {
+    this.categorieService.getCategoriesActives().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.updatePagination();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des categories:', error.message);
+        alert('Impossible de charger les categories. Veuillez réessayer plus tard.');
+      }
+    });
   }
 
   updatePagination() {
@@ -144,10 +166,10 @@ export class CategorieComponent {
     try {
       // Attendre la fermeture de la modale et récupérer les données saisies
       const result = await firstValueFrom(dialogRef.afterClosed());
-      
+
       if (result) {
         console.log('Modification enregistrée:', result);
-        
+
         // Fusionner les données existantes de la categorie avec les modifications
         const updatedData = { ...categorie, libelle: result.libelle.trim() };
         console.log(updatedData);
@@ -182,7 +204,7 @@ export class CategorieComponent {
       width: '400px',
       data: {
         title: 'Confirmer la suppression',
-        message: `Êtes-vous sûr de vouloir supprimer "${ categorie.libelle }" comme categorie ? Cette action est irréversible.`
+        message: `Êtes-vous sûr de vouloir supprimer "${categorie.libelle}" comme categorie ? Cette action est irréversible.`
       }
     });
 
@@ -197,7 +219,7 @@ export class CategorieComponent {
 
   // Fonction de suppression d'un employé
   async deleteCategorie(categorieId: string) {
-  
+
     try {
       // Appel API pour supprimer la categorie
       const deletedCategorie = await lastValueFrom(this.categorieService.deleteCategorie(categorieId));
@@ -210,7 +232,7 @@ export class CategorieComponent {
           this.categories[index] = deletedCategorie; // Mettre à jour l'objet avec la version renvoyée
           this.updatePagination(); // Rafraîchir la liste affichée
         }
-      } 
+      }
 
     } catch (error: any) {
       console.error('Erreur lors de la suppression:', error);
@@ -218,8 +240,8 @@ export class CategorieComponent {
       alert(errorMessage); // Affiche l'erreur à l'utilisateur
     }
   }
-  
-  
+
+
   // Fonction pour gérer la pagination
   onPaginateChange(event: PageEvent) {
     const { pageIndex, pageSize } = event;

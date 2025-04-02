@@ -31,6 +31,7 @@ export class SpecialiteComponent {
   services: any[] = [];
   sousServices: any[] = [];
   mecaniciens: any[] = [];
+  isAdmin: boolean = false;
 
   paginatedSpecialites: Specialite[] = [];
 
@@ -50,11 +51,18 @@ export class SpecialiteComponent {
   ) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role == "manager") {
+      this.isAdmin = true;
+    }
+    else
+      this.columns = ['Service', 'Specialite', 'Mecanicien', 'Date d\'enregistrement', 'Manager'];
     // Initialisez la pagination au chargement du composant
+    this.getAllMecaniciensActives();
     this.getAllSpecialite();
     this.getAllServicesActives();
     this.getAllSousServicesActives();
-    this.getAllMecaniciensActives();
   }
 
   getAllMecaniciensActives() {
@@ -78,7 +86,11 @@ export class SpecialiteComponent {
   }
 
   getAllSpecialite() {
-    this.specialiteService.getSpecialites().subscribe({
+    const observable = this.isAdmin
+      ? this.specialiteService.getSpecialites()
+      : this.specialiteService.getSpecialitesActives();
+
+    observable.subscribe({
       next: (specialites) => {
         console.log(specialites);
         this.specialites = specialites;
