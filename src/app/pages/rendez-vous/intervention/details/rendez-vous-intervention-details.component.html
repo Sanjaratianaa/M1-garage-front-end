@@ -1,80 +1,63 @@
 <div class="rendez-vous-intervention-details">
-  <main class="pageWrapper maxWidth">
-      <app-breadcrumb>
-          <div class="bg-white rounded p-20 m-b-30">
-              <div class="row">
-                  <div class="col-sm-8">
-                      <h4 class="page-title m-0 f-s-18 f-w-600">Rendez-vous interventions</h4>
-                  </div>
-                  <div class="col-sm-4">
-                      <div class="d-flex align-items-center justify-content-lg-end">
-                          <mat-card-title class="mat-mdc-card-title m-b-0">
-                              <span
-                                  class="rounded p-x-8 p-y-2 text-primary bg-light-primary f-s-12 f-w-500">Details</span>
-                          </mat-card-title>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </app-breadcrumb>
+    <main class="pageWrapper maxWidth">
+        <app-breadcrumb>
+            <div class="bg-white rounded p-20 m-b-30">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h4 class="page-title m-0 f-s-18 f-w-600">Rendez-vous interventions</h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="d-flex align-items-center justify-content-lg-end">
+                            <mat-card-title class="mat-mdc-card-title m-b-0">
+                                <span
+                                    class="rounded p-x-8 p-y-2 text-primary bg-light-primary f-s-12 f-w-500">Details</span>
+                            </mat-card-title>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </app-breadcrumb>
 
-      <mat-card class="mat-mdc-card mdc-card cardWithShadow">
-          <mat-tab-group mat-stretch-tabs="false" animationDuration="0ms" class="mat-primary">
+        <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+            <mat-tab-group mat-stretch-tabs="false" animationDuration="0ms" class="mat-primary">
 
-              <mat-tab label="Details">
-                  <ng-template mat-tab-label>
-                      <div class="d-flex align-items-center">
-                          <mat-icon class="icon-20 m-r-8 d-flex">description</mat-icon>
-                          Details
-                      </div>
-                  </ng-template>
-                    <!-- <mat-card-content class="p-y-24">
-                        <form [formGroup]="detailsForm">
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Title</mat-label>
-                                <input matInput formControlName="title">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Description</mat-label>
-                                <textarea matInput formControlName="description"></textarea>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Assignee</mat-label>
-                                <input matInput formControlName="assignee">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Status</mat-label>
-                                <mat-select formControlName="status">
-                                    <mat-option value="open">Open</mat-option>
-                                    <mat-option value="inprogress">In Progress</mat-option>
-                                    <mat-option value="closed">Closed</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Date</mat-label>
-                                <input matInput [matDatepicker]="picker" formControlName="date">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Heure Debut</mat-label>
-                                <input matInput type="time" formControlName="heureDebut">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="w-100">
-                                <mat-label>Heure Fin</mat-label>
-                                <input matInput type="time" formControlName="heureFin">
-                            </mat-form-field>
-
-                            <button mat-flat-button color="primary" (click)="saveDetails()">Save Details</button>
-                        </form>
-                    </mat-card-content> -->
-                </mat-tab>
+                <mat-tab label="Details">
+                    <ng-template mat-tab-label>
+                        <div class="d-flex align-items-center">
+                            <mat-icon class="icon-20 m-r-8 d-flex">description</mat-icon>
+                            Details
+                        </div>
+                    </ng-template>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+                                <mat-card-content class="mat-mdc-card-content p-y-24">
+                                    <mat-card-title class="mat-mdc-card-title">Voiture</mat-card-title>
+                                    <mat-card-subtitle class="mat-mdc-card-subtitle f-s-14">Information sur la voiture</mat-card-subtitle>
+                                    <div class="m-t-24" *ngIf="rendezVous?.voiture">
+                                        <p>Immatriculation: {{ rendezVous?.voiture?.numeroImmatriculation || 'Non renseignée' }}</p>
+                                        <p>Marque: {{ rendezVous?.voiture?.marque?.libelle || 'Non renseignée' }}</p>
+                                        <p>Modèle: {{ rendezVous?.voiture?.modele?.libelle || 'Non renseigné' }}</p>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                        <div class="col-sm-6">
+                            <mat-card class="mat-mdc-card mdc-card cardWithShadow">
+                                <mat-card-content class="mat-mdc-card-content p-y-24">
+                                    <mat-card-title class="mat-mdc-card-title">Mécanicien</mat-card-title>
+                                    <div class="m-t-24">
+                                        <ul>
+                                            <li *ngFor="let service of rendezVous?.services || []">
+                                                {{ service.sousSpecialite.libelle || 'Service inconnu' }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                    </div>
+                </mat-tab>                
 
                 <mat-tab label="Services">
                     <ng-template mat-tab-label>
@@ -86,8 +69,7 @@
                     <mat-card-content class="p-y-14">
                         <div *ngIf="rendezVous && rendezVous.services">
                             <div *ngFor="let service of rendezVous.services">
-                                <div *ngIf="isCurrentUser(service); else completedServiceOrNotCurrentUser">
-                                    <!-- Editable Form Fields (displayed when service.status !== 'terminé') -->
+                                <div *ngIf="isCurrentUser(service) && service.status !== 'terminé' else completedServiceOrNotCurrentUser">
                                     <mat-card class="">
                                         <mat-card-content>
                                             <mat-card-title style="margin-bottom: 2%; word-wrap: break-word;">{{ service.sousSpecialite.libelle }} : {{ service.raison }}</mat-card-title>
@@ -95,12 +77,12 @@
                                             <div class="w-100">
                                             <mat-form-field appearance="outline" class="w-50 m-r-8">
                                                 <mat-label>Heure Debut</mat-label>
-                                                <input matInput type="time" [(ngModel)]="service.heureDebut">
+                                                <input matInput type="datetime-local" [(ngModel)]="service.heureDebut">
                                             </mat-form-field>
                 
                                             <mat-form-field appearance="outline" class="w-50 m-r-8">
                                                 <mat-label>Heure Fin</mat-label>
-                                                <input matInput type="time" [(ngModel)]="service.heureFin">
+                                                <input matInput type="datetime-local" [(ngModel)]="service.heureFin">
                                             </mat-form-field>
                                             </div>
 
@@ -147,7 +129,7 @@
                                 </div>
                 
                                 <ng-template #completedServiceOrNotCurrentUser>
-                                    <div *ngIf="!isCurrentUser(service) || service.status === 'terminé'">
+                                    <div *ngIf="isCurrentUser(service) && service.status === 'terminé' || !isCurrentUser(service)">
                                         <mat-card
                                             class="mat-mdc-card mdc-card cardWithShadow img-task m-b-15 overflow-hidden">
                                             <div class="d-flex align-items-center justify-content-between p-x-12 p-y-10">
@@ -160,8 +142,7 @@
                                                     <div class="d-flex align-items-center gap-4">
                                                         <!-- Calendar Icon (Replace with your icon component) -->
                                                         <mat-icon>calendar_month</mat-icon>
-                                                        <span class="f-s-12 lh-base">{{ rendezVous.dateRendezVous | date: 'dd
-                                                            MMMM' }}</span>
+                                                        <span class="f-s-12 lh-base">{{ formatDate(rendezVous.dateRendezVous) | date:'medium' }}</span>
                                                     </div>
                                                     <span class="rounded f-s-12 p-x-8 text-white"
                                                         [ngStyle]="getServiceStatusStyle(service.status)">
@@ -176,8 +157,8 @@
                                                     <span class="f-s-12"><strong>Mecanicien:</strong> {{
                                                         service.mecanicien.nom }} {{
                                                             service.mecanicien.prenom }}</span>
-                                                    <span class="f-s-12"><strong>Time:</strong> {{ service.heureDebut }} -
-                                                        {{ service.heureFin }}</span>
+                                                    <span class="f-s-12"><strong>Time:</strong> {{ formatDate(service.heureDebut) | date:'medium' }} -
+                                                        {{ formatDate(service.heureFin) | date:'medium' }}</span>
                                                 </div>
                                             </div>
                                         </mat-card>
@@ -209,13 +190,64 @@
                         <!-- Ajout d'un nouvel employé -->
                         <mat-card class="cardWithShadow">
                             <mat-card-content>
-                            <button mat-flat-button color="primary" class="m-r-8" >Ajouter des pieces</button>
+                            <button mat-flat-button color="primary" class="m-r-8"  (click)="openModal()">Ajouter des pieces</button>
                             </mat-card-content>
                         </mat-card>
 
-                        <!-- <div *ngIf="intervention && intervention.piecesAchetees">
-                            
-                        </div> -->
+                        <div *ngIf="rendezVous && rendezVous.piecesAchetees">
+                            <mat-card class="cardWithShadow">
+                                <mat-card-content>
+                                  <mat-card-title>Liste des pièces</mat-card-title>
+                                  <mat-table [dataSource]="paginatedPieces" matSort class="mat-elevation-z8">
+                                    <ng-container matColumnDef="Libelle">
+                                      <mat-header-cell *matHeaderCellDef> Libelle </mat-header-cell>
+                                      <mat-cell *matCellDef="let piece"> {{ piece.piece.libelle }} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="Quantite">
+                                        <mat-header-cell *matHeaderCellDef> Quantite </mat-header-cell>
+                                        <mat-cell *matCellDef="let piece"> {{ piece.quantite }} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="Prix Unitaire">
+                                        <mat-header-cell *matHeaderCellDef> Prix Unitaire </mat-header-cell>
+                                        <mat-cell *matCellDef="let piece"> {{ piece.prixUnitaire }} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="Prix Total">
+                                        <mat-header-cell *matHeaderCellDef> Prix Total </mat-header-cell>
+                                        <mat-cell *matCellDef="let piece"> {{ piece.prixTotal }} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="Commentaire">
+                                        <mat-header-cell *matHeaderCellDef> Commentaire </mat-header-cell>
+                                        <mat-cell *matCellDef="let piece"> {{ piece.commentaire }} </mat-cell>
+                                    </ng-container>
+                              
+                                    <ng-container matColumnDef="actions">
+                                        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+                                        <mat-cell *matCellDef="let piece">
+                                            <button mat-icon-button color="warn">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                            <!-- <button mat-icon-button color="warn" (click)="openDeleteConfirmation(marque)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button> -->
+                                        </mat-cell>
+                                    </ng-container>
+                              
+                                    <!-- Table Header & Row Definitions -->
+                                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                                  </mat-table>
+                              
+                                  <!-- Pagination -->
+                                  <mat-paginator [length]="pieces.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+                                    (page)="onPaginateChange($event)">
+                                  </mat-paginator>
+                                </mat-card-content>
+                              </mat-card>
+                        </div>
 
                     </mat-card-content>
                 </mat-tab>

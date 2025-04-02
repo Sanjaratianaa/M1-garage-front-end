@@ -51,6 +51,7 @@ export interface Service {
     mecaniciensDisponibles: any[];
     commentaire: string | null;
     status: string;
+    tempStatus?: string;
 }
 
 export interface Piece {
@@ -59,7 +60,6 @@ export interface Piece {
 }
 
 export interface PiecesAchetees {
-    _id: string;
     piece: Piece;
     quantite: Number;
     prixUnitaire: number;
@@ -181,14 +181,12 @@ export class RendezVousService {
     /**
      * Modifier une rendezVous existante
      */
-    updateRendezVous(rendezVous: any): Observable<RendezVous> {
+    updateRendezVous(_id: string, rendezVous: any): Observable<RendezVous> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        console.log("Service za zaoooo ", `${this.apiUrl}/${rendezVous._id}`);
-
-        return this.http.put<RendezVous>(`${this.apiUrl}/${rendezVous._id}`, rendezVous, { headers }).pipe(
+        return this.http.put<RendezVous>(`${this.apiUrl}/${_id}`, rendezVous, { headers }).pipe(
             catchError(this.handleError)
         );
     }

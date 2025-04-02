@@ -103,17 +103,17 @@
 
                         <!-- Debut Column -->
                         <ng-container matColumnDef="debut">
-                            <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Debut</th>
+                            <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Début</th>
                             <td mat-cell *matCellDef="let rendezVous" class="f-s-14">
-                                {{ rendezVous.heureDebut }}
+                                {{ rendezVous.heureDebut | date:'medium' }}
                             </td>
-                        </ng-container>
+                        </ng-container>                        
 
                         <!-- Fin Column -->
                         <ng-container matColumnDef="fin">
                             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Fin</th>
                             <td mat-cell *matCellDef="let rendezVous" class="f-s-14">
-                                {{ rendezVous.heureFin }}
+                                {{ rendezVous.heureFin | date:'medium' }}
                             </td>
                         </ng-container>
 
@@ -124,15 +124,11 @@
                                 <a class="m-r-10 cursor-pointer" (click)="onEditClick(rendezVous)" aria-label="Edit">
                                     <mat-icon>edit</mat-icon>
                                 </a>
-                                <a class="m-r-10 cursor-pointer" aria-label="Delete">
-                                    <mat-icon>delete</mat-icon>
-                                </a>
                             </td>
                         </ng-container>
 
                         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackByRendezVous" (click)="onRowClick(row)"
-                            style="cursor: pointer;"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onRowClick(row)" style="cursor: pointer;"></tr>
                     </table>
                 </div>
                 <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons aria-label="Select page of interventions"

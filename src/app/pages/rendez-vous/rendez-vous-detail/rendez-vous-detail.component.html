@@ -32,8 +32,8 @@
 
                                         <div class="m-t-24">
                                             <p>Immatriculation: {{ rendezVous.voiture.numeroImmatriculation }}</p>
-                                            <p>Marque: {{ rendezVous.voiture.marque }}</p>
-                                            <p>Modèle: {{ rendezVous.voiture.modele }}</p>
+                                            <p>Marque: {{ rendezVous?.voiture?.marque?.libelle || 'Non renseignée' }}</p>
+                                            <p>Modèle: {{ rendezVous?.voiture?.modele?.libelle || 'Non renseigné' }}</p>
                                         </div>
                                     </mat-card-content>
                                 </mat-card>
