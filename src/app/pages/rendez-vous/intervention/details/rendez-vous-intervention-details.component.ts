@@ -1,5 +1,5 @@
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,26 +10,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Intervention } from '../rendez-vous-intervention.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-
-export interface Service {
-    sousSpecialite: any;
-    raison: string;
-    mecanicien: any;
-    quantiteEstimee: number;
-    heureDebut: Date;
-    heureFin: Date;
-    quantiteFinale: number;
-    prixUnitaire: number;
-    prixTotal: number;
-    remise: number;
-    commentaire: string;
-    note: number;
-    avis: string;
-    status: string; // Enum: 'en cours', 'en attente', 'suspendue', 'terminé'
-}
+import { PiecesAchetees, RendezVous, Service } from 'src/app/services/rendez-vous/rendez-vous.service';
+import { firstValueFrom } from 'rxjs';
+import { RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
+import { MatDialog } from '@angular/material/dialog';
+import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
+import { PieceService } from 'src/app/services/caracteristiques/piece.service';
+import { PrixPiece } from 'src/app/services/caracteristiques/prixStock.service';
+import { MarqueService } from 'src/app/services/caracteristiques/marque.service';
+import { ModeleService } from 'src/app/services/caracteristiques/modele.service';
+import { TypeTransmissionService } from 'src/app/services/caracteristiques/typeTransmission.service';
 
 @Component({
     selector: 'app-rendez-vous-intervention-details',
@@ -47,29 +41,55 @@ export interface Service {
         ReactiveFormsModule,
         MatDatepickerModule,
         MatNativeDateModule,
+        MatPaginatorModule,
+        MatTableModule,
+        DatePipe,
     ],
     templateUrl: './rendez-vous-intervention-details.component.html',
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class RendezVousInterventionDetailsComponent implements OnInit {
-    intervention: Intervention | undefined;
+    rendezVous: RendezVous | undefined;
     detailsForm: FormGroup;
     notesForm: FormGroup;
+
+    displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire"];
+    piecesOrigines: any[] = [];
+    marques: any[];
+    modeles: any[];
+    typeTransmissions: any[];
+
+    pieces: PiecesAchetees[] = [];
+    paginatedPieces: PiecesAchetees[] = [];
+
+    newPieceAchete = { id_piece: '', marque_piece: '', id_marque: '', id_modele: '', id_type_transmission: '', quantite: 1, prixUnitaire: 0, prixTotal: 0, commentaire: '' };
+
+    pageSize = 5;
+    currentPage = 0;
+    pageSizeOptions = [5, 10, 20];
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private rendezVousService: RendezVousService,
+        private dialog: MatDialog,
+        private pieceService: PieceService,
+        private marqueService: MarqueService,
+        private modeleService: ModeleService,
+        private typeTransmissionService: TypeTransmissionService
     ) {
-        this.detailsForm = this.fb.group({
-            title: ['', Validators.required],
-            description: [''],
-            assignee: [''],
-            status: [''],
-            date: [''],
-            heureDebut: [''],
-            heureFin: ['']
-        });
+
+        this.rendezVous = this.router.getCurrentNavigation()?.extras.state?.['rendezVous'];
+
+        console.log(">> rendez: ", this.rendezVous);
+
+        if (this.rendezVous?.services) {
+            this.rendezVous.services = this.rendezVous.services.map((service: Service) => ({
+                ...service,
+                tempStatus: service.status
+            }));
+        }
 
         this.notesForm = this.fb.group({
             notes: ['']
@@ -77,129 +97,89 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const interventionId = Number(this.route.snapshot.paramMap.get('id'));
-        this.intervention = this.getInterventionDetails(interventionId);
+        this.pieces = this.rendezVous?.piecesAchetees || [];
 
-        if (this.intervention) {
-            this.detailsForm.patchValue({
-                title: this.intervention.title,
-                description: this.intervention.description,
-                assignee: this.intervention.assignee?.name,
-                status: this.intervention.status,
-                date: this.intervention.date,
-                heureDebut: this.intervention.heureDebut,
-                heureFin: this.intervention.heureFin
-            });
-        }
+        this.updatePagination();
+
+        this.getAllPieceActives();
+        this.getAllMarqueActives();
+        this.getAllModeleActives();
+        this.getAllTypeTransmissionActives();
     }
 
-    getInterventionDetails(id: number): Intervention | undefined {
-        const interventionsData: Intervention[] = [
-            {
-                id: 1,
-                title: 'Sed ut perspiciatis unde omnis iste',
-                description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-                assignee: { name: 'Alice', imageUrl: '/assets/images/profile/user-1.jpg' },
-                status: 'inprogress',
-                date: new Date('2024-05-01'),
-                heureDebut: '09:00',
-                heureFin: '10:00',
-                services: [
-                    {
-                        sousSpecialite: { name: 'Oil Change' },
-                        raison: 'Regular maintenance',
-                        mecanicien: { name: 'Bob' },
-                        quantiteEstimee: 1,
-                        heureDebut: new Date('2024-05-15T09:00:00'),
-                        heureFin: new Date('2024-05-15T10:00:00'),
-                        quantiteFinale: 1,
-                        prixUnitaire: 50,
-                        prixTotal: 50,
-                        remise: 0,
-                        commentaire: 'Completed on time',
-                        note: 5,
-                        avis: 'Excellent service',
-                        status: 'en attente'
-                    },
-                    {
-                        sousSpecialite: { name: 'Tire Rotation' },
-                        raison: 'Tire maintenance',
-                        mecanicien: { name: 'Charlie' },
-                        quantiteEstimee: 1,
-                        heureDebut: new Date('2024-05-15T10:00:00'),
-                        heureFin: new Date('2024-05-15T11:00:00'),
-                        quantiteFinale: 1,
-                        prixUnitaire: 30,
-                        prixTotal: 30,
-                        remise: 5,
-                        commentaire: 'Completed',
-                        note: 4,
-                        avis: 'Good service',
-                        status: 'terminé'
-                    }
-                ]
-            },
-            {
-                id: 2,
-                title: 'Xtreme theme dropdown issue',
-                description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-                assignee: { name: 'Jonathan', imageUrl: '/assets/images/profile/user-2.jpg' },
-                status: 'open',
-                date: new Date('2024-05-03'),
-                services: []
-            },
-            {
-                id: 3,
-                title: 'Header issue in material admin',
-                description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-                assignee: { name: 'Smith', imageUrl: '/assets/images/profile/user-3.jpg' },
-                status: 'closed',
-                date: new Date('2024-05-02'),
-                heureDebut: '14:00',
-                heureFin: '15:00',
-                services: []
-            },
-            {
-                id: 4,
-                title: 'Sidebar issue in Nice admin',
-                description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-                assignee: { name: 'Vincent', imageUrl: '/assets/images/profile/user-4.jpg' },
-                status: 'inprogress',
-                date: new Date('2024-05-06'),
-                services: []
-            },
-            {
-                id: 5,
-                title: 'Elegant Theme Side Menu show OnClick',
-                description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-                assignee: { name: 'Chris', imageUrl: '/assets/images/profile/user-5.jpg' },
-                status: 'open',
-                date: new Date('2024-05-04'),
-                heureDebut: '11:00',
-                heureFin: '12:00',
-                services: []
-            }
-        ];
-        return interventionsData.find(i => i.id === id);
-    }
 
     goBack(): void {
         this.router.navigate(['/rendez-vous/interventions']);
     }
 
-    saveDetails(): void {
-        if (this.intervention) {
-            this.intervention.title = this.detailsForm.get('title')?.value;
-            this.intervention.description = this.detailsForm.get('description')?.value;
-            // ... other updates
+    formatDate(date: string | Date): string {
+        if (!date) return '';
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = ('0' + (d.getMonth() + 1)).slice(-2);
+        const day = ('0' + d.getDate()).slice(-2);
+        const hours = ('0' + d.getHours()).slice(-2);
+        const minutes = ('0' + d.getMinutes()).slice(-2);
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
 
-            console.log('Saving details:', this.detailsForm.value);
+    isCurrentUser(service: Service): boolean {
+        const userString = localStorage.getItem('user');
+        if (userString) {
+            try {
+                const user = JSON.parse(userString);
+                return !!(service.mecanicien && user.idPersonne === service.mecanicien._id);
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+        return false;
+    }
+
+    saveDetails(): void {
+        if (this.rendezVous) {
+            // this.rendezVous.title = this.detailsForm.get('title')?.value;
+            // this.intervention.description = this.detailsForm.get('description')?.value;
+            // // ... other updates
+
+            // console.log('Saving details:', this.detailsForm.value);
+            console.log('Saving details:');
         }
     }
 
-    saveService(service: Service): void {
-        console.log('Saving service:', service);
+    calculatePrixTotal(service: Service): void {
+        const quantite = Number(service.quantiteFinale) || 0;
+        const prixUnitaire = Number(service.prixUnitaire) || 0;
+
+        const total = quantite * prixUnitaire;
+        service.prixTotal = parseFloat(total.toFixed(2));
     }
+
+    async saveService(service: Service): Promise<void> {
+        console.log('Saving service:', service);
+
+        if (!this.rendezVous) {
+            console.error("Erreur : Aucun rendez-vous sélectionné.");
+            return;
+        }
+
+        service.status = service.tempStatus || '';
+
+        const serviceUpdate = {
+            _id: this.rendezVous._id,
+            services: [service]
+        };
+
+        try {
+            const updatedRendezVous = await firstValueFrom(
+                this.rendezVousService.updateRendezVous(serviceUpdate)
+            );
+            console.log("Backend update successful:", updatedRendezVous);
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour du service :", error);
+        }
+    }
+
 
     getServiceStatusStyle(status: string): any {
         switch (status) {
@@ -217,18 +197,203 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     }
 
     saveAllServices() {
-      if (this.intervention && this.intervention.services) {
-        this.intervention.services.forEach(service => {
-          // this.rendezVousService.updateRendezVousService(this.intervention._id, service._id, service)
-          //   .subscribe({
-          //     next: (response) => {
-          //       console.log(`Service ${service.raison} updated successfully:`, response);
-          //     },
-          //     error: (error) => {
-          //       console.error(`Error updating service ${service.raison}:`, error);
-          //     }
-          //   });
+        if (this.rendezVous && this.rendezVous.services) {
+            this.rendezVous.services.forEach(service => {
+                // this.rendezVousService.updateRendezVousService(this.intervention._id, service._id, service)
+                //   .subscribe({
+                //     next: (response) => {
+                //       console.log(`Service ${service.raison} updated successfully:`, response);
+                //     },
+                //     error: (error) => {
+                //       console.error(`Error updating service ${service.raison}:`, error);
+                //     }
+                //   });
+            });
+        }
+    }
+
+    // PIECES
+
+    getAllPieceActives() {
+        this.pieceService.getPiecesActives().subscribe({
+            next: (pieces) => {
+                this.piecesOrigines = pieces.map(piece => ({
+                    value: piece._id,
+                    label: piece.libelle
+                }));
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
         });
-      }
+    }
+
+    getAllMarqueActives() {
+        this.marqueService.getMarquesActives().subscribe({
+            next: (marques) => {
+                this.marques = [
+                    { value: '0', label: 'Tous' },  // Option "Tous" ajoutée au début
+                    ...marques.map(marque => ({
+                        value: marque._id,
+                        label: marque.libelle
+                    }))
+                ];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllModeleActives() {
+        this.modeleService.getModelesActives().subscribe({
+            next: (modeles) => {
+                this.modeles = [
+                    { value: '0', label: 'Tous' },  // Option "Tous" ajoutée au début
+                    ...modeles.map(modele => ({
+                        value: modele._id,
+                        label: modele.libelle
+                    }))
+                ];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllTypeTransmissionActives() {
+        this.typeTransmissionService.getTypeTransmissionsActives().subscribe({
+            next: (typeTransmissions) => {
+                this.typeTransmissions = [
+                    { value: '0', label: 'Tous' },  // Option "Tous" ajoutée au début
+                    ...typeTransmissions.map(typeTransmission => ({
+                        value: typeTransmission._id,
+                        label: typeTransmission.libelle
+                    }))
+                ];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    updatePagination() {
+        const startIndex = this.currentPage * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        this.paginatedPieces = this.pieces.slice(startIndex, endIndex);
+    }
+
+    async addNewPieceAsync(pieceAchete: any) {
+        if (pieceAchete) {
+            try {
+                if (this.rendezVous && this.rendezVous._id) {
+                    const rendezVousUpdate = await firstValueFrom(this.rendezVousService.addNewPiece(this.rendezVous._id, pieceAchete.id_piece, pieceAchete.marque_piece,
+                        pieceAchete.id_marque, pieceAchete.id_modele, pieceAchete.id_type_transmission, pieceAchete.quantite, pieceAchete.commentaire));
+
+                    console.log('Pièce ajoutée avec succès:', rendezVousUpdate);
+                    this.rendezVous.piecesAchetees = rendezVousUpdate.piecesAchetees;
+                    this.pieces = rendezVousUpdate.piecesAchetees;
+                    const startIndex = this.currentPage * this.pageSize;
+                    const endIndex = startIndex + this.pageSize;
+
+                    if (this.pieces.length > startIndex && this.pieces.length <= endIndex) {
+                        // La page actuelle a encore de la place, on reste dessus
+                    } else {
+                        this.currentPage = Math.floor((this.pieces.length - 1) / this.pageSize);
+                    }
+
+                    this.updatePagination();
+                }
+            } catch (error: any) {
+                console.error('Erreur lors de l’ajout de la marque:', error);
+                const errorMessage = error.error && error.error.message ? error.error.message : error.toString();
+                throw new Error(errorMessage);
+            }
+        }
+    }
+
+    async openModal(errorMessage: string = '') {
+        const data = {
+            title: 'Ajouter un achat de piece',
+            fields: [
+                {
+                    name: 'id_piece', label: 'Piece', type: 'select', required: true,
+                    options: this.piecesOrigines, defaultValue: this.newPieceAchete.id_piece
+                },
+                { name: 'marque_piece', label: 'Marque Piece', type: 'text', required: true, defaultValue: this.newPieceAchete.marque_piece },
+                {
+                    name: 'id_marque', label: 'Marque voiture', type: 'select', required: true, defaultValue: this.newPieceAchete.id_marque,
+                    options: this.marques
+                },
+                {
+                    name: 'id_modele', label: 'Modele', type: 'select', required: true, defaultValue: this.newPieceAchete.id_modele,
+                    options: this.modeles
+                },
+                {
+                    name: 'id_type_transmission', label: 'Type Transmission', type: 'select', required: true, defaultValue: this.newPieceAchete.id_type_transmission,
+                    options: this.typeTransmissions
+                },
+                { name: 'quantite', label: 'Quantite', type: 'number', required: true, defaultValue: this.newPieceAchete.quantite },
+                { name: 'commentaire', label: 'Commentaire', type: 'text', required: true, defaultValue: this.newPieceAchete.commentaire },
+            ],
+            submitText: 'Ajouter',
+            errorMessage: errorMessage,
+        };
+
+        const dialogRef = this.dialog.open(GenericModalComponent, {
+            width: '400px',
+            data: data,
+        });
+
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if (result) {
+                console.log('Données du formulaire pour pièce:', result);
+
+                try {
+                    this.newPieceAchete = result;
+
+                    console.log('Données du formulaire pour newPieceAchete:', this.newPieceAchete);
+
+                    // Uncomment the following line when you are ready to save
+                    await this.addNewPieceAsync(this.newPieceAchete);
+
+                } catch (error: any) {
+                    console.error('Erreur lors de l’ajout:', error.message);
+                    await this.openModal(error.message.replace("Error: ", ""));
+                }
+            }
+        });
+    }
+
+    // Fonction pour gérer la pagination
+    onPaginateChange(event: PageEvent) {
+        const { pageIndex, pageSize } = event;
+        this.currentPage = pageIndex;
+        this.pageSize = pageSize;
+
+        this.updatePagination();
+
+        // Vous pouvez ajouter ici une logique de récupération des données paginées depuis un serveur si nécessaire
+        console.log('Pagination changed: ', event);
+    }
+
+}
+
+@Component({
+    selector: 'app-modal',
+    template: `
+      `,
+})
+export class ModalComponent {
+    constructor(public dialog: MatDialog) { }
+
+    close() {
+        this.dialog.closeAll();
     }
 }

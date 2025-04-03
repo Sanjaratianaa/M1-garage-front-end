@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,25 +11,11 @@ import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
-
-import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
-
-export interface Intervention {
-  id: number;
-  title: string;
-  description: string;
-  assignee: {
-    name: string;
-    imageUrl: string;
-  };
-  status: string;
-  date: Date;
-  heureDebut?: string;
-  heureFin?: string;
-  services?: any[];
-}
+import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service'; // Assuming RendezVous interface is also here or imported separately
+import { PaiementService } from 'src/app/services/paiement/paiement.service';
 
 @Component({
   selector: 'app-intervention-list',
@@ -43,317 +29,123 @@ export interface Intervention {
     MatButtonModule,
     MatTableModule,
     MatPaginatorModule,
-    FormsModule
+    FormsModule,
+    DatePipe,
   ],
   templateUrl: './rendez-vous-intervention.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class RendezVousInterventionComponent implements OnInit {
+export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
 
   displayedColumns: string[] = ['description', 'client', 'status', 'date', 'debut', 'fin', 'action'];
 
   paginatedRendezVous: RendezVous[] = [];
-  // listeRendezVous: RendezVous[];
-  
-  interventionsData: Intervention[] = [
-    {
-      id: 1,
-      title: 'Sed ut perspiciatis unde omnis iste',
-      description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-      assignee: { name: 'Alice', imageUrl: '/assets/images/profile/user-1.jpg' },
-      status: 'inprogress',
-      date: new Date('2024-05-01'),
-      heureDebut: '09:00',
-      heureFin: '10:00'
-    },
-    {
-      id: 2,
-      title: 'Xtreme theme dropdown issue',
-      description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-      assignee: { name: 'Jonathan', imageUrl: '/assets/images/profile/user-2.jpg' },
-      status: 'open',
-      date: new Date('2024-05-03')
-    },
-    {
-      id: 3,
-      title: 'Header issue in material admin',
-      description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-      assignee: { name: 'Smith', imageUrl: '/assets/images/profile/user-3.jpg' },
-      status: 'closed',
-      date: new Date('2024-05-02' ,  ),
-      heureDebut: '14:00',
-      heureFin: '15:00'
-    },
-    {
-      id: 4,
-      title: 'Sidebar issue in Nice admin',
-      description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-      assignee: { name: 'Vincent', imageUrl: '/assets/images/profile/user-4.jpg' },
-      status: 'inprogress',
-      date: new Date('2024-05-06')
-    },
-    {
-      id: 5,
-      title: 'Elegant Theme Side Menu show OnClick',
-      description: 'ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-      assignee: { name: 'Chris', imageUrl: '/assets/images/profile/user-5.jpg' },
-      status: 'open',
-      date: new Date('2024-05-04'),
-      heureDebut: '11:00',
-      heureFin: '12:00'
-    }
-  ];
+  listeRendezVous: RendezVous[] = [];
 
-  listeRendezVous: RendezVous[] = [
-    {
-      "_id": "67e803adf39f50978ef39411",
-      "client": {
-        "_id": "67e7feecead3c7edffdcb695",
-        "nom": "RAKOTONDRAINY",
-        "prenom": "Tahiry",
-        "numeroTelephone": "038 99 622 63",
-        "email": "tahiry@gmail.com",
-        "genre": "Homme"
-      },
-      "validateur": {
-        "_id": "67da371fd1ac391f76c781eb",
-        "nom": "Anjaratiana",
-        "prenom": "Layah",
-        "numeroTelephone": "555-123-1234",
-        "email": "layah@example.com",
-        "genre": "Femme"
-      },
-      "voiture": {
-        "_id": "67e801cb522f7fe7a83eeafa",
-        "client": "67e7feecead3c7edffdcb698",
-        "marque": {
-          "_id": "67e252445d5a56721f3258b6",
-          "libelle": "BMW"
-        },
-        "modele": {
-          "_id": "67e24e8470ebd5b6ae09f569",
-          "libelle": "BMW Série 3"
-        },
-        "categorie": {
-          "_id": "67e25015c746a234f5f3b562",
-          "libelle": "SUV"
-        },
-        "typeTransmission": {
-          "_id": "67e1546ec9ac9f947030d51f",
-          "libelle": "Automatique"
-        },
-        "annee": 2016,
-        "numeroImmatriculation": "5600 ATD",
-        "kilometrage": 4500,
-        "puissanceMoteur": 500,
-        "cylindree": 34,
-        "capaciteReservoir": 25,
-        "pressionPneusRecommande": "4.5"
-      },
-      "services": [
-        {
-          "_id": "67e803adf39f50978ef39412",
-          "sousSpecialite": {
-            "_id": "67e256df811b3e52c586a976",
-            "service": {
-              "_id": "67e255a6edec2a99b8385687",
-              "libelle": "Diagnostic et réparation mécanique"
-            },
-            "libelle": "Diagnostic électronique",
-            "duree": 45,
-            "ptix": 0
-          },
-          "raison": "Misy tsy milamina ao amn motera.",
-          "mecanicien": {
-            "_id": "67e1b79f1ff9ce25ead9186f",
-            "nom": "ANJARATIANA",
-            "prenom": "Noah",
-            "numeroTelephone": "023145735",
-            "email": "noah@example.com",
-            "genre": "Homme"
-          },
-          "quantiteEstimee": 1,
-          "prixUnitaire": 30000,
-          "mecaniciensDisponibles": [],
-          "status": "en attente"
-        }
-      ],
-      "dateRendezVous": new Date("2025-03-31T08:00:00.000Z"),
-      "etat": "validé",
-      "dateHeureDemande": new Date("2025-03-29T14:29:01.222Z"),
-      "piecesAchetees": [],
-      "remarque": "",
-      "heureFin": null,
-      "heureDebut": null
-    },
-    {
-      "_id": "67e7b6ef4e43f93a901852e3",
-      "client": {
-        "_id": "67e3071018c9673f291d3ad2",
-        "nom": "RABEKOTO",
-        "prenom": "Maria",
-        "numeroTelephone": "0321423421",
-        "email": "maria@example.com",
-        "genre": "Femme"
-      },
-      "validateur": {
-        "_id": "67da371fd1ac391f76c781eb",
-        "nom": "Anjaratiana",
-        "prenom": "Layah",
-        "numeroTelephone": "555-123-1234",
-        "email": "layah@example.com",
-        "genre": "Femme"
-      },
-      "voiture": {
-        "_id": "67e2701349b59270464e2879",
-        "client": "67e3071118c9673f291d3ad5",
-        "marque": {
-          "_id": "67e2537a561193c28b342da8",
-          "libelle": "Peugeot"
-        },
-        "modele": {
-          "_id": "67e26f9149b59270464e2861",
-          "libelle": "Peugeot 208"
-        },
-        "categorie": {
-          "_id": "67e15462c9ac9f947030d51a",
-          "libelle": "Citadine"
-        },
-        "typeTransmission": {
-          "_id": "67e15472c9ac9f947030d523",
-          "libelle": "Manuelle"
-        },
-        "annee": 2015,
-        "numeroImmatriculation": "3652 MDT",
-        "kilometrage": 6000,
-        "puissanceMoteur": 400,
-        "cylindree": 28,
-        "capaciteReservoir": 20,
-        "pressionPneusRecommande": "3.5"
-      },
-      "services": [
-        {
-          "_id": "67e7b6ef4e43f93a901852e4",
-          "sousSpecialite": {
-            "_id": "67e256df811b3e52c586a976",
-            "service": {
-              "_id": "67e255a6edec2a99b8385687",
-              "libelle": "Diagnostic et réparation mécanique"
-            },
-            "libelle": "Diagnostic électronique",
-            "duree": 45,
-            "ptix": 0
-          },
-          "raison": "",
-          "mecanicien": {
-            "_id": "67e1b79f1ff9ce25ead9186f",
-            "nom": "ANJARATIANA",
-            "prenom": "Noah",
-            "numeroTelephone": "023145735",
-            "email": "noah@example.com",
-            "genre": "Homme"
-          },
-          "quantiteEstimee": 45,
-          "prixUnitaire": 30000,
-          "mecaniciensDisponibles": [],
-          "status": "en attente"
-        },
-        {
-          "_id": "67e7b6ef4e43f93a901852e5",
-          "sousSpecialite": {
-            "_id": "67e256f6811b3e52c586a97c",
-            "service": {
-              "_id": "67e255adedec2a99b838568c",
-              "libelle": "Système de freinage"
-            },
-            "libelle": "Changement et équilibrage des pneus",
-            "duree": 35,
-            "ptix": 0
-          },
-          "raison": "",
-          "mecanicien": {
-            "_id": "67de8f789315352284c05b9b",
-            "nom": "Rota",
-            "prenom": "Volamarooa",
-            "numeroTelephone": "034 88 735 43",
-            "email": "rota@example.com",
-            "genre": "Femme"
-          },
-          "quantiteEstimee": 35,
-          "prixUnitaire": 0,
-          "mecaniciensDisponibles": [],
-          "status": "en attente"
-        }
-      ],
-      "dateRendezVous": new Date("2025-05-12T06:00:00.000Z"),
-      "etat": "validé",
-      "dateHeureDemande": new Date("2025-03-29T09:01:35.733Z"),
-      "piecesAchetees": [],
-      "remarque": "Ra afaka tonga 15mn plutot tsara koakoa.",
-      "heureFin": null,
-      "heureDebut": null
-    }
-  ];
+  dataSource = new MatTableDataSource<RendezVous>([]);
 
-  dataSource = new MatTableDataSource<RendezVous>(this.paginatedRendezVous);
-
-  totalInterventions = this.interventionsData.length;
-  interventionsInProgress = this.interventionsData.filter(t => t.status === 'inprogress').length;
-  interventionsOpen = this.interventionsData.filter(t => t.status === 'open').length;
-  interventionsClosed = this.interventionsData.filter(t => t.status === 'closed').length;
-
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   pageSize = 5;
   currentPage = 0;
   pageSizeOptions = [5, 10, 20];
+  totalInterventions = 0; // Initialize count
 
-  selectedIntervention: Intervention | null = null;
+  selectedRendezVous: RendezVous | null = null;
+
+  interventionsInProgress = 0;
+  interventionsOpen = 0;
+  interventionsClosed = 0;
 
   constructor(
     private dialog: MatDialog,
     private router: Router,
-    private rendezVousService: RendezVousService
+    private rendezVousService: RendezVousService,
+    private paiementService: PaiementService,
   ) { }
 
   ngOnInit() {
     this.getAllRendezVous();
-    this.dataSource.paginator = this.paginator;
+  }
+
+  ngAfterViewInit() {
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    } else {
+        console.warn("MatPaginator instance was not found. Pagination might not work.");
+    }
   }
 
   getStatusClass(status: string): string {
-    switch (status) {
-      case 'validé': return 'bg-light-warning';
-      case 'open': return 'bg-light-success';
-      case 'closed': return 'bg-light-error';
-      default: return 'bg-light';
+    const lowerCaseStatus = status?.toLowerCase() || '';
+    switch (lowerCaseStatus) {
+      case 'validé':
+      case 'valide':
+      case 'en attente':
+        return 'bg-light-warning';
+      case 'open':
+        return 'bg-light-success';
+      case 'terminé':
+      case 'termine':
+      case 'closed':
+        return 'bg-light-error';
+      default:
+        return 'bg-light';
     }
   }
 
-  onRowClick(intervention: Intervention): void {
-    this.selectedIntervention = intervention;
-    if (!intervention.heureDebut || !intervention.heureFin) {
+  getDescription(rendezVous: RendezVous): string {
+    if (!rendezVous.services || rendezVous.services.length === 0) {
+      return 'Aucun service spécifié';
+    }
+    const serviceDescriptions = rendezVous.services
+      .map(service => service.sousSpecialite?.libelle)
+      .filter(libelle => !!libelle);
+    return serviceDescriptions.join(', ') || 'Services non détaillés';
+  }
+
+  getImageUrl(rendezVous: RendezVous): string {
+    if(rendezVous?.client?.genre === 'Femme') {
+      return '/assets/images/profile/user-2.jpg';
+    }
+    return '/assets/images/profile/user-1.jpg';
+  }
+
+  onRowClick(rendezVous: RendezVous): void {
+    this.selectedRendezVous = rendezVous;
+
+    if (this.selectedRendezVous.etat !== "terminé" && !rendezVous.heureDebut || !rendezVous.heureFin) {
       this.openModal();
     }
   }
 
-  onEditClick(intervention: Intervention): void {
-    this.selectedIntervention = intervention;
-    if (!intervention.heureDebut) {
-      this.openModal();
-    } else {
-      this.router.navigate(['/rendez-vous/interventions-details', intervention.id]);
+  onEditClick(rendezVous: RendezVous): void {
+    this.selectedRendezVous = rendezVous;
+
+    if(this.selectedRendezVous.etat !== "terminé") {
+      if (!rendezVous.heureDebut) {
+        this.openModal();
+      } else {
+        this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
+          state: { rendezVous: rendezVous}
+      });
+      }
     }
   }
 
   async openModal(errorMessage: string = '') {
+    if (!this.selectedRendezVous) {
+        console.error("No rendez-vous selected for modal.");
+        return;
+    }
+
     const data = {
       title: 'Confirmation Intervention',
       fields: [
-        { name: 'heureDebut', label: 'Heure de début', type: 'time', defaultValue: this.selectedIntervention?.heureDebut || "" },
-        { name: 'heureFin', label: 'Heure de fin', type: 'time', defaultValue: this.selectedIntervention?.heureFin || "" },
+        { name: 'heureDebut', label: 'Heure de début', type: 'datetime-local', required: true, defaultValue: this.formatDate(this.selectedRendezVous.heureDebut || "") },
+        { name: 'heureFin', label: 'Heure de fin', type: 'datetime-local', defaultValue: this.formatDate(this.selectedRendezVous.heureFin || "") },
       ],
-      submitText: 'Ajouter',
+      submitText: 'Confirmer Horaires',
       errorMessage: errorMessage,
     };
 
@@ -362,57 +154,240 @@ export class RendezVousInterventionComponent implements OnInit {
       data: data,
     });
 
-    dialogRef.afterClosed().subscribe(async result => {
-      if (result) {
-        try {
+    const result = await firstValueFrom(dialogRef.afterClosed());
 
-          console.log('Données du formulaire:', result);
+    if (result && this.selectedRendezVous) {
+      const rendezVousId = this.selectedRendezVous._id;
+      try {
+        console.log('Données du formulaire:', result);
 
-          if (this.selectedIntervention) {
-            this.selectedIntervention.heureDebut = result.heureDebut;
-            this.selectedIntervention.heureFin = result.heureFin;
+        this.verifyBeforeSubmit(this.selectedRendezVous, result.heureDebut, result.heureFin);
+
+        let rendezVousUpdatePayload: any = {
+          _id: rendezVousId,
+          heureDebut: result.heureDebut,
+          heureFin: result.heureFin
+        };
+
+        if (result.heureFin !== null && result.heureFin !== undefined && result.heureFin !== "") {
+          rendezVousUpdatePayload = {
+            ...rendezVousUpdatePayload,
+            etat: "terminé"
           }
-
-          // Refresh the table data
-          this.dataSource.data = [...this.listeRendezVous];
-          
-        } catch (error: any) {
-          console.error('Erreur lors de l’ajout:', error.message);
-          await this.openModal(error.message.replace("Error: ", ""));
+          this.savePaiement(this.selectedRendezVous, result.heureFin);
         }
+
+        console.log("Payload for update: ", rendezVousUpdatePayload);
+
+        const updatedRendezVous = await firstValueFrom(
+          this.rendezVousService.updateRendezVous(rendezVousUpdatePayload)
+        );
+        console.log("Backend update successful:", updatedRendezVous);
+
+        const index = this.listeRendezVous.findIndex(rdv => rdv._id === rendezVousId);
+
+        if (index !== -1) {
+          this.listeRendezVous[index] = { ...this.listeRendezVous[index], ...updatedRendezVous };
+        } else {
+
+          this.selectedRendezVous.heureDebut = updatedRendezVous.heureDebut;
+          this.selectedRendezVous.heureFin = updatedRendezVous.heureFin;
+
+          if (updatedRendezVous.etat) {
+              this.selectedRendezVous.etat = updatedRendezVous.etat;
+          }
+        }
+
+        this.updatePagination();
+        this.updateInterventionCounts();
+
+      } catch (error: any) {
+        console.error('Erreur lors de la mise à jour:', error);
+
+        const friendlyError = error.message?.includes('already passed') ? 'L\'heure de début ne peut pas être dans le passé.' :
+                              error.message?.includes('required') ? 'Veuillez remplir tous les champs requis.' :
+                              error.message?.includes('L\'heure de début ne peut pas être avant') ? 'L\'heure de début ne peut pas être dans le passé.' :
+                              error.message?.includes('L\'heure de fin doit être après') ? 'L\'heure de fin doit être après l\'heure de début.' :
+                              error.message?.includes('La durée totale des services dépasse') ? 'La durée totale des services dépasse l\'heure de fin.' :
+                              error.message?.includes('Tous les services doivent être') ? 'Tous les services doivent être terminés avant de clôturer le rendez-vous.' :
+                              'Une erreur est survenue lors de la mise à jour.';
+                             
+        await this.openModal(friendlyError.replace("Error: ", ""));
       }
-    });
+    }
   }
+
+  formatDate(date: string | Date): string {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2); // Adding leading zero to month
+    const day = ('0' + d.getDate()).slice(-2); // Adding leading zero to day
+    const hours = ('0' + d.getHours()).slice(-2); // Adding leading zero to hours
+    const minutes = ('0' + d.getMinutes()).slice(-2); // Adding leading zero to minutes
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  verifyBeforeSubmit(selectedRendezVous: RendezVous, heureDebut: any, heureFin: any) {
+    const originalHeureDebut = new Date(selectedRendezVous.heureDebut).getTime();
+      const selectedHeureDebut = new Date(heureDebut).getTime();
+      if (selectedHeureDebut < originalHeureDebut) {
+        throw new Error("L'heure de début ne peut pas être avant l'heure initiale du rendez-vous.");
+      }
+
+      const selectedHeureFin = new Date(heureFin).getTime();
+      if (selectedHeureFin <= selectedHeureDebut) {
+        throw new Error("L'heure de fin doit être après l'heure de début.");
+      }
+
+      // Vérifier si la durée totale des services dépasse l'heureFin
+      const totalDuration = this.calculateTotalServiceDuration();
+      const plannedEnd = selectedHeureDebut + totalDuration;
+      if (plannedEnd > selectedHeureFin) {
+        throw new Error("La durée totale des services dépasse l'heure de fin.");
+      }
+
+      // Vérifier si tous les services sont terminés
+      const incompleteServices = selectedRendezVous.services?.some(service => service.status !== 'terminé');
+      if (incompleteServices) {
+        throw new Error("Tous les services doivent être terminés avant de clôturer le rendez-vous.");
+      }
+  }
+
+  calculateTotalServiceDuration(): number {
+    let totalDuration = 0;
+  
+    if (this.selectedRendezVous && this.selectedRendezVous.services) {
+      this.selectedRendezVous.services.forEach(service => {
+        // Convertir la durée de chaque service (en minutes)
+        const startTime = new Date(service.heureDebut).getTime();
+        const endTime = new Date(service.heureFin).getTime();
+        if (startTime && endTime) {
+          totalDuration += (endTime - startTime);
+        }
+      });
+    }
+  
+    return totalDuration;
+  }
+
+  calculateMontantTotal(rendezVous: RendezVous): number {
+    if (!rendezVous) {
+        console.error("Erreur : Aucun rendez-vous fourni.");
+        return 0;
+    }
+
+    const totalServices = rendezVous.services.reduce((total, service) => {
+        return total + (service.prixTotal || 0);
+    }, 0);
+
+    const totalPieces = rendezVous.piecesAchetees.reduce((total, piece) => {
+        return total + (piece.prixTotal || 0);
+    }, 0);
+
+    return totalServices + totalPieces;
+  }
+
+  async savePaiement(rendezVous: RendezVous, heureFin: Date): Promise<void> {
+    
+    if (!rendezVous) {
+        console.error("Erreur : Aucun rendez-vous sélectionné.");
+        return;
+    }
+
+    let paiementData: any = {
+        rendezVous: {
+            _id: rendezVous._id,
+        },
+        montant: this.calculateMontantTotal(rendezVous) || 0,
+        datePaiement: heureFin,
+    };
+
+    console.log(paiementData)
+
+    const userString = localStorage.getItem('user');
+    if (userString) {
+        try {
+            const user = JSON.parse(userString);
+            paiementData = {
+                ...paiementData,
+                mecanicien: {
+                    _id: user.idPersonne,
+                },
+                datePaiement: heureFin,
+            };
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+        }
+    }
+
+    console.log("paiementData >>>> ", paiementData);
+
+    try {
+        const updatedPaiement = await firstValueFrom(
+            this.paiementService.addPaiement(paiementData)
+        );
+        console.log("Backend save for paiement successful:", updatedPaiement);
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour du service :", error);
+    }
+  } 
 
   getAllRendezVous() {
     this.rendezVousService.getRendezVousByMecanicien().subscribe({
         next: (listeRendezVous) => {
-          console.log(listeRendezVous);
+          console.log('Rendez-vous reçus:', listeRendezVous);
             this.listeRendezVous = listeRendezVous;
+
+            this.dataSource.data = this.listeRendezVous;
+
+            this.updateInterventionCounts();
+
+            this.totalInterventions = this.listeRendezVous.length;
+
             this.updatePagination();
+            if (this.paginator) {
+                this.dataSource.paginator = this.paginator;
+            }
         },
         error: (error) => {
-            console.error('Erreur lors du chargement des listeRendezVous:', error.message);
-            alert('Impossible de charger les listeRendezVous. Veuillez réessayer plus tard.');
+            console.error('Erreur lors du chargement des rendez-vous:', error.message || error);
+            alert('Impossible de charger la liste des rendez-vous. Veuillez vérifier votre connexion ou contacter le support.');
+            this.listeRendezVous = [];
+            this.dataSource.data = [];
+            this.totalInterventions = 0;
+            this.updateInterventionCounts();
         }
     });
   }
 
+  updateInterventionCounts() {
+    this.interventionsInProgress = 0;
+    this.interventionsOpen = 0;
+    this.interventionsClosed = 0;
+
+    this.totalInterventions = this.listeRendezVous.length;
+    this.interventionsInProgress = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'en attente').length;
+    this.interventionsOpen = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'validé' || t.etat?.toLowerCase() === 'valide').length;
+    this.interventionsClosed = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'terminé' || t.etat?.toLowerCase() === 'termine').length;
+
+  }
+
   updatePagination() {
-    const startIndex = this.currentPage * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedRendezVous = this.listeRendezVous.slice(startIndex, endIndex);
+    this.totalInterventions = this.listeRendezVous.length;
+
+    this.dataSource.data = this.listeRendezVous;
+
   }
 
   onPaginateChange(event: PageEvent) {
-      const { pageIndex, pageSize } = event;
-      this.currentPage = pageIndex;
-      this.pageSize = pageSize;
-
-      this.updatePagination();
-
-      // Vous pouvez ajouter ici une logique de récupération des données paginées depuis un serveur si nécessaire
-      console.log('Pagination changed: ', event);
+      console.log('Paginate event:', event);
+      this.currentPage = event.pageIndex;
+      this.pageSize = event.pageSize;
   }
-  
+
+  trackByRendezVous(index: number, item: RendezVous): string {
+    return item?._id ?? `index-${index}`;
+  }
+
 }
