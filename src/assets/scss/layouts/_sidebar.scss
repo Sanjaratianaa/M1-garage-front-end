@@ -16,12 +16,12 @@
 .sidebar-list {
   position: fixed;
   position: fixed;
-    top: 0; // Pour bien la fixer en haut
-    left: 0;
-    bottom: 0; // Assure qu'elle prend toute la hauteur de l'écran
-    z-index: 1000; // S'assurer qu'elle reste au-dessus
-    background-color: var(--mat-sys-background); // Ajoute un fond si besoin
-  
+  top: 0; // Pour bien la fixer en haut
+  left: 0;
+  bottom: 0; // Assure qu'elle prend toute la hauteur de l'écran
+  z-index: 1000; // S'assurer qu'elle reste au-dessus
+  background-color: var(--mat-sys-background); // Ajoute un fond si besoin
+
   &.mdc-list {
     padding: 0 18px;
     width: $sidenav-desktop;
@@ -32,7 +32,7 @@
     bottom: 60px; // Décale sous le header (si besoin)
     left: 0;
     right: 0;
-    
+
     .sub-item-icon {
       width: 16px !important;
       height: 16px !important;
@@ -52,6 +52,7 @@
       .caption-icon {
         display: none;
       }
+
       .caption-text {
         display: inline;
       }
@@ -71,6 +72,7 @@
       padding: 11px 16px !important;
       margin-bottom: 4px;
       width: 100%;
+
       &.twoline {
         height: 60px;
         align-items: center;
@@ -146,4 +148,11 @@
 
 .side-img {
   margin-right: -30px;
+}
+
+
+.ng-scrollbar-custom>div {
+  position: fixed !important;
+  top: 85px !important;
+  overflow: hidden;
 }
