@@ -81,13 +81,14 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
     switch (lowerCaseStatus) {
       case 'validé':
       case 'valide':
-      case 'en attente':
         return 'bg-light-warning';
-      case 'open':
-        return 'bg-light-success';
       case 'terminé':
       case 'termine':
-      case 'closed':
+        return 'bg-light-success';
+      case 'annulé':
+      case 'rejeté':
+      case 'termine':
+      case 'rejete':
         return 'bg-light-error';
       default:
         return 'bg-light';
@@ -221,10 +222,10 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
     if (!date) return '';
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = ('0' + (d.getMonth() + 1)).slice(-2); // Adding leading zero to month
-    const day = ('0' + d.getDate()).slice(-2); // Adding leading zero to day
-    const hours = ('0' + d.getHours()).slice(-2); // Adding leading zero to hours
-    const minutes = ('0' + d.getMinutes()).slice(-2); // Adding leading zero to minutes
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    const hours = ('0' + d.getHours()).slice(-2);
+    const minutes = ('0' + d.getMinutes()).slice(-2);
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
@@ -240,7 +241,6 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
         throw new Error("L'heure de fin doit être après l'heure de début.");
       }
 
-      // Vérifier si la durée totale des services dépasse l'heureFin
       const totalDuration = this.calculateTotalServiceDuration();
       const plannedEnd = selectedHeureDebut + totalDuration;
       if (plannedEnd > selectedHeureFin) {
@@ -259,7 +259,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   
     if (this.selectedRendezVous && this.selectedRendezVous.services) {
       this.selectedRendezVous.services.forEach(service => {
-        // Convertir la durée de chaque service (en minutes)
+        
         const startTime = new Date(service.heureDebut).getTime();
         const endTime = new Date(service.heureFin).getTime();
         if (startTime && endTime) {
@@ -367,9 +367,9 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
     this.interventionsClosed = 0;
 
     this.totalInterventions = this.listeRendezVous.length;
-    this.interventionsInProgress = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'en attente').length;
-    this.interventionsOpen = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'validé' || t.etat?.toLowerCase() === 'valide').length;
-    this.interventionsClosed = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'terminé' || t.etat?.toLowerCase() === 'termine').length;
+    this.interventionsInProgress = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'validé' || t.etat?.toLowerCase() === 'valide').length;
+    this.interventionsOpen = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'terminé' || t.etat?.toLowerCase() === 'termine').length;
+    this.interventionsClosed = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'annulé' || t.etat?.toLowerCase() === 'rejeté' || t.etat?.toLowerCase() === 'annule' || t.etat?.toLowerCase() === 'rejete').length;
 
   }
 
