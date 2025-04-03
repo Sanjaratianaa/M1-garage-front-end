@@ -21,6 +21,9 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { PieceService } from 'src/app/services/caracteristiques/piece.service';
 import { PrixPiece, PrixPieceService } from 'src/app/services/caracteristiques/prixStock.service';
+import { MarqueService } from 'src/app/services/caracteristiques/marque.service';
+import { ModeleService } from 'src/app/services/caracteristiques/modele.service';
+import { TypeTransmissionService } from 'src/app/services/caracteristiques/typeTransmission.service';
 
 @Component({
     selector: 'app-rendez-vous-intervention-details',
@@ -50,18 +53,17 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     detailsForm: FormGroup;
     notesForm: FormGroup;
 
-    displayedColumns: string[] = ['Libelle', "Quantite", "Prix Unitaire", "Prix Total", "Commentaire", 'actions'];
-    pieces: PiecesAchetees[] = [];
+    displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire", 'actions'];
     piecesOrigines: any[] = [];
+    marques: any[];
+    modeles: any[];
+    typeTransmissions: any[];
+
+    pieces: PiecesAchetees[] = [];
     prixPieces: PrixPiece[] = [];
     paginatedPieces: PiecesAchetees[] = [];
-    newPieceAchete: PiecesAchetees = {
-        piece: { _id: '', libelle: '' },
-        quantite: 0,
-        prixUnitaire: 0,
-        prixTotal: 0,
-        commentaire: '',
-    };
+
+    newPieceAchete = { id_piece: '', marque_piece: '', id_marque: '', id_modele: '', id_type_transmission: '', quantite: 1, prixUnitaire: 0, prixTotal: 0, commentaire: '' };
 
     pageSize = 5;
     currentPage = 0;
@@ -75,6 +77,9 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         private dialog: MatDialog,
         private pieceService: PieceService,
         private prixPieceService: PrixPieceService,
+        private marqueService: MarqueService,
+        private modeleService: ModeleService,
+        private typeTransmissionService: TypeTransmissionService
     ) {
 
         this.rendezVous = this.router.getCurrentNavigation()?.extras.state?.['rendezVous'];
@@ -97,11 +102,14 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         this.pieces = this.rendezVous?.piecesAchetees || [];
 
         this.updatePagination();
-        
+
         this.getAllPieceActives();
         this.getAllPrixPieces();
+        this.getAllMarqueActives();
+        this.getAllModeleActives();
+        this.getAllTypeTransmissionActives();
     }
-    
+
 
     goBack(): void {
         this.router.navigate(['/rendez-vous/interventions']);
@@ -116,7 +124,7 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         const hours = ('0' + d.getHours()).slice(-2);
         const minutes = ('0' + d.getMinutes()).slice(-2);
         return `${year}-${month}-${day}T${hours}:${minutes}`;
-      }
+    }
 
     isCurrentUser(service: Service): boolean {
         const userString = localStorage.getItem('user');
@@ -145,26 +153,26 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     calculatePrixTotal(service: Service): void {
         const quantite = Number(service.quantiteFinale) || 0;
         const prixUnitaire = Number(service.prixUnitaire) || 0;
-    
+
         const total = quantite * prixUnitaire;
         service.prixTotal = parseFloat(total.toFixed(2));
-      }
+    }
 
     async saveService(service: Service): Promise<void> {
         console.log('Saving service:', service);
-    
+
         if (!this.rendezVous) {
             console.error("Erreur : Aucun rendez-vous sélectionné.");
             return;
         }
 
         service.status = service.tempStatus || '';
-    
+
         const serviceUpdate = {
-            _id:this.rendezVous._id,
+            _id: this.rendezVous._id,
             services: [service]
         };
-    
+
         try {
             const updatedRendezVous = await firstValueFrom(
                 this.rendezVousService.updateRendezVous(serviceUpdate)
@@ -174,7 +182,7 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
             console.error("Erreur lors de la mise à jour du service :", error);
         }
     }
-    
+
 
     getServiceStatusStyle(status: string): any {
         switch (status) {
@@ -192,48 +200,102 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     }
 
     saveAllServices() {
-      if (this.rendezVous && this.rendezVous.services) {
-        this.rendezVous.services.forEach(service => {
-          // this.rendezVousService.updateRendezVousService(this.intervention._id, service._id, service)
-          //   .subscribe({
-          //     next: (response) => {
-          //       console.log(`Service ${service.raison} updated successfully:`, response);
-          //     },
-          //     error: (error) => {
-          //       console.error(`Error updating service ${service.raison}:`, error);
-          //     }
-          //   });
-        });
-      }
+        if (this.rendezVous && this.rendezVous.services) {
+            this.rendezVous.services.forEach(service => {
+                // this.rendezVousService.updateRendezVousService(this.intervention._id, service._id, service)
+                //   .subscribe({
+                //     next: (response) => {
+                //       console.log(`Service ${service.raison} updated successfully:`, response);
+                //     },
+                //     error: (error) => {
+                //       console.error(`Error updating service ${service.raison}:`, error);
+                //     }
+                //   });
+            });
+        }
     }
 
     // PIECES
 
     getAllPieceActives() {
         this.pieceService.getPiecesActives().subscribe({
-          next: (pieces) => {
-            this.piecesOrigines = pieces.map(piece => ({
-              value: piece._id,
-              label: piece.libelle
-            }));
-          },
-          error: (error) => {
-            console.error('Erreur lors du chargement des marques:', error.message);
-            alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
-          }
+            next: (pieces) => {
+                this.piecesOrigines = pieces.map(piece => ({
+                    value: piece._id,
+                    label: piece.libelle
+                }));
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
         });
     }
 
     getAllPrixPieces() {
         this.prixPieceService.getPrixPieces().subscribe({
-          next: (prixPieces) => {
-            this.prixPieces = prixPieces;
-            console.log("Prix des pieces: ", this.prixPieces);
-          },
-          error: (error) => {
-            console.error('Erreur lors du chargement des prixPieces:', error.message);
-            alert('Impossible de charger les prixPieces. Veuillez réessayer plus tard.');
-          }
+            next: (prixPieces) => {
+                this.prixPieces = prixPieces;
+                console.log("Prix des pieces: ", this.prixPieces);
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des prixPieces:', error.message);
+                alert('Impossible de charger les prixPieces. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllMarqueActives() {
+        this.marqueService.getMarquesActives().subscribe({
+            next: (marques) => {
+                this.marques = [
+                    { value: '0', label: 'Tous' },  // Option "Tous" ajoutée au début
+                    ...marques.map(marque => ({
+                        value: marque._id,
+                        label: marque.libelle
+                    }))
+                ];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllModeleActives() {
+        this.modeleService.getModelesActives().subscribe({
+            next: (modeles) => {
+                this.modeles = [
+                    { value: '0', label: 'Tous' },  // Option "Tous" ajoutée au début
+                    ...modeles.map(modele => ({
+                        value: modele._id,
+                        label: modele.libelle
+                    }))
+                ];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getAllTypeTransmissionActives() {
+        this.typeTransmissionService.getTypeTransmissionsActives().subscribe({
+            next: (typeTransmissions) => {
+                this.typeTransmissions = [
+                    { value: '0', label: 'Tous' },  // Option "Tous" ajoutée au début
+                    ...typeTransmissions.map(typeTransmission => ({
+                        value: typeTransmission._id,
+                        label: typeTransmission.libelle
+                    }))
+                ];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des marques:', error.message);
+                alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
         });
     }
 
@@ -243,142 +305,115 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         this.paginatedPieces = this.pieces.slice(startIndex, endIndex);
     }
 
-    async addNewPieceAsync(piecesAcheteesData: any): Promise<PiecesAchetees | undefined> {
-        if (piecesAcheteesData) {
-
+    async addNewPieceAsync(pieceAchete: any) {
+        if (pieceAchete) {
             try {
-
-                if (this.rendezVous?.piecesAchetees) {
-                    this.rendezVous.piecesAchetees.push(...piecesAcheteesData.addPiecesAchetees);
-                }
-
-                let piece = null;
                 if (this.rendezVous && this.rendezVous._id) {
-                    try {
-                        piece = await firstValueFrom(this.rendezVousService.updateRendezVous({_id: this.rendezVous._id, piecesAcheteesData}));
-                        console.log('Pièce ajoutée avec succès:', piece);
-                        this.rendezVous.piecesAchetees = piece.piecesAchetees;
-                        this.pieces = piece.piecesAchetees;
-                    } catch (error: any) {
-                        console.error('Erreur lors de l’ajout de la pièce:', error);
+                    const rendezVousUpdate = await firstValueFrom(this.rendezVousService.addNewPiece(this.rendezVous._id, pieceAchete.id_piece, pieceAchete.marque_piece,
+                        pieceAchete.id_marque, pieceAchete.id_modele, pieceAchete.id_type_transmission, pieceAchete.quantite, pieceAchete.commentaire));
+
+                    console.log('Pièce ajoutée avec succès:', rendezVousUpdate);
+                    this.rendezVous.piecesAchetees = rendezVousUpdate.piecesAchetees;
+                    this.pieces = rendezVousUpdate.piecesAchetees;
+                    const startIndex = this.currentPage * this.pageSize;
+                    const endIndex = startIndex + this.pageSize;
+
+                    if (this.pieces.length > startIndex && this.pieces.length <= endIndex) {
+                        // La page actuelle a encore de la place, on reste dessus
+                    } else {
+                        this.currentPage = Math.floor((this.pieces.length - 1) / this.pageSize);
                     }
-                } else {
-                    console.error("Impossible de récupérer l'ID du rendez-vous.");
+
+                    this.updatePagination();
                 }
-        
-                const startIndex = this.currentPage * this.pageSize;
-                const endIndex = startIndex + this.pageSize;
-        
-                if (this.pieces.length > startIndex && this.pieces.length <= endIndex) {
-                // La page actuelle a encore de la place, on reste dessus
-                } else {
-                    this.currentPage = Math.floor((this.pieces.length - 1) / this.pageSize);
-                }
-        
-                this.updatePagination();    
-                return ;
             } catch (error: any) {
                 console.error('Erreur lors de l’ajout de la marque:', error);
                 const errorMessage = error.error && error.error.message ? error.error.message : error.toString();
                 throw new Error(errorMessage);
             }
-            }
-            return undefined;
         }
-    
-        async openModal(errorMessage: string = '') {
-            const data = {
+    }
+
+    async openModal(errorMessage: string = '') {
+        const data = {
             title: 'Ajouter un achat de piece',
             fields: [
                 {
                     name: 'id_piece', label: 'Piece', type: 'select', required: true,
-                    options: this.piecesOrigines
+                    options: this.piecesOrigines, defaultValue: this.newPieceAchete.id_piece
                 },
-                { name: 'quantite', label: 'Quantite', type: 'text', required: true, defaultValue: "" },
-                { name: 'commentaire', label: 'Commentaire', type: 'text', defaultValue: "" },
+                { name: 'marque_piece', label: 'Marque Piece', type: 'text', required: true, defaultValue: this.newPieceAchete.marque_piece },
+                {
+                    name: 'id_marque', label: 'Marque voiture', type: 'select', required: true, defaultValue: this.newPieceAchete.id_marque,
+                    options: this.marques
+                },
+                {
+                    name: 'id_modele', label: 'Modele', type: 'select', required: true, defaultValue: this.newPieceAchete.id_modele,
+                    options: this.modeles
+                },
+                {
+                    name: 'id_type_transmission', label: 'Type Transmission', type: 'select', required: true, defaultValue: this.newPieceAchete.id_type_transmission,
+                    options: this.typeTransmissions
+                },
+                { name: 'quantite', label: 'Quantite', type: 'number', required: true, defaultValue: this.newPieceAchete.quantite },
+                { name: 'commentaire', label: 'Commentaire', type: 'text', required: true, defaultValue: this.newPieceAchete.commentaire },
             ],
             submitText: 'Ajouter',
             errorMessage: errorMessage,
         };
-    
+
         const dialogRef = this.dialog.open(GenericModalComponent, {
             width: '400px',
             data: data,
         });
-    
+
         dialogRef.afterClosed().subscribe(async (result) => {
             if (result) {
                 console.log('Données du formulaire pour pièce:', result);
                 console.log('Données du formulaire pour prix:', this.prixPieces);
-        
+
                 try {
-                    // Check if prixPieces is defined and is an array
-                    if (!Array.isArray(this.prixPieces)) {
-                        throw new Error("Les prix des pièces ne sont pas disponibles.");
-                    }
-        
-                    const prixSousService = this.prixPieces.find(
-                        (ss) => ss.piece && ss.piece._id === result.id_piece
-                    );
-        
-                    if (!prixSousService) {
-                        throw new Error("Pièce non trouvée dans les prix disponibles.");
-                    }
-        
-                    // Vérifier que les propriétés existent dans result
-                    if (!result.id_piece || !result.quantite || result.commentaire === undefined) {
-                        throw new Error("Données du formulaire incomplètes.");
-                    }
-        
-                    // Set the new piece data
-                    this.newPieceAchete.piece._id = result.id_piece;
-                    this.newPieceAchete.quantite = result.quantite;
-                    this.newPieceAchete.commentaire = result.commentaire;
-                    this.newPieceAchete.prixUnitaire = prixSousService.prixUnitaire;
-                    this.newPieceAchete.prixTotal = prixSousService.prixUnitaire * result.quantite;
-        
-                    console.log('Données du formulaire pour prixPiece:', prixSousService);
-        
-                    const piecesAcheteesData = {
-                        addPiecesAchetees: [this.newPieceAchete],
-                    };
-        
-                    console.log('Données du formulaire pour prixPieceData:', piecesAcheteesData);
-        
+                    this.newPieceAchete = result;
+
+                    // this.newPieceAchete.prixTotal = prixSousService.prixUnitaire * result.quantite;
+
+
+                    console.log('Données du formulaire pour newPieceAchete:', this.newPieceAchete);
+
                     // Uncomment the following line when you are ready to save
-                    await this.addNewPieceAsync(piecesAcheteesData);
-        
+                    await this.addNewPieceAsync(this.newPieceAchete);
+
                 } catch (error: any) {
                     console.error('Erreur lors de l’ajout:', error.message);
                     await this.openModal(error.message.replace("Error: ", ""));
                 }
             }
-        });        
-      }
-      
-      // Fonction pour gérer la pagination
-      onPaginateChange(event: PageEvent) {
+        });
+    }
+
+    // Fonction pour gérer la pagination
+    onPaginateChange(event: PageEvent) {
         const { pageIndex, pageSize } = event;
         this.currentPage = pageIndex;
         this.pageSize = pageSize;
-    
+
         this.updatePagination();
-    
+
         // Vous pouvez ajouter ici une logique de récupération des données paginées depuis un serveur si nécessaire
         console.log('Pagination changed: ', event);
-      }
-    
     }
-    
-    @Component({
-      selector: 'app-modal',
-      template: `
+
+}
+
+@Component({
+    selector: 'app-modal',
+    template: `
       `,
-    })
-    export class ModalComponent {
-      constructor(public dialog: MatDialog) { }
-    
-      close() {
+})
+export class ModalComponent {
+    constructor(public dialog: MatDialog) { }
+
+    close() {
         this.dialog.closeAll();
-      }
+    }
 }

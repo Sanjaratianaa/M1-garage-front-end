@@ -27,19 +27,19 @@
             <div class="col-sm-6 col-lg-3">
                 <mat-card class="mat-mdc-card mdc-card shadow-none p-30 bg-light-warning text-center cursor-pointer rounded">
                     <h3 class="f-s-24 text-warning m-b-4 f-w-500">{{ interventionsInProgress }}</h3>
-                    <h6 class="text-warning f-w-500 m-0 f-s-16">In Progress</h6>
+                    <h6 class="text-warning f-w-500 m-0 f-s-16">En progression</h6>
                 </mat-card>
             </div>
             <div class="col-sm-6 col-lg-3">
                 <mat-card class="mat-mdc-card mdc-card shadow-none p-30 bg-light-success text-center cursor-pointer rounded">
                     <h3 class="f-s-24 text-success m-b-4 f-w-500">{{ interventionsOpen }}</h3>
-                    <h6 class="text-success f-w-500 m-0 f-s-16">Open</h6>
+                    <h6 class="text-success f-w-500 m-0 f-s-16">Ouvert</h6>
                 </mat-card>
             </div>
             <div class="col-sm-6 col-lg-3">
                 <mat-card class="mat-mdc-card mdc-card shadow-none p-30 bg-light-error text-center cursor-pointer rounded">
                     <h3 class="f-s-24 text-error m-b-4 f-w-500">{{ interventionsClosed }}</h3>
-                    <h6 class="text-error f-w-500 m-0 f-s-16">Closed</h6>
+                    <h6 class="text-error f-w-500 m-0 f-s-16">Fermé</h6>
                 </mat-card>
             </div>
         </div>
@@ -97,7 +97,7 @@
                         <ng-container matColumnDef="date">
                             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Date</th>
                             <td mat-cell *matCellDef="let rendezVous" class="f-s-14">
-                                {{ rendezVous.dateRendezVous | date }}
+                                {{ rendezVous.dateRendezVous ? (rendezVous.dateRendezVous | date:'dd/MM/yyyy') : '-- --' }}
                             </td>
                         </ng-container>
 
@@ -105,7 +105,7 @@
                         <ng-container matColumnDef="debut">
                             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Début</th>
                             <td mat-cell *matCellDef="let rendezVous" class="f-s-14">
-                                {{ rendezVous.heureDebut | date:'medium' }}
+                                {{ rendezVous.heureDebut ? (rendezVous.heureDebut | date:'HH:mm:ss') : '-- --' }}
                             </td>
                         </ng-container>                        
 
@@ -113,7 +113,7 @@
                         <ng-container matColumnDef="fin">
                             <th mat-header-cell *matHeaderCellDef class="f-s-16 f-w-600">Fin</th>
                             <td mat-cell *matCellDef="let rendezVous" class="f-s-14">
-                                {{ rendezVous.heureFin | date:'medium' }}
+                                {{ rendezVous.heureFin ? (rendezVous.heureFin | date:'HH:mm:ss') : '-- --' }}
                             </td>
                         </ng-container>
 
@@ -131,7 +131,7 @@
                         <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onRowClick(row)" style="cursor: pointer;"></tr>
                     </table>
                 </div>
-                <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons aria-label="Select page of interventions"
+                <mat-paginator *ngIf="listeRendezVous && listeRendezVous.length > 5" [pageSizeOptions]="pageSizeOptions" showFirstLastButtons aria-label="Select page of interventions"
                   [length]="totalInterventions" [pageSize]="pageSize" (page)="onPaginateChange($event)" [pageIndex]="currentPage">
                 </mat-paginator>
 

@@ -59,8 +59,27 @@ export interface Piece {
     libelle: string;
 }
 
+export interface Marque {
+    _id: string;
+    libelle: string;
+}
+
+export interface Modele {
+    _id: string;
+    libelle: string;
+}
+
+export interface TypeTransmission {
+    _id: string;
+    libelle: string;
+}
+
 export interface PiecesAchetees {
     piece: Piece;
+    marquePiece: string;
+    marqueVoiture: Marque;
+    modeleVoiture: Modele;
+    typeTransmission: TypeTransmission;
     quantite: Number;
     prixUnitaire: number;
     prixTotal: number;
@@ -192,7 +211,7 @@ export class RendezVousService {
             }
         ];
 
-        return this.http.put<RendezVous[]>(`${this.apiUrl}/repondre/${idRendezVous}`, {actions}, { headers }).pipe(
+        return this.http.put<RendezVous[]>(`${this.apiUrl}/repondre/${idRendezVous}`, { actions }, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
@@ -206,6 +225,28 @@ export class RendezVousService {
         });
 
         return this.http.delete<RendezVous>(`${this.apiUrl}/${rendezVousId}`, { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    /**
+     * Ajouter un piece
+     */
+    addNewPiece(rendezVousId: string, idPiece: string, marquePiece: string, idMarque: string, idModele: string, idTypeTransmission: string, quantite: number, commentaire: number): Observable<RendezVous> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+        
+        const pieceData = {
+            piece: idPiece,
+            marquePiece: marquePiece.trim().toUpperCase(),
+            marqueVoiture: idMarque === '0' ? null : idMarque,
+            modeleVoiture: idModele === '0' ? null : idModele,
+            typeTransmission: idTypeTransmission === '0' ? null : idTypeTransmission,
+            quantite: quantite,
+            commentaire: commentaire,
+        };
+        return this.http.put<RendezVous>(this.apiUrl + "/ajoutPiece/" + rendezVousId, pieceData, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }
