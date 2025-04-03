@@ -20,7 +20,7 @@ import { GenericModalComponent } from 'src/app/components/modal-generique/add-mo
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { PieceService } from 'src/app/services/caracteristiques/piece.service';
-import { PrixPiece, PrixPieceService } from 'src/app/services/caracteristiques/prixStock.service';
+import { PrixPiece } from 'src/app/services/caracteristiques/prixStock.service';
 import { MarqueService } from 'src/app/services/caracteristiques/marque.service';
 import { ModeleService } from 'src/app/services/caracteristiques/modele.service';
 import { TypeTransmissionService } from 'src/app/services/caracteristiques/typeTransmission.service';
@@ -53,14 +53,13 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     detailsForm: FormGroup;
     notesForm: FormGroup;
 
-    displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire", 'actions'];
+    displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire"];
     piecesOrigines: any[] = [];
     marques: any[];
     modeles: any[];
     typeTransmissions: any[];
 
     pieces: PiecesAchetees[] = [];
-    prixPieces: PrixPiece[] = [];
     paginatedPieces: PiecesAchetees[] = [];
 
     newPieceAchete = { id_piece: '', marque_piece: '', id_marque: '', id_modele: '', id_type_transmission: '', quantite: 1, prixUnitaire: 0, prixTotal: 0, commentaire: '' };
@@ -76,7 +75,6 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         private rendezVousService: RendezVousService,
         private dialog: MatDialog,
         private pieceService: PieceService,
-        private prixPieceService: PrixPieceService,
         private marqueService: MarqueService,
         private modeleService: ModeleService,
         private typeTransmissionService: TypeTransmissionService
@@ -104,7 +102,6 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         this.updatePagination();
 
         this.getAllPieceActives();
-        this.getAllPrixPieces();
         this.getAllMarqueActives();
         this.getAllModeleActives();
         this.getAllTypeTransmissionActives();
@@ -228,19 +225,6 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
             error: (error) => {
                 console.error('Erreur lors du chargement des marques:', error.message);
                 alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
-            }
-        });
-    }
-
-    getAllPrixPieces() {
-        this.prixPieceService.getPrixPieces().subscribe({
-            next: (prixPieces) => {
-                this.prixPieces = prixPieces;
-                console.log("Prix des pieces: ", this.prixPieces);
-            },
-            error: (error) => {
-                console.error('Erreur lors du chargement des prixPieces:', error.message);
-                alert('Impossible de charger les prixPieces. Veuillez réessayer plus tard.');
             }
         });
     }
@@ -370,13 +354,9 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         dialogRef.afterClosed().subscribe(async (result) => {
             if (result) {
                 console.log('Données du formulaire pour pièce:', result);
-                console.log('Données du formulaire pour prix:', this.prixPieces);
 
                 try {
                     this.newPieceAchete = result;
-
-                    // this.newPieceAchete.prixTotal = prixSousService.prixUnitaire * result.quantite;
-
 
                     console.log('Données du formulaire pour newPieceAchete:', this.newPieceAchete);
 

@@ -268,7 +268,7 @@
 
                                         <ng-container matColumnDef="Commentaire">
                                             <mat-header-cell *matHeaderCellDef> Commentaire </mat-header-cell>
-                                            <mat-cell *matCellDef="let piece"> {{ piece.commentaire }} </mat-cell>
+                                            <mat-cell *matCellDef="let piece"> {{ piece.commentaire || '--'}} </mat-cell>
                                         </ng-container>
 
                                         <ng-container matColumnDef="actions">
