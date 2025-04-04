@@ -1,9 +1,7 @@
 import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { MaterialModule } from '../../material.module';
-import { AppNewCustomersComponent } from 'src/app/components/new-customers/new-customers.component';
 import { AppTotalIncomeComponent } from 'src/app/components/total-income/total-income.component';
 import { AppDailyActivitiesComponent } from 'src/app/components/daily-activities/daily-activities.component';
-import { AppBlogCardsComponent } from 'src/app/components/blog-card/blog-card.component';
 import { AppRevenueProductComponent } from 'src/app/components/revenue-product/revenue-product.component';
 import { AppRevenueForecastComponent } from 'src/app/components/revenue-forecast/revenue-forecast.component';
 import { RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
@@ -19,10 +17,8 @@ interface EtatCount {
   selector: 'app-starter',
   imports: [
     MaterialModule,
-    AppNewCustomersComponent,
     AppTotalIncomeComponent,
     AppDailyActivitiesComponent,
-    AppBlogCardsComponent,
     AppRevenueProductComponent,
     AppRevenueForecastComponent,
     CommonModule,
@@ -78,8 +74,6 @@ export class StarterComponent implements OnInit {
           return;
         }
 
-        console.log(fetchedListeRendezVous);
-
         this.listeRendezVous = fetchedListeRendezVous;
 
         this.stats = this.listeRendezVous.map((rv, index) => {
@@ -93,12 +87,11 @@ export class StarterComponent implements OnInit {
               time: formattedTime,
               color: colorInfo,
               subtext: subText,
-              title: raison || 'No Title', // Use 'raison' for the title
-              description: sousServiceLibelle || 'No Description' // Use 'sousServiceLibelle' for the description
+              title: raison || 'No Title', // raison pour title
+              description: sousServiceLibelle || 'No Description' //  'sousServiceLibelle' pour description
           };
         });
 
-        console.log('Transformed stats data:', this.stats);
         this.isLoading = false;
       },
       error: (error) => {
@@ -181,7 +174,7 @@ export class StarterComponent implements OnInit {
         sousServiceLibelle = service.sousSpecialite.libelle;
       }
 
-      return `${sousServiceLibelle}`;
+      return `${raison} : ${sousServiceLibelle}`;
     }).join('; ');
   }
 
