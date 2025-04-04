@@ -52,6 +52,9 @@ export interface Service {
     commentaire: string | null;
     status: string;
     tempStatus?: string;
+    remise: number | 0;
+    note: number | 5;
+    avis: string;
 }
 
 export interface Piece {
@@ -122,6 +125,16 @@ export class RendezVousService {
         });
 
         return this.http.get<RendezVous[]>(`${this.apiUrl}/liste/parClient`, { headers }).pipe(
+            catchError(this.handleError) // Gestion des erreurs
+        );
+    }
+
+    getRendezVousById(idRendezVous: string): Observable<RendezVous> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<RendezVous>(`${this.apiUrl}/${idRendezVous}`, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

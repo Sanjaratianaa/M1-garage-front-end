@@ -14,6 +14,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Service' ||
         item.displayName === 'Sous Service' ||
         item.displayName === 'Prix Sous Service' ||
+        item.displayName === 'Gestion Promotion' ||
         item.navCap === 'Voiture' ||
         item.displayName === 'Voiture' ||
         item.displayName === 'Categorie' ||
@@ -46,6 +47,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Modele' ||
         item.displayName === 'Type de Transmission' ||
         item.navCap === 'RENDEZ-VOUS' ||
+        item.displayName === 'Interventions' ||
         item.displayName === 'Prendre Rendez-vous' ||
         item.displayName === 'Historique Rendez-vous' ||
         item.displayName === 'Demande en attente' ||
@@ -170,8 +172,13 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
     },
     {
       displayName: 'Prix Sous Service',
-      iconName: 'fluent-mdl2:service-off',
+      iconName: 'solar:bill-list-line-duotone',
       route: '/service/prix-sous-service', 
+    },
+    {
+      displayName: 'Gestion Promotion',
+      iconName: 'solar:bill-list-line-duotone',
+      route: '/service/promotion/gestion-promotion', 
     },
 
     {

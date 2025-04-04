@@ -52,6 +52,7 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     rendezVous: RendezVous | undefined;
     detailsForm: FormGroup;
     notesForm: FormGroup;
+    isClient: boolean = false;
 
     displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire"];
     piecesOrigines: any[] = [];
@@ -97,14 +98,33 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.pieces = this.rendezVous?.piecesAchetees || [];
+        var idRendezVous = '';
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id'); // Récupération de la variable
+            if (id)
+                idRendezVous = id;
+            console.log('idRendezVous:', idRendezVous);
+        });
+
+        console.log(">> rendez ng init: ", this.rendezVous);
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const role = user.role.libelle;
+        if (role == "client")
+            this.isClient = true;
+        else {
+            this.getAllPieceActives();
+            this.getAllMarqueActives();
+            this.getAllModeleActives();
+            this.getAllTypeTransmissionActives();
+        }
+        
+        if(this.rendezVous == null && idRendezVous != "") {
+            this.getRendezVous(idRendezVous);
+        } else
+            this.pieces = this.rendezVous?.piecesAchetees || [];
 
         this.updatePagination();
-
-        this.getAllPieceActives();
-        this.getAllMarqueActives();
-        this.getAllModeleActives();
-        this.getAllTypeTransmissionActives();
     }
 
 
@@ -225,6 +245,19 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
             error: (error) => {
                 console.error('Erreur lors du chargement des marques:', error.message);
                 alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getRendezVous(idRendezVous: string) {
+        this.rendezVousService.getRendezVousById(idRendezVous).subscribe({
+            next: (rendezVous) => {
+                this.rendezVous = rendezVous;
+                this.pieces = rendezVous?.piecesAchetees || [];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des rendez-vous:', error.message);
+                alert('Impossible de charger les rendez-vous. Veuillez réessayer plus tard.');
             }
         });
     }
