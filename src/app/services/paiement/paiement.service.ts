@@ -43,6 +43,24 @@ export class PaiementService {
         );
     }
 
+    /**
+     * Nombres statistiques
+     */
+    getStatPaiements(annee: string, mois?: string): Observable<any> {
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${this.getToken()}`
+        });
+      
+        const url = mois 
+          ? `${this.apiUrl}/paiementStat?annee=${annee}&mois=${mois}` 
+          : `${this.apiUrl}/paiementStat?annee=${annee}`;
+      
+        return this.http.get<any>(url, { headers }).pipe(
+          catchError(this.handleError)
+        );
+    }
+      
+
     getPaiementsActives(): Observable<Paiement[]> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${this.getToken()}`

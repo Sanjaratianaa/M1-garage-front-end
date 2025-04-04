@@ -2,19 +2,17 @@
   <mat-card-content>
     <div class="hstack align-items-center flex-column flex-lg-row">
       <div class="w-100">
-        <mat-card-title>Revenue Forecast</mat-card-title>
+        <mat-card-title>Les montants entrants pas année</mat-card-title>
       </div>
       <div class="m-l-auto">
         <mat-form-field class="theme-select" appearance="outline">
-          <mat-select value="mar">
-            @for(month of months; track month.viewValue ) {
-            <mat-option [value]="month.value">
-              {{ month.viewValue }}
+          <mat-select [(ngModel)]="selectedYear" (selectionChange)="updateChart()">
+            <mat-option *ngFor="let year of years" [value]="year">
+              {{ year }}
             </mat-option>
-            }
-          </mat-select>
+          </mat-select>          
         </mat-form-field>
-      </div>
+      </div>      
     </div>
 
     <!-- chart -->

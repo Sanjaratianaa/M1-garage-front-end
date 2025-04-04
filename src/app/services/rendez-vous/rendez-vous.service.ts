@@ -166,6 +166,19 @@ export class RendezVousService {
     }
 
     /**
+     * Récupérer stat rendez-vous
+     */
+    getNumberStat(): Observable<any> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.get<any>(`${this.apiUrl}/parNombreStat`, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    /**
      * Ajouter une nouvelle sousService
      */
     addRendezVous(rendezVousData: any): Observable<RendezVous> {

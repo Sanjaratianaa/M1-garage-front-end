@@ -1,6 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../material.module';
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   ApexChart,
   ChartComponent,
@@ -13,6 +15,8 @@ import {
   NgApexchartsModule,
   ApexFill,
 } from 'ng-apexcharts';
+
+import { PaiementService } from 'src/app/services/paiement/paiement.service';
 
 export interface revenueForecastChart {
   series: ApexAxisChartSeries;
@@ -32,7 +36,7 @@ interface month {
 
 @Component({
   selector: 'app-revenue-forecast',
-  imports: [MaterialModule, TablerIconsModule, NgApexchartsModule],
+  imports: [MaterialModule, TablerIconsModule, NgApexchartsModule, CommonModule, FormsModule],
   templateUrl: './revenue-forecast.component.html',
 })
 export class AppRevenueForecastComponent {
@@ -40,24 +44,37 @@ export class AppRevenueForecastComponent {
   public revenueForecastChart!: Partial<revenueForecastChart> | any;
 
   months: month[] = [
-    { value: 'mar', viewValue: 'Sep 2025' },
-    { value: 'apr', viewValue: 'Oct 2025' },
-    { value: 'june', viewValue: 'Nov 2025' },
+    { value: '01', viewValue: 'Jan' },
+    { value: '02', viewValue: 'Feb' },
+    { value: '03', viewValue: 'Mar' },
+    { value: '04', viewValue: 'Apr' },
+    { value: '05', viewValue: 'May' },
+    { value: '06', viewValue: 'Jun' },
+    { value: '07', viewValue: 'Jul' },
+    { value: '08', viewValue: 'Aug' },
+    { value: '09', viewValue: 'Sep' },
+    { value: '10', viewValue: 'Oct' },
+    { value: '11', viewValue: 'Nov' },
+    { value: '12', viewValue: 'Dec' },
   ];
 
-  constructor() {
+  // Years available for selection
+  years: string[] = ["2024", "2025", "2026"];
+
+  currentYear: number = new Date().getFullYear();
+  selectedYear: string = this.currentYear.toString();
+  selectedMonth: string | undefined; // We no longer need the month filter
+
+  constructor(private paiementService: PaiementService) {
+    this.years = Array.from({ length: 6 }, (_, index) => (this.currentYear - index).toString());
+
     this.revenueForecastChart = {
       series: [
         {
-          name: '2025',
-          data: [1.2, 2.7, 1, 3.6, 2.1, 2.7, 2.2, 1.3, 2.5],
-        },
-        {
-          name: '2024',
-          data: [-2.8, -1.1, -2.5, -1.5, -2.3, -1.9, -1, -2.1, -1.3],
+          name: this.selectedYear, // Par défaut, on montre l'année en cours
+          data: Array(12).fill(0), // Initialize with zeros for each month
         },
       ],
-
       chart: {
         type: 'bar',
         fontFamily: 'inherit',
@@ -69,7 +86,7 @@ export class AppRevenueForecastComponent {
           show: false,
         },
       },
-      colors: ['rgba(99, 91, 255, 1)', 'rgba(255, 102, 146,1)'],
+      colors: ['rgba(99, 91, 255, 1)'], // Uniquement l'année sélectionnée
       plotOptions: {
         bar: {
           horizontal: false,
@@ -107,8 +124,8 @@ export class AppRevenueForecastComponent {
       },
 
       yaxis: {
-        min: -5,
-        max: 5,
+        min: 0,
+        max: 500000,
         tickAmount: 4,
       },
       xaxis: {
@@ -118,17 +135,7 @@ export class AppRevenueForecastComponent {
         axisTicks: {
           show: false,
         },
-        categories: [
-          'Jan',
-          'Feb',
-          'Mar',
-          'Apr',
-          'May',
-          'Jun',
-          'July',
-          'Aug',
-          'Sep',
-        ],
+        categories: this.months.map((m) => m.viewValue), // Use month names for categories
         labels: {
           style: { fontSize: '13px', colors: '#adb0bb', fontWeight: '400' },
         },
@@ -140,5 +147,47 @@ export class AppRevenueForecastComponent {
         },
       },
     };
+
+    this.getStatPaiements(); 
+  }
+
+  getStatPaiements() {
+    const yearToFetch = this.selectedYear;
+    
+    this.paiementService.getStatPaiements(yearToFetch, this.selectedMonth ?? undefined).subscribe(
+      (response) => {
+  
+        if (response && response.details && Array.isArray(response.details)) {
+          const yearData = Array(12).fill(0);
+
+          const responseYear = response._id?.annee;
+          
+          // Check if the response year matches the selected year
+          if (responseYear && responseYear.toString() === yearToFetch.toString()) {
+            response.details.forEach((item: any) => {
+  
+              const monthIndex = this.months.findIndex(m => m.value === item.mois);
+              if (monthIndex !== -1) {
+                yearData[monthIndex] = item.total;
+              }
+            });
+  
+            this.revenueForecastChart.series = [
+              { name: `${yearToFetch}`, data: yearData },
+            ];
+
+          } 
+        } 
+      },
+      (error) => {
+        console.error('Error fetching payments:', error);
+      }
+    );
+  }
+  
+
+  // Method to update the chart when year changes
+  updateChart() {
+    this.getStatPaiements(); // Fetch and update chart when the year is changed
   }
 }

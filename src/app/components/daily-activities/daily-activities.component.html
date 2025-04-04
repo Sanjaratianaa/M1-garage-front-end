@@ -1,8 +1,14 @@
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <mat-card-title>Daily activities</mat-card-title>
-
-    <div class="timeline m-t-12">
+    <mat-card-title>
+    @if(isAdmin) {
+      Les rendez-vous en attente et validés
+    } @if (isMecanicien) {
+      Les rendez-vous en cours aujourd'hui
+    }
+  </mat-card-title>
+    
+    <div class="timeline m-t-12" *ngIf="isAdmin || isMecanicien">
       @for(stat of stats; track stat.id) {
       <div class="timeline-item d-flex overflow-hidden">
         <div class="time text-right f-s-14">{{ stat.time }}</div>

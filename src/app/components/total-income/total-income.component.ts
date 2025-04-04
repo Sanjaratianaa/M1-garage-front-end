@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../material.module';
+import { CommonModule } from '@angular/common';
 import {
   ApexChart,
   ChartComponent,
@@ -13,6 +14,8 @@ import {
   ApexFill,
 } from 'ng-apexcharts';
 
+import { PaiementService } from 'src/app/services/paiement/paiement.service';
+
 export interface totalincomeChart {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -24,16 +27,48 @@ export interface totalincomeChart {
   fill: ApexFill;
 }
 
+interface month {
+  value: string;
+  viewValue: string;
+}
+
 @Component({
   selector: 'app-total-income',
-  imports: [MaterialModule, NgApexchartsModule],
+  imports: [MaterialModule, NgApexchartsModule, CommonModule],
   templateUrl: './total-income.component.html',
 })
 export class AppTotalIncomeComponent {
   @ViewChild('chart') chart: ChartComponent = Object.create(null);
   public totalincomeChart!: Partial<totalincomeChart> | any;
 
-  constructor() {
+  selectedYear: string = new Date().getFullYear().toString(); // Default to current year
+  selectedMonth: string | undefined = undefined;
+
+  years: string[] = [];
+
+  months: month[] = [
+    { value: '01', viewValue: 'Jan' },
+    { value: '02', viewValue: 'Feb' },
+    { value: '03', viewValue: 'Mar' },
+    { value: '04', viewValue: 'Apr' },
+    { value: '05', viewValue: 'May' },
+    { value: '06', viewValue: 'Jun' },
+    { value: '07', viewValue: 'Jul' },
+    { value: '08', viewValue: 'Aug' },
+    { value: '09', viewValue: 'Sep' },
+    { value: '10', viewValue: 'Oct' },
+    { value: '11', viewValue: 'Nov' },
+    { value: '12', viewValue: 'Dec' },
+  ];
+
+  isLoading: boolean = false;
+  totalAmount: number = 0;
+
+  constructor(private paiementService: PaiementService) {
+
+    const currentYear = new Date().getFullYear();
+    this.years = Array.from({ length: 6 }, (_, index) => (currentYear - index).toString());
+    
     this.totalincomeChart = {
       series: [
         {
@@ -71,5 +106,22 @@ export class AppTotalIncomeComponent {
         },
       },
     };
+
+    this.getStatPaiements();
   }
+
+  getStatPaiements() {
+    this.isLoading = true;
+    this.paiementService.getStatPaiements(this.selectedYear, this.selectedMonth ?? undefined).subscribe(
+      (response) => {
+        this.totalAmount = response.totalMontant || 0;
+        this.isLoading = false;
+      },
+      (error) => {
+        console.error('Error fetching payment data', error);
+        this.isLoading = false;
+      }
+    );
+  }
+
 }

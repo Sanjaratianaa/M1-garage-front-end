@@ -1,22 +1,33 @@
 <mat-card class="cardWithShadow">
   <mat-card-content>
-    <div class="hstack align-items-center">
-      <div class="rounded icon-48 bg-light-error d-flex align-items-center flex-shrink-0 justify-content-center">
-        <i class="iconify f-s-24 text-error" data-icon="solar:box-linear"></i>
+    <div class="hstack align-items-center flex-column flex-lg-row">
+      <div class="w-100">
+        <div class="rounded icon-48 bg-light-error d-flex align-items-center flex-shrink-0 justify-content-center">
+          <i class="iconify f-s-24 text-error" data-icon="solar:box-linear"></i>
+        </div>
+        <mat-card-title class="f-s-16 f-w-500 m-b-0">Rendez-vous</mat-card-title>
       </div>
-      <mat-card-title class="f-s-16 f-w-500 m-b-0">Total Income</mat-card-title>
+      <div class="m-l-auto">
+        <mat-form-field class="theme-select" appearance="outline">
+          <mat-select [(value)]="selectedYear" (selectionChange)="getStatPaiements()">
+            <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="theme-select" appearance="outline">
+          <mat-select [(value)]="selectedMonth" (selectionChange)="getStatPaiements()">
+            <mat-option [value]="undefined">Tous</mat-option>
+            <mat-option *ngFor="let month of months" [value]="month.value">
+              {{ month.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
 
     <div class="row m-t-8">
-      <div class="col-6">
-        <h5 class="f-s-24 f-w-500 m-b-8 m-t-30">$680</h5>
-        <span class="text-success f-s-14 f-w-600">+18%</span>
-      </div>
-      <div class="col-6 d-flex align-items-center">
-        <!-- chart -->
-        <apx-chart [series]="totalincomeChart.series" [chart]="totalincomeChart.chart"
-          [stroke]="totalincomeChart.stroke" [markers]="totalincomeChart.markers"
-          [tooltip]="totalincomeChart.tooltip"></apx-chart>
+      <div class="col-12">
+        <h5 class="f-s-24 f-w-500 m-b-8 m-t-30">{{ totalAmount | number }} Ariary</h5>
+        <span class="text-success f-s-14 f-w-600">Montant totale</span>
       </div>
     </div>
   </mat-card-content>
