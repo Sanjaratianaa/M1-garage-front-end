@@ -129,7 +129,8 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
       } else {
         this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
           state: { rendezVous: rendezVous}
-      });
+        });
+        localStorage.setItem('rendezVous', JSON.stringify(rendezVous));
       }
     }
   }

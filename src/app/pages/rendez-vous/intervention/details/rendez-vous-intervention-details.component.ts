@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -48,7 +48,7 @@ import { TypeTransmissionService } from 'src/app/services/caracteristiques/typeT
     templateUrl: './rendez-vous-intervention-details.component.html',
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class RendezVousInterventionDetailsComponent implements OnInit {
+export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy {
     rendezVous: RendezVous | undefined;
     detailsForm: FormGroup;
     notesForm: FormGroup;
@@ -97,6 +97,12 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
     }
 
     ngOnInit(): void {
+
+        const storedRendezVous = localStorage.getItem('rendezVous');
+        if (storedRendezVous) {
+            this.rendezVous = JSON.parse(storedRendezVous);
+        }
+
         this.pieces = this.rendezVous?.piecesAchetees || [];
 
         this.updatePagination();
@@ -105,6 +111,11 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         this.getAllMarqueActives();
         this.getAllModeleActives();
         this.getAllTypeTransmissionActives();
+    }
+
+    ngOnDestroy() {
+        localStorage.removeItem('rendezVous');
+        console.log('Données rendezVous supprimées du localStorage');
     }
 
 

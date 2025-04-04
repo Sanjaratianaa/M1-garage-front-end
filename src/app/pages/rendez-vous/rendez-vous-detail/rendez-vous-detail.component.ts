@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -32,7 +32,7 @@ import { ActivatedRoute, Router } from '@angular/router';
         ])
     ]
 })
-export class RendezVousDetailComponent implements OnInit {
+export class RendezVousDetailComponent implements OnInit, OnDestroy {
     rendezVousId: string | null = null;
 
     rendezVous: any = {};
@@ -68,13 +68,15 @@ export class RendezVousDetailComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.rendezVousId = this.route.snapshot.queryParamMap.get('id');
-
-        if (this.rendezVousId) {
-            console.log('RendezVous ID:', this.rendezVousId);
-        } else {
-            console.error('RendezVous ID not found in route.');
+        const storedRendezVous = localStorage.getItem('rendezVous');
+        if (storedRendezVous) {
+            this.rendezVous = JSON.parse(storedRendezVous);
         }
+    }
+
+    ngOnDestroy() {
+        localStorage.removeItem('rendezVous');
+        console.log('Données rendezVous supprimées du localStorage');
     }
 
     tabChanged(tabChangeEvent: any): void {

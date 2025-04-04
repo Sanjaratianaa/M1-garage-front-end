@@ -206,6 +206,7 @@ export class RendezVousComponent implements OnInit {
             this.router.navigate(['/rendez-vous/details/', rendezVousData._id], {
                 state: { rendezVous: rendezVousData}
             });
+            localStorage.setItem('rendezVous', JSON.stringify(rendezVousData));
 
 
             // Implement your logic to display event details here (e.g., open a modal).
