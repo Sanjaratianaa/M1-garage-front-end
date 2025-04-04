@@ -32,7 +32,9 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Piece' ||
         item.displayName === 'Gestion Stock' ||
         item.displayName === 'Stock Piece' ||
-        item.displayName === 'Gestion Prix Piece'
+        item.displayName === 'Gestion Prix Piece' ||
+        item.navCap === 'CONGES' ||
+        item.displayName === 'Planning Conges'
       );
 
 
@@ -81,7 +83,9 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Specialité' ||
         item.navCap === 'Pièce détachée' ||
         item.displayName === 'Piece' ||
-        item.displayName === 'Stock Piece' 
+        item.displayName === 'Stock Piece' ||
+        item.navCap === 'CONGES' ||
+        item.displayName === 'Prendre Conges'
 
       );
     }
@@ -218,6 +222,35 @@ export function getNavItemsForRole(userRole: string): NavItem[] {
       displayName: 'Planning Rendez-vous',
       iconName: 'solar:bookmark-square-minimalistic-line-duotone',
       route: '/rendez-vous',
+      chip: true,
+    },
+    {
+      displayName: 'Demande en attente',
+      iconName: 'solar:document-text-line-duotone',
+      route: '/rendez-vous/en-attente',
+      chip: true,
+    },
+    {
+      displayName: 'Historique Rendez-vous',
+      iconName: 'solar:document-text-line-duotone',
+      route: '/rendez-vous/historique-demande',
+      chip: true,
+    },
+
+    {
+      divider: true,
+      navCap: 'CONGES',
+    },
+    {
+      displayName: 'Prendre Conges',
+      iconName: 'solar:bookmark-square-minimalistic-line-duotone',
+      route: '/conges',
+      chip: true,
+    },
+    {
+      displayName: 'Planning Conges',
+      iconName: 'solar:bookmark-square-minimalistic-line-duotone',
+      route: '/conges',
       chip: true,
     },
     {

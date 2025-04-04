@@ -76,7 +76,7 @@
                                     <mat-card class="">
                                         <mat-card-content>
                                             <mat-card-title style="margin-bottom: 2%; word-wrap: break-word;">{{
-                                                service.sousSpecialite.libelle }} : {{ service.raison }}
+                                                service.sousSpecialite.libelle }} : {{ service.raison || '-- --' }}
                                             </mat-card-title>
 
                                             <div class="w-100">
@@ -174,7 +174,7 @@
                                                 <div
                                                     class="d-flex align-items-center justify-content-between p-x-12 p-y-10">
                                                     <span class="f-s-12"><strong>Mecanicien:</strong> {{
-                                                        service.mecanicien.nom }} {{ service.note }} {{
+                                                        service.mecanicien.nom }} {{
                                                         service.mecanicien.prenom }}</span>
                                                     <span class="f-s-12"><strong>Time:</strong> {{
                                                         formatDate(service.heureDebut) | date:'dd/MM/yyyy HH:mm:ss' }} -
@@ -184,21 +184,36 @@
                                             </div>
 
                                             <!-- Avis et note -->
-                                            <div class="p-x-12 p-y-10" >
-                                                <div>
+                                            <div class="p-x-12 p-y-10">
+                                                <span class="f-s-12">
                                                     <strong>Avis : </strong>
-                                                    <span class="m-0"> {{ service.avis || '-- --'}} </span>
-                                                </div>
+                                                    {{ service.avis || '-- --'}}
+                                                </span>
+                                            </div>
 
-                                                <div>
-                                                    <strong>Note : {{ service.note }} </strong>
+                                            <!--  note -->
+                                            <div class="p-x-12 p-y-10">
+                                                <div class="d-flex align-items-center f-s-12">
+                                                    <strong>Note :</strong>
+
                                                     <ng-container *ngFor="let star of [1,2,3,4,5]">
                                                         <mat-icon color="warn">
-                                                            {{ star <= (service.note / 2) ? 'star' : 'star_border' }} </mat-icon>
+                                                            {{ star <= (service.note / 2) ? 'star' : 'star_border' }}
+                                                                </mat-icon>
                                                     </ng-container>
-                                                    ({{ service.note }}/10)
+
+                                                    <span class="m-l-8"> ({{ service.note || 0 }}/10) </span>
                                                 </div>
-                                            </div>  
+                                            </div>
+
+                                            <div class="text-end p-x-12 p-b-10">
+                                                <button mat-flat-button
+                                                    *ngIf="isClient && service.status === 'terminé' && !service.avis"
+                                                    (click)="openAddAvisModal(rendezVous._id, service._id)"
+                                                    class="bg-secondary text-white w-auto m-r-12">
+                                                    <span class="mdc-button__label">Ajouter avis</span>
+                                                </button>
+                                            </div>
                                         </mat-card>
                                     </div>
                                 </ng-template>
@@ -297,9 +312,6 @@
                                                     <button mat-icon-button color="warn">
                                                         <mat-icon>delete</mat-icon>
                                                     </button>
-                                                    <!-- <button mat-icon-button color="warn" (click)="openDeleteConfirmation(marque)">
-                                                    <mat-icon>delete</mat-icon>
-                                                </button> -->
                                                 </mat-cell>
                                             </ng-container>
 

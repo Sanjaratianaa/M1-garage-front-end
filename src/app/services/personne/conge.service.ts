@@ -79,15 +79,17 @@ export class CongeService {
     /**
      * Ajouter une nouvelle sousService
      */
-    addConge(congeData: any): Observable<Conge> {
+    addConge(dateDebut: string, dateFin: string, raison: string): Observable<Conge> {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        console.log("API URL:", this.apiUrl);
-
-        console.log("data: ", congeData);
+        const congeData = {
+            dateHeureDebut: dateDebut, 
+            dateHeureFin: dateFin,
+            raison: raison
+        };
 
         return this.http.post<Conge>(this.apiUrl, congeData, { headers }).pipe(
             catchError(this.handleError)

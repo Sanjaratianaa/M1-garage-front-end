@@ -11,18 +11,12 @@ import { isSameDay, isSameMonth } from 'date-fns';
 import { MatDialog } from '@angular/material/dialog';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { addMonths, subMonths } from 'date-fns';
-import { SousServiceService } from 'src/app/services/services/sousService.service';
-import { Voiture, VoitureService } from 'src/app/services/caracteristiques/voiture.sevice';
 import { Router } from '@angular/router';
-import { RendezVous, RendezVousService } from 'src/app/services/rendez-vous/rendez-vous.service';
-import { RendezVousModalComponent } from '../../rendez-vous/add-rendez-vous-modal/rendez-vous-modal.component';
 import { Conge, CongeService } from 'src/app/services/personne/conge.service';
 import { format } from 'date-fns';
+import { GenericModalComponent } from 'src/app/components/modal-generique/add-modal/modal.component';
 
-interface VoitureSelectItem {
-    value: string;
-    label: string;
-}
+
 
 @Component({
     selector: 'app-demande-conge',
@@ -36,10 +30,10 @@ interface VoitureSelectItem {
         FormsModule,
         CalendarModule,
     ],
-    templateUrl: './rendez-vous.component.html',
+    templateUrl: './demande-conge.component.html',
     schemas: [NO_ERRORS_SCHEMA],
 })
-export class RendezVousComponent implements OnInit {
+export class DemandeCongeComponent implements OnInit {
     view: CalendarView = CalendarView.Month;
     CalendarView = CalendarView;
     viewDate: Date = new Date();
@@ -52,10 +46,10 @@ export class RendezVousComponent implements OnInit {
     isMecanicien: boolean = false;
     idPersonne: string;
 
-    newSousService: any = {
-        voiture: null,
-        id_sous_service: [],
-        date: null,
+    newConge: any = {
+        dateDebut: '',
+        dateFin: '',
+        raison: ''
     };
     selectedSousServices: any[] = [];
 
@@ -135,8 +129,8 @@ export class RendezVousComponent implements OnInit {
                         start: dateDebut,
                         end: dateFin,
                         title: this.isMecanicien && this.idPersonne === conge.mecanicien._id
-                            ? `Congé pour: ${heureDebut} - ${heureFin} - ${conge.raison}`
-                            : `Rendez-vous pour: ${conge.mecanicien.nom} ${conge.mecanicien.prenom} (${heureDebut} - ${heureFin}) - ${conge.raison}`,
+                            ? `Congé prévu de ${heureDebut} à ${heureFin} - ${conge.raison}`
+                            : `Rendez-vous pour: ${conge.mecanicien.nom} ${conge.mecanicien.prenom} prévu de ${heureDebut} à ${heureFin} - ${conge.raison}`,
                         allDay: false,
                         meta: {
                             conge: conge
@@ -218,29 +212,17 @@ export class RendezVousComponent implements OnInit {
 
     async openModal(errorMessage: string = '') {
         const data = {
-            title: 'Prendre un rendez-vous',
+            title: 'Faire une demande de congés',
             fields: [
-                {
-                    name: 'voiture', label: 'Voiture', type: 'select', required: true,
-                    options: this.voitures, defaultValue: this.newSousService.voiture
-                },
-                {
-                    name: "date",
-                    label: "Date souhaité pour le rendez-vous",
-                    type: "date",
-                    required: true,
-                    defaultValue: this.newSousService.date
-                },
-                {
-                    name: 'id_sous_service', label: 'Sous-service', type: 'select', required: true,
-                    options: this.sousServices, defaultValue: this.newSousService.id_sous_service,
-                },
+                { name: 'dateDebut', label: 'Date et heure du debut du congé', type: 'datetime-local', required: true, defaultValue: this.newConge.dateDebut },
+                { name: 'dateFin', label: 'Date et heure du fin du congé', type: 'datetime-local', required: true, defaultValue: this.newConge.dateFin },
+                { name: 'raison', label: 'Raison du congés', type: 'text', required: true, defaultValue: this.newConge.raison },
             ],
             submitText: 'Ajouter',
-            errorMessage: errorMessage
+            errorMessage: errorMessage,
         };
 
-        const dialogRef = this.dialog.open(RendezVousModalComponent, {
+        const dialogRef = this.dialog.open(GenericModalComponent, {
             width: '600px',
             data: data,
         });
@@ -250,54 +232,29 @@ export class RendezVousComponent implements OnInit {
         try {
             if (result) {
                 console.log('Données du formulaire:', result);
+                this.newConge = result;
+                const conge = await firstValueFrom(this.congeService.addConge(this.newConge.dateDebut, this.newConge.dateFin, this.newConge.raison));
 
-                const servicesArray = result.sousServicesArray.map((sousServiceItem: any) => {
-                    const sousServiceId = sousServiceItem.id;
-                    const sousServiceObject = this.sousServicesObject.find(ss => ss._id === sousServiceId);
-
-                    if (sousServiceObject) {
-                        return {
-                            sousSpecialite: sousServiceId,
-                            raison: sousServiceItem.raison, // from form
-                            quantiteEstimee: sousServiceItem.quantite, // from form
-                            prixUnitaire: sousServiceObject.prixUnitaire ? sousServiceObject.prixUnitaire : 0,
-                            status: "en attente"
-                        };
-                    } else {
-                        return null;
-                    }
-                }).filter((item: any) => item !== null);
-
-
-                delete result.sousServicesArray;
-                delete result.id_sous_service;
-
-                this.newSousService = {
-                    ...result,
-                    services: servicesArray,
-                    dateRendezVous: result.date,
-                    voiture: result.voiture
-                };
-
-                console.log("Data to send to backend:", this.newSousService);
-
-                const rendezVous = await firstValueFrom(this.rendezVousService.addRendezVous(this.newSousService));
-                console.log(rendezVous);
-
-                // Ajouter le nouveau rendez-vous à la liste existante
-                this.rendezVous.push(rendezVous);
+                this.conges.push(conge);
 
                 // Mettre à jour les événements pour inclure le nouveau rendez-vous
-                const serviceDescriptions = rendezVous.services.map(service => service.sousSpecialite?.libelle);
-                const eventColor = this.getEventColor(rendezVous.etat);
+                const eventColor = this.getEventColor(conge.etat);
+
+                const dateDebut = conge.dateHeureDebut ? new Date(conge.dateHeureDebut) : new Date();
+                const dateFin = conge.dateHeureFin ? new Date(conge.dateHeureFin) : new Date();
+
+                const heureDebut = format(dateDebut, "HH:mm");
+                const heureFin = format(dateFin, "HH:mm");
 
                 const newEvent = {
-                    start: rendezVous.dateRendezVous ? new Date(rendezVous.dateRendezVous) : new Date(),
-                    end: rendezVous?.heureFin ? new Date(rendezVous.heureFin) : undefined,
-                    title: `Rendez-vous pour: ${rendezVous.voiture?.numeroImmatriculation || 'N/A'} - ${serviceDescriptions.join(', ')}`,
+                    start: dateDebut,
+                    end: dateFin,
+                    title: this.isMecanicien && this.idPersonne === conge.mecanicien._id
+                        ? `Congé prévu de ${heureDebut} à ${heureFin} - ${conge.raison}`
+                        : `Rendez-vous pour: ${conge.mecanicien.nom} ${conge.mecanicien.prenom} prévu de ${heureDebut} à ${heureFin} - ${conge.raison}`,
                     allDay: false,
                     meta: {
-                        rendezVousData: rendezVous
+                        conge: conge
                     },
                     color: eventColor,
                 };

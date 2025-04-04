@@ -118,8 +118,8 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
             this.getAllModeleActives();
             this.getAllTypeTransmissionActives();
         }
-        
-        if(this.rendezVous == null && idRendezVous != "") {
+
+        if (this.rendezVous == null && idRendezVous != "") {
             this.getRendezVous(idRendezVous);
         } else
             this.pieces = this.rendezVous?.piecesAchetees || [];
@@ -416,17 +416,49 @@ export class RendezVousInterventionDetailsComponent implements OnInit {
         console.log('Pagination changed: ', event);
     }
 
-}
+    async openAddAvisModal(idRendezVous: string, idSousService: string, errorMessage: string = '') {
+        const data = {
+            title: 'Ajouter un avis sur le service',
+            fields: [
+                { name: 'avis', label: 'Avis sur le service', type: 'text', required: true },
+                { name: 'note', label: 'Note / 10', type: 'number', required: true },
+            ],
+            submitText: 'Ajouter',
+            errorMessage: errorMessage,
+        };
 
-@Component({
-    selector: 'app-modal',
-    template: `
-      `,
-})
-export class ModalComponent {
-    constructor(public dialog: MatDialog) { }
+        const dialogRef = this.dialog.open(GenericModalComponent, {
+            width: '400px',
+            data: data,
+        });
 
-    close() {
-        this.dialog.closeAll();
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if (result) {
+                console.log('Données du formulaire pour avis:', result);
+
+                try {
+                    if(this.rendezVous && this.rendezVous.services) {
+                        const rendezVousCopy = structuredClone(this.rendezVous);
+                        const services = rendezVousCopy.services;
+                        for (const service of services) {
+                            if(service._id == idSousService) {
+                                service.avis = result.avis;
+                                service.note = result.note;
+                                break;
+                            }
+                        }
+    
+                        const rendezVousUpdate = await firstValueFrom(this.rendezVousService.updateRendezVous(rendezVousCopy));
+                        this.rendezVous.services = rendezVousUpdate.services;
+                    }
+
+                } catch (error: any) {
+                    console.error('Erreur lors de l’ajout:', error.message);
+                    await this.openAddAvisModal(idRendezVous, idSousService, error.message.replace("Error: ", ""));
+                }
+            }
+        });
     }
+
 }
+

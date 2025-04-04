@@ -62,6 +62,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/promotion/promotion.routes').then((m) => m.PromotionRoutes),
       },
+      {
+        path: 'conges',
+        loadChildren: () =>
+          import('./pages/conge/conge.routes').then((m) => m.CongeRoutes),
+      },
     ],
   },
   {
