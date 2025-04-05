@@ -71,7 +71,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
     if (role == "client") {
       this.isClient = true;
       this.displayedColumns = ['description', 'status', 'date', 'debut', 'fin', 'action'];
-    } 
+    }
     this.getAllRendezVous();
   }
 
@@ -79,7 +79,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
     } else {
-        console.warn("MatPaginator instance was not found. Pagination might not work.");
+      console.warn("MatPaginator instance was not found. Pagination might not work.");
     }
   }
 
@@ -113,7 +113,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   }
 
   getImageUrl(rendezVous: RendezVous): string {
-    if(rendezVous?.client?.genre === 'Femme') {
+    if (rendezVous?.client?.genre === 'Femme') {
       return '/assets/images/profile/user-2.jpg';
     }
     return '/assets/images/profile/user-1.jpg';
@@ -127,275 +127,272 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onEditClick(rendezVous: RendezVous): void {
+  onEditClick(rendezVous: RendezVous, canValid: boolean = false): void {
     this.selectedRendezVous = rendezVous;
 
-    if(this.selectedRendezVous.etat !== "terminé") {
-      if (!rendezVous.heureDebut) {
-        this.openModal();
-      } else {
-        this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
-          state: { rendezVous: rendezVous}
-        });
-        localStorage.setItem('rendezVous', JSON.stringify(rendezVous));
-      }
-    }
+    this.router.navigate(['/rendez-vous/interventions-details', rendezVous._id], {
+      state: { rendezVous: rendezVous }
+    });
+    localStorage.setItem('rendezVous', JSON.stringify(rendezVous));
   }
 
   async openModal(errorMessage: string = '') {
-    if (!this.selectedRendezVous) {
-        console.error("No rendez-vous selected for modal.");
-        return;
+  if (!this.selectedRendezVous) {
+    console.error("No rendez-vous selected for modal.");
+    return;
+  }
+
+  const data = {
+    title: 'Confirmation Intervention',
+    fields: [
+      { name: 'heureDebut', label: 'Heure de début', type: 'datetime-local', required: true, defaultValue: this.formatDate(this.selectedRendezVous.heureDebut || "") },
+      { name: 'heureFin', label: 'Heure de fin', type: 'datetime-local', defaultValue: this.formatDate(this.selectedRendezVous.heureFin || "") },
+    ],
+    submitText: 'Confirmer Horaires',
+    errorMessage: errorMessage,
+  };
+
+  const dialogRef = this.dialog.open(GenericModalComponent, {
+    width: '400px',
+    data: data,
+  });
+
+  const result = await firstValueFrom(dialogRef.afterClosed());
+
+  if (result && this.selectedRendezVous) {
+    const rendezVousId = this.selectedRendezVous._id;
+    try {
+      console.log('Données du formulaire:', result);
+
+      this.verifyBeforeSubmit(this.selectedRendezVous, result.heureDebut, result.heureFin);
+
+      let rendezVousUpdatePayload: any = {
+        _id: rendezVousId,
+        heureDebut: result.heureDebut,
+        heureFin: result.heureFin
+      };
+
+      if (result.heureFin !== null && result.heureFin !== undefined && result.heureFin !== "") {
+        rendezVousUpdatePayload = {
+          ...rendezVousUpdatePayload,
+          etat: "terminé"
+        }
+        this.savePaiement(this.selectedRendezVous, result.heureFin);
+      }
+
+      console.log("Payload for update: ", rendezVousUpdatePayload);
+
+      const updatedRendezVous = await firstValueFrom(
+        this.rendezVousService.updateRendezVous(rendezVousUpdatePayload)
+      );
+      console.log("Backend update successful:", updatedRendezVous);
+
+      const index = this.listeRendezVous.findIndex(rdv => rdv._id === rendezVousId);
+
+      if (index !== -1) {
+        this.listeRendezVous[index] = { ...this.listeRendezVous[index], ...updatedRendezVous };
+      } else {
+
+        this.selectedRendezVous.heureDebut = updatedRendezVous.heureDebut;
+        this.selectedRendezVous.heureFin = updatedRendezVous.heureFin;
+
+        if (updatedRendezVous.etat) {
+          this.selectedRendezVous.etat = updatedRendezVous.etat;
+        }
+      }
+
+      this.updatePagination();
+      this.updateInterventionCounts();
+
+    } catch (error: any) {
+      console.error('Erreur lors de la mise à jour:', error);
+
+      const friendlyError = error.message?.includes('already passed') ? 'L\'heure de début ne peut pas être dans le passé.' :
+        error.message?.includes('required') ? 'Veuillez remplir tous les champs requis.' :
+          error.message?.includes('L\'heure de début ne peut pas être avant') ? 'L\'heure de début ne peut pas être dans le passé.' :
+            error.message?.includes('L\'heure de fin doit être après') ? 'L\'heure de fin doit être après l\'heure de début.' :
+              error.message?.includes('La durée totale des services dépasse') ? 'La durée totale des services dépasse l\'heure de fin.' :
+                error.message?.includes('Tous les services doivent être') ? 'Tous les services doivent être terminés avant de clôturer le rendez-vous.' :
+                  'Une erreur est survenue lors de la mise à jour.';
+
+      await this.openModal(friendlyError.replace("Error: ", ""));
     }
+  }
+}
 
-    const data = {
-      title: 'Confirmation Intervention',
-      fields: [
-        { name: 'heureDebut', label: 'Heure de début', type: 'datetime-local', required: true, defaultValue: this.formatDate(this.selectedRendezVous.heureDebut || "") },
-        { name: 'heureFin', label: 'Heure de fin', type: 'datetime-local', defaultValue: this.formatDate(this.selectedRendezVous.heureFin || "") },
-      ],
-      submitText: 'Confirmer Horaires',
-      errorMessage: errorMessage,
-    };
+formatDate(date: string | Date): string {
+  if (!date) return '';
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = ('0' + (d.getMonth() + 1)).slice(-2);
+  const day = ('0' + d.getDate()).slice(-2);
+  const hours = ('0' + d.getHours()).slice(-2);
+  const minutes = ('0' + d.getMinutes()).slice(-2);
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 
-    const dialogRef = this.dialog.open(GenericModalComponent, {
-      width: '400px',
-      data: data,
+verifyBeforeSubmit(selectedRendezVous: RendezVous, heureDebut: any, heureFin: any) {
+  const originalHeureDebut = new Date(selectedRendezVous.heureDebut).getTime();
+  const selectedHeureDebut = new Date(heureDebut).getTime();
+  if (selectedHeureDebut < originalHeureDebut) {
+    throw new Error("L'heure de début ne peut pas être avant l'heure initiale du rendez-vous.");
+  }
+
+  const selectedHeureFin = new Date(heureFin).getTime();
+  if (selectedHeureFin <= selectedHeureDebut) {
+    throw new Error("L'heure de fin doit être après l'heure de début.");
+  }
+
+  const totalDuration = this.calculateTotalServiceDuration();
+  const plannedEnd = selectedHeureDebut + totalDuration;
+  if (plannedEnd > selectedHeureFin) {
+    throw new Error("La durée totale des services dépasse l'heure de fin.");
+  }
+
+  // Vérifier si tous les services sont terminés
+  const incompleteServices = selectedRendezVous.services?.some(service => service.status !== 'terminé');
+  if (incompleteServices) {
+    throw new Error("Tous les services doivent être terminés avant de clôturer le rendez-vous.");
+  }
+}
+
+calculateTotalServiceDuration(): number {
+  let totalDuration = 0;
+
+  if (this.selectedRendezVous && this.selectedRendezVous.services) {
+    this.selectedRendezVous.services.forEach(service => {
+
+      const startTime = new Date(service.heureDebut).getTime();
+      const endTime = new Date(service.heureFin).getTime();
+      if (startTime && endTime) {
+        totalDuration += (endTime - startTime);
+      }
     });
-
-    const result = await firstValueFrom(dialogRef.afterClosed());
-
-    if (result && this.selectedRendezVous) {
-      const rendezVousId = this.selectedRendezVous._id;
-      try {
-        console.log('Données du formulaire:', result);
-
-        this.verifyBeforeSubmit(this.selectedRendezVous, result.heureDebut, result.heureFin);
-
-        let rendezVousUpdatePayload: any = {
-          _id: rendezVousId,
-          heureDebut: result.heureDebut,
-          heureFin: result.heureFin
-        };
-
-        if (result.heureFin !== null && result.heureFin !== undefined && result.heureFin !== "") {
-          rendezVousUpdatePayload = {
-            ...rendezVousUpdatePayload,
-            etat: "terminé"
-          }
-          this.savePaiement(this.selectedRendezVous, result.heureFin);
-        }
-
-        console.log("Payload for update: ", rendezVousUpdatePayload);
-
-        const updatedRendezVous = await firstValueFrom(
-          this.rendezVousService.updateRendezVous(rendezVousUpdatePayload)
-        );
-        console.log("Backend update successful:", updatedRendezVous);
-
-        const index = this.listeRendezVous.findIndex(rdv => rdv._id === rendezVousId);
-
-        if (index !== -1) {
-          this.listeRendezVous[index] = { ...this.listeRendezVous[index], ...updatedRendezVous };
-        } else {
-
-          this.selectedRendezVous.heureDebut = updatedRendezVous.heureDebut;
-          this.selectedRendezVous.heureFin = updatedRendezVous.heureFin;
-
-          if (updatedRendezVous.etat) {
-              this.selectedRendezVous.etat = updatedRendezVous.etat;
-          }
-        }
-
-        this.updatePagination();
-        this.updateInterventionCounts();
-
-      } catch (error: any) {
-        console.error('Erreur lors de la mise à jour:', error);
-
-        const friendlyError = error.message?.includes('already passed') ? 'L\'heure de début ne peut pas être dans le passé.' :
-                              error.message?.includes('required') ? 'Veuillez remplir tous les champs requis.' :
-                              error.message?.includes('L\'heure de début ne peut pas être avant') ? 'L\'heure de début ne peut pas être dans le passé.' :
-                              error.message?.includes('L\'heure de fin doit être après') ? 'L\'heure de fin doit être après l\'heure de début.' :
-                              error.message?.includes('La durée totale des services dépasse') ? 'La durée totale des services dépasse l\'heure de fin.' :
-                              error.message?.includes('Tous les services doivent être') ? 'Tous les services doivent être terminés avant de clôturer le rendez-vous.' :
-                              'Une erreur est survenue lors de la mise à jour.';
-                             
-        await this.openModal(friendlyError.replace("Error: ", ""));
-      }
-    }
   }
 
-  formatDate(date: string | Date): string {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = ('0' + (d.getMonth() + 1)).slice(-2);
-    const day = ('0' + d.getDate()).slice(-2);
-    const hours = ('0' + d.getHours()).slice(-2);
-    const minutes = ('0' + d.getMinutes()).slice(-2);
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  return totalDuration;
+}
+
+calculateMontantTotal(rendezVous: RendezVous): number {
+  if (!rendezVous) {
+    console.error("Erreur : Aucun rendez-vous fourni.");
+    return 0;
   }
 
-  verifyBeforeSubmit(selectedRendezVous: RendezVous, heureDebut: any, heureFin: any) {
-    const originalHeureDebut = new Date(selectedRendezVous.heureDebut).getTime();
-      const selectedHeureDebut = new Date(heureDebut).getTime();
-      if (selectedHeureDebut < originalHeureDebut) {
-        throw new Error("L'heure de début ne peut pas être avant l'heure initiale du rendez-vous.");
-      }
+  const totalServices = rendezVous.services.reduce((total, service) => {
+    return total + (service.prixTotal || 0);
+  }, 0);
 
-      const selectedHeureFin = new Date(heureFin).getTime();
-      if (selectedHeureFin <= selectedHeureDebut) {
-        throw new Error("L'heure de fin doit être après l'heure de début.");
-      }
+  const totalPieces = rendezVous.piecesAchetees.reduce((total, piece) => {
+    return total + (piece.prixTotal || 0);
+  }, 0);
 
-      const totalDuration = this.calculateTotalServiceDuration();
-      const plannedEnd = selectedHeureDebut + totalDuration;
-      if (plannedEnd > selectedHeureFin) {
-        throw new Error("La durée totale des services dépasse l'heure de fin.");
-      }
+  return totalServices + totalPieces;
+}
 
-      // Vérifier si tous les services sont terminés
-      const incompleteServices = selectedRendezVous.services?.some(service => service.status !== 'terminé');
-      if (incompleteServices) {
-        throw new Error("Tous les services doivent être terminés avant de clôturer le rendez-vous.");
-      }
+  async savePaiement(rendezVous: RendezVous, heureFin: Date): Promise < void> {
+
+  if(!rendezVous) {
+    console.error("Erreur : Aucun rendez-vous sélectionné.");
+    return;
   }
-
-  calculateTotalServiceDuration(): number {
-    let totalDuration = 0;
-  
-    if (this.selectedRendezVous && this.selectedRendezVous.services) {
-      this.selectedRendezVous.services.forEach(service => {
-        
-        const startTime = new Date(service.heureDebut).getTime();
-        const endTime = new Date(service.heureFin).getTime();
-        if (startTime && endTime) {
-          totalDuration += (endTime - startTime);
-        }
-      });
-    }
-  
-    return totalDuration;
-  }
-
-  calculateMontantTotal(rendezVous: RendezVous): number {
-    if (!rendezVous) {
-        console.error("Erreur : Aucun rendez-vous fourni.");
-        return 0;
-    }
-
-    const totalServices = rendezVous.services.reduce((total, service) => {
-        return total + (service.prixTotal || 0);
-    }, 0);
-
-    const totalPieces = rendezVous.piecesAchetees.reduce((total, piece) => {
-        return total + (piece.prixTotal || 0);
-    }, 0);
-
-    return totalServices + totalPieces;
-  }
-
-  async savePaiement(rendezVous: RendezVous, heureFin: Date): Promise<void> {
-    
-    if (!rendezVous) {
-        console.error("Erreur : Aucun rendez-vous sélectionné.");
-        return;
-    }
 
     let paiementData: any = {
-        rendezVous: {
-            _id: rendezVous._id,
-        },
-        montant: this.calculateMontantTotal(rendezVous) || 0,
-        datePaiement: heureFin,
-    };
+    rendezVous: {
+      _id: rendezVous._id,
+    },
+    montant: this.calculateMontantTotal(rendezVous) || 0,
+    datePaiement: heureFin,
+  };
 
-    console.log(paiementData)
+  console.log(paiementData)
 
     const userString = localStorage.getItem('user');
-    if (userString) {
-        try {
-            const user = JSON.parse(userString);
-            paiementData = {
-                ...paiementData,
-                mecanicien: {
-                    _id: user.idPersonne,
-                },
-                datePaiement: heureFin,
-            };
-        } catch (error) {
-            console.error('Error parsing user data:', error);
-        }
+  if(userString) {
+    try {
+      const user = JSON.parse(userString);
+      paiementData = {
+        ...paiementData,
+        mecanicien: {
+          _id: user.idPersonne,
+        },
+        datePaiement: heureFin,
+      };
+    } catch (error) {
+      console.error('Error parsing user data:', error);
     }
+  }
 
     console.log("paiementData >>>> ", paiementData);
 
-    try {
-        const updatedPaiement = await firstValueFrom(
-            this.paiementService.addPaiement(paiementData)
-        );
-        console.log("Backend save for paiement successful:", updatedPaiement);
-    } catch (error) {
-        console.error("Erreur lors de la mise à jour du service :", error);
+  try {
+    const updatedPaiement = await firstValueFrom(
+      this.paiementService.addPaiement(paiementData)
+    );
+    console.log("Backend save for paiement successful:", updatedPaiement);
+  } catch(error) {
+    console.error("Erreur lors de la mise à jour du service :", error);
+  }
+}
+
+getAllRendezVous() {
+  this.rendezVousService.getRendezVousByMecanicien().subscribe({
+    next: (listeRendezVous) => {
+      console.log('Rendez-vous reçus:', listeRendezVous);
+      this.listeRendezVous = listeRendezVous;
+
+      this.dataSource.data = this.listeRendezVous;
+
+      this.updateInterventionCounts();
+
+      this.totalInterventions = this.listeRendezVous.length;
+
+      this.updatePagination();
+      if (this.paginator) {
+        this.dataSource.paginator = this.paginator;
+      }
+    },
+    error: (error) => {
+      console.error('Erreur lors du chargement des rendez-vous:', error.message || error);
+      alert('Impossible de charger la liste des rendez-vous. Veuillez vérifier votre connexion ou contacter le support.');
+      this.listeRendezVous = [];
+      this.dataSource.data = [];
+      this.totalInterventions = 0;
+      this.updateInterventionCounts();
     }
-  } 
+  });
+}
 
-  getAllRendezVous() {
-    this.rendezVousService.getRendezVousByMecanicien().subscribe({
-        next: (listeRendezVous) => {
-          console.log('Rendez-vous reçus:', listeRendezVous);
-            this.listeRendezVous = listeRendezVous;
+updateInterventionCounts() {
+  this.interventionsInProgress = 0;
+  this.interventionsOpen = 0;
+  this.interventionsClosed = 0;
 
-            this.dataSource.data = this.listeRendezVous;
+  this.totalInterventions = this.listeRendezVous.length;
+  this.interventionsInProgress = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'validé' || t.etat?.toLowerCase() === 'valide').length;
+  this.interventionsOpen = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'terminé' || t.etat?.toLowerCase() === 'termine').length;
+  this.interventionsClosed = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'annulé' || t.etat?.toLowerCase() === 'rejeté' || t.etat?.toLowerCase() === 'annule' || t.etat?.toLowerCase() === 'rejete').length;
 
-            this.updateInterventionCounts();
+}
 
-            this.totalInterventions = this.listeRendezVous.length;
+updatePagination() {
+  // this.dataSource.data = this.listeRendezVous;
 
-            this.updatePagination();
-            if (this.paginator) {
-                this.dataSource.paginator = this.paginator;
-            }
-        },
-        error: (error) => {
-            console.error('Erreur lors du chargement des rendez-vous:', error.message || error);
-            alert('Impossible de charger la liste des rendez-vous. Veuillez vérifier votre connexion ou contacter le support.');
-            this.listeRendezVous = [];
-            this.dataSource.data = [];
-            this.totalInterventions = 0;
-            this.updateInterventionCounts();
-        }
-    });
-  }
+  const startIndex = this.currentPage * this.pageSize;
+  const endIndex = startIndex + this.pageSize;
+  this.dataSource.data = this.listeRendezVous.slice(startIndex, endIndex);
 
-  updateInterventionCounts() {
-    this.interventionsInProgress = 0;
-    this.interventionsOpen = 0;
-    this.interventionsClosed = 0;
+}
 
-    this.totalInterventions = this.listeRendezVous.length;
-    this.interventionsInProgress = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'validé' || t.etat?.toLowerCase() === 'valide').length;
-    this.interventionsOpen = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'terminé' || t.etat?.toLowerCase() === 'termine').length;
-    this.interventionsClosed = this.listeRendezVous.filter(t => t.etat?.toLowerCase() === 'annulé' || t.etat?.toLowerCase() === 'rejeté' || t.etat?.toLowerCase() === 'annule' || t.etat?.toLowerCase() === 'rejete').length;
+onPaginateChange(event: PageEvent) {
+  console.log('Paginate event:', event);
+  this.currentPage = event.pageIndex;
+  this.pageSize = event.pageSize;
+  this.updatePagination();
+}
 
-  }
-
-  updatePagination() {
-    this.totalInterventions = this.listeRendezVous.length;
-
-    this.dataSource.data = this.listeRendezVous;
-
-  }
-
-  onPaginateChange(event: PageEvent) {
-      console.log('Paginate event:', event);
-      this.currentPage = event.pageIndex;
-      this.pageSize = event.pageSize;
-  }
-
-  trackByRendezVous(index: number, item: RendezVous): string {
-    return item?._id ?? `index-${index}`;
-  }
+trackByRendezVous(index: number, item: RendezVous): string {
+  return item?._id ?? `index-${index}`;
+}
 
 }

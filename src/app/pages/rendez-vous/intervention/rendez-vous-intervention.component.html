@@ -133,7 +133,8 @@
                                 <ng-container *ngIf="rendezVous?.heureDebut">
                                     <a class="m-r-10 cursor-pointer" (click)="onEditClick(rendezVous)"
                                         aria-label="Edit">
-                                        <mat-icon>{{ isClient ? 'visibility' : 'edit'}}</mat-icon>
+                                        <mat-icon>{{ isClient || rendezVous.etat == 'terminé' ? 'visibility' : 'edit'}}
+                                        </mat-icon>
                                     </a>
                                 </ng-container>
                             </td>
@@ -144,9 +145,9 @@
                             (click)="!isClient && onRowClick(row)" style="cursor: pointer;"></tr>
                     </table>
                 </div>
-                <mat-paginator *ngIf="listeRendezVous && listeRendezVous.length > 5" [pageSizeOptions]="pageSizeOptions"
+                <mat-paginator *ngIf="listeRendezVous && listeRendezVous.length > 5" 
                     showFirstLastButtons aria-label="Select page of interventions" [length]="totalInterventions"
-                    [pageSize]="pageSize" (page)="onPaginateChange($event)" [pageIndex]="currentPage">
+                    (page)="onPaginateChange($event)" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]">
                 </mat-paginator>
 
             </mat-card-content>

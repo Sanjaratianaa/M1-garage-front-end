@@ -25,6 +25,7 @@ function filterNavItems(navItems: NavItem[], userRole: string): NavItem[] {
         item.displayName === 'Mecanicien' ||
         item.displayName === 'Specialité' ||
         item.navCap === 'RENDEZ-VOUS' ||
+        item.displayName === 'Interventions' ||
         item.displayName === 'Historique Rendez-vous' ||
         item.displayName === 'Planning Rendez-vous' ||
         item.displayName === 'Demande en attente' ||

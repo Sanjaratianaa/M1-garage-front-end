@@ -38,7 +38,7 @@ export class AppResetPasswordComponent {
     if (this.form.valid) {
       this.authService.changePassword(this.form.value.email!, this.form.value.oldPassword!, this.form.value.newPassword!, this.form.value.confirmPassword!).subscribe({
         next: (response) => {
-          this.router.navigate(['/authentification/login']);
+          this.router.navigate(['/authentication/client-login']);
         },
         error: (error) => {
           this.errorMessage = error.message;

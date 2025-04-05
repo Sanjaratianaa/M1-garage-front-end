@@ -233,6 +233,16 @@ export class RendezVousService {
         );
     }
 
+    updateServiceRendezVous(rendezVous: any): Observable<RendezVous> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${this.getToken()}`
+        });
+
+        return this.http.put<RendezVous>(`${this.apiUrl}/repondre-service/${rendezVous._id}`, rendezVous, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
     /**
      * Modifier une rendezVous existante
      */

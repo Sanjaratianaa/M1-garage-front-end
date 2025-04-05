@@ -220,16 +220,6 @@
                             </div>
                         </div>
 
-                        <button mat-flat-button *ngIf="!isClient"
-                            class="bg-secondary text-white mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base"
-                            (click)="saveAllServices()">
-                            <span class="mat-mdc-button-persistent-ripple mdc-button__ripple"></span>
-                            <span class="mdc-button__label">Enregistrer tout</span>
-                            <span class="mat-focus-indicator"></span>
-                            <span class="mat-mdc-button-touch-target"></span>
-                            <span class="mat-ripple mat-mdc-button-ripple"></span>
-                        </button>
-
                     </mat-card-content>
                 </mat-tab>
 
@@ -243,7 +233,7 @@
                     <mat-card-content class="p-y-14">
 
                         <!-- Ajout d'un nouvel employé -->
-                        <mat-card class="cardWithShadow" *ngIf="!isClient">
+                        <mat-card class="cardWithShadow" *ngIf="!isClient && canValid">
                             <mat-card-content>
                                 <button mat-flat-button color="primary" class="m-r-8" (click)="openModal()">Ajouter des
                                     pieces</button>

@@ -53,6 +53,7 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
     detailsForm: FormGroup;
     notesForm: FormGroup;
     isClient: boolean = false;
+    canValid: boolean = false;
 
     displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire"];
     piecesOrigines: any[] = [];
@@ -104,6 +105,8 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
         }
 
         this.pieces = this.rendezVous?.piecesAchetees || [];
+        this.canValid = this.rendezVous?.etat == 'terminé' ? false : true;
+
         // var idRendezVous = '';
         // this.route.paramMap.subscribe(params => {
         //     const id = params.get('id'); // Récupération de la variable
@@ -167,17 +170,6 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
         return false;
     }
 
-    saveDetails(): void {
-        if (this.rendezVous) {
-            // this.rendezVous.title = this.detailsForm.get('title')?.value;
-            // this.intervention.description = this.detailsForm.get('description')?.value;
-            // // ... other updates
-
-            // console.log('Saving details:', this.detailsForm.value);
-            console.log('Saving details:');
-        }
-    }
-
     calculatePrixTotal(service: Service): void {
         const quantite = Number(service.quantiteFinale) || 0;
         const prixUnitaire = Number(service.prixUnitaire) || 0;
@@ -203,9 +195,12 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
 
         try {
             const updatedRendezVous = await firstValueFrom(
-                this.rendezVousService.updateRendezVous(serviceUpdate)
+                this.rendezVousService.updateServiceRendezVous(serviceUpdate)
             );
+
             console.log("Backend update successful:", updatedRendezVous);
+            localStorage.setItem('rendezVous', JSON.stringify(updatedRendezVous));
+            
         } catch (error) {
             console.error("Erreur lors de la mise à jour du service :", error);
         }
@@ -224,22 +219,6 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
                 return { 'background-color': '#28a745' };
             default:
                 return { 'background-color': '#6c757d' };
-        }
-    }
-
-    saveAllServices() {
-        if (this.rendezVous && this.rendezVous.services) {
-            this.rendezVous.services.forEach(service => {
-                // this.rendezVousService.updateRendezVousService(this.intervention._id, service._id, service)
-                //   .subscribe({
-                //     next: (response) => {
-                //       console.log(`Service ${service.raison} updated successfully:`, response);
-                //     },
-                //     error: (error) => {
-                //       console.error(`Error updating service ${service.raison}:`, error);
-                //     }
-                //   });
-            });
         }
     }
 
@@ -448,17 +427,20 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
                 console.log('Données du formulaire pour avis:', result);
 
                 try {
-                    if(this.rendezVous && this.rendezVous.services) {
+                    if (result.note < 0)
+                        throw new Error("La note fournie est invalide. Elle doit être un nombre supérieur ou égal à 0.");
+
+                    if (this.rendezVous && this.rendezVous.services) {
                         const rendezVousCopy = structuredClone(this.rendezVous);
                         const services = rendezVousCopy.services;
                         for (const service of services) {
-                            if(service._id == idSousService) {
+                            if (service._id == idSousService) {
                                 service.avis = result.avis;
                                 service.note = result.note;
                                 break;
                             }
                         }
-    
+
                         const rendezVousUpdate = await firstValueFrom(this.rendezVousService.updateRendezVous(rendezVousCopy));
                         this.rendezVous.services = rendezVousUpdate.services;
                     }
