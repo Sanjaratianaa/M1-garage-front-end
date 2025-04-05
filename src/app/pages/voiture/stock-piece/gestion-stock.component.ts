@@ -219,7 +219,8 @@ export class GestionStockComponent {
             {value: '0', label: "Sortie"},
           ]
         },
-        { name: 'quantite', label: 'Quantité', type: 'number', required: true, defaultValue: this.newStock.quantite },
+        
+        { name: 'quantite', label: 'Quantité(s)', type: 'number', required: true, defaultValue: this.newStock.quantite },
         { name: 'prixUnitaire', label: 'Prix unitaire', type: 'text', required: true, defaultValue: this.newStock.prixUnitaire },
       ],
       submitText: 'Ajouter',

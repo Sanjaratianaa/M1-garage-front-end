@@ -13,6 +13,7 @@ export interface SousService {
     },
     duree: number | 0, 
     prixUnitaire: number | 0,
+    remise: number | 0,
     dateEnregistrement: Date | null;
     manager: { id: string, nom: string, prenom: string } | any;
     dateSuppression: Date | any;

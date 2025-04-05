@@ -57,6 +57,16 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./pages/specialite/specialite.routes').then((m) => m.SpecialiteRoutes),
       },
+      {
+        path: 'service/promotion',
+        loadChildren: () =>
+          import('./pages/promotion/promotion.routes').then((m) => m.PromotionRoutes),
+      },
+      {
+        path: 'conges',
+        loadChildren: () =>
+          import('./pages/conge/conge.routes').then((m) => m.CongeRoutes),
+      },
     ],
   },
   {

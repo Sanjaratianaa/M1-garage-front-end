@@ -74,6 +74,14 @@
                         </mat-cell>
                     </ng-container>
 
+                    <!-- Remise Column -->
+                    <ng-container matColumnDef="remise">
+                        <mat-header-cell *matHeaderCellDef> Remise </mat-header-cell>
+                        <mat-cell *matCellDef="let ctrl; let i = index">
+                            {{ data.rendezVous.services[i].remise }} %
+                        </mat-cell>
+                    </ng-container>
+
                     <!-- Mécanicien Assigné Column -->
                     <ng-container matColumnDef="mecanicien">
                         <mat-header-cell *matHeaderCellDef> Mécanicien Assigné </mat-header-cell>

@@ -83,6 +83,11 @@
                     <mat-cell *matCellDef="let sousService"> {{ sousService.prixUnitaire }} Ar </mat-cell>
                 </ng-container>
 
+                <ng-container matColumnDef="remise">
+                    <mat-header-cell *matHeaderCellDef> Remise </mat-header-cell>
+                    <mat-cell *matCellDef="let sousService"> {{ sousService.remise }} % </mat-cell>
+                </ng-container>
+
                 <ng-container matColumnDef="Date d'enregistrement">
                     <mat-header-cell *matHeaderCellDef> Date d'enregistrement </mat-header-cell>
                     <mat-cell *matCellDef="let sousService"> {{ sousService.dateEnregistrement | date:'dd/MM/yyyy

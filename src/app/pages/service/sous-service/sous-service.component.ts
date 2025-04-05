@@ -49,7 +49,7 @@ export class SousServiceComponent {
     pageSizeOptions = [5, 10, 20];
 
     colors: string[] = ['#FF5722', '#4CAF50', '#2196F3', '#FFEB3B'];
-    columns = ['service', 'libelle', 'duree', 'Prix', 'Manager', 'Date d\'enregistrement', 'Manager Suppression', 'Date Suppression', 'Statut', 'actions'];
+    columns = ['service', 'libelle', 'duree', 'Prix', 'remise', 'Manager', 'Date d\'enregistrement', 'Manager Suppression', 'Date Suppression', 'Statut', 'actions'];
 
     constructor(private dialog: MatDialog, private serviceService: ServiceService, private souServiceService: SousServiceService) { }
 
@@ -59,7 +59,7 @@ export class SousServiceComponent {
         if (role == "manager")
             this.isAdmin = true;
         else
-            this.columns = ['service', 'libelle', 'duree', 'Prix', 'Date d\'enregistrement'];
+            this.columns = ['service', 'libelle', 'duree', 'Prix', 'remise', 'Date d\'enregistrement'];
 
         // Initialisez la pagination au chargement du composant
         this.getAllServices();

@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivateChild {
         let redirectUrl = '/authentication/client-login';
         if (role === "manager") {
           redirectUrl = '/authentication/manager-login';
-        } else if (role === "mecanicien") {
+        } else if (role === "mécanicien") {
           redirectUrl = '/authentication/mecanicien-login';
         }
 
