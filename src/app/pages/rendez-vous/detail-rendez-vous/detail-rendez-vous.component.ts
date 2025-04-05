@@ -31,7 +31,7 @@ import { RendezVous } from 'src/app/services/rendez-vous/rendez-vous.service';
 export class DetailRendezVousComponent implements OnInit {
     form: FormGroup;
     // Colonnes pour le tableau des services
-    columns = ['sousSpecialite', 'raison', 'quantite', 'prix', 'mecanicien'];
+    columns = ['sousSpecialite', 'raison', 'quantite', 'prix', 'remise', 'mecanicien'];
     displayedColumns: string[] = ['label', 'value'];
 
     voitureDetails = [

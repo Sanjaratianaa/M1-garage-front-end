@@ -41,6 +41,7 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
 
   paginatedRendezVous: RendezVous[] = [];
   listeRendezVous: RendezVous[] = [];
+  isClient: boolean = false;
 
   dataSource = new MatTableDataSource<RendezVous>([]);
 
@@ -65,6 +66,12 @@ export class RendezVousInterventionComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role.libelle;
+    if (role == "client") {
+      this.isClient = true;
+      this.displayedColumns = ['description', 'status', 'date', 'debut', 'fin', 'action'];
+    } 
     this.getAllRendezVous();
   }
 

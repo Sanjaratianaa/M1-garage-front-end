@@ -52,6 +52,7 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
     rendezVous: RendezVous | undefined;
     detailsForm: FormGroup;
     notesForm: FormGroup;
+    isClient: boolean = false;
 
     displayedColumns: string[] = ['piece', "marquePiece", "marqueVoiture", "modeleVoiture", "typeTransmission", "Quantite", "Prix Unitaire", "Prix Total", "Commentaire"];
     piecesOrigines: any[] = [];
@@ -97,20 +98,39 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
     }
 
     ngOnInit(): void {
-
         const storedRendezVous = localStorage.getItem('rendezVous');
         if (storedRendezVous) {
             this.rendezVous = JSON.parse(storedRendezVous);
         }
 
         this.pieces = this.rendezVous?.piecesAchetees || [];
+        // var idRendezVous = '';
+        // this.route.paramMap.subscribe(params => {
+        //     const id = params.get('id'); // Récupération de la variable
+        //     if (id)
+        //         idRendezVous = id;
+        //     console.log('idRendezVous:', idRendezVous);
+        // });
+
+        // console.log(">> rendez ng init: ", this.rendezVous);
+
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const role = user.role.libelle;
+        if (role == "client")
+            this.isClient = true;
+        else {
+            this.getAllPieceActives();
+            this.getAllMarqueActives();
+            this.getAllModeleActives();
+            this.getAllTypeTransmissionActives();
+        }
+
+        // if (this.rendezVous == null && idRendezVous != "") {
+        //     this.getRendezVous(idRendezVous);
+        // } else
+        //     this.pieces = this.rendezVous?.piecesAchetees || [];
 
         this.updatePagination();
-
-        this.getAllPieceActives();
-        this.getAllMarqueActives();
-        this.getAllModeleActives();
-        this.getAllTypeTransmissionActives();
     }
 
     ngOnDestroy() {
@@ -236,6 +256,19 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
             error: (error) => {
                 console.error('Erreur lors du chargement des marques:', error.message);
                 alert('Impossible de charger les marques. Veuillez réessayer plus tard.');
+            }
+        });
+    }
+
+    getRendezVous(idRendezVous: string) {
+        this.rendezVousService.getRendezVousById(idRendezVous).subscribe({
+            next: (rendezVous) => {
+                this.rendezVous = rendezVous;
+                this.pieces = rendezVous?.piecesAchetees || [];
+            },
+            error: (error) => {
+                console.error('Erreur lors du chargement des rendez-vous:', error.message);
+                alert('Impossible de charger les rendez-vous. Veuillez réessayer plus tard.');
             }
         });
     }
@@ -394,17 +427,49 @@ export class RendezVousInterventionDetailsComponent implements OnInit, OnDestroy
         console.log('Pagination changed: ', event);
     }
 
-}
+    async openAddAvisModal(idRendezVous: string, idSousService: string, errorMessage: string = '') {
+        const data = {
+            title: 'Ajouter un avis sur le service',
+            fields: [
+                { name: 'avis', label: 'Avis sur le service', type: 'text', required: true },
+                { name: 'note', label: 'Note / 10', type: 'number', required: true },
+            ],
+            submitText: 'Ajouter',
+            errorMessage: errorMessage,
+        };
 
-@Component({
-    selector: 'app-modal',
-    template: `
-      `,
-})
-export class ModalComponent {
-    constructor(public dialog: MatDialog) { }
+        const dialogRef = this.dialog.open(GenericModalComponent, {
+            width: '400px',
+            data: data,
+        });
 
-    close() {
-        this.dialog.closeAll();
+        dialogRef.afterClosed().subscribe(async (result) => {
+            if (result) {
+                console.log('Données du formulaire pour avis:', result);
+
+                try {
+                    if(this.rendezVous && this.rendezVous.services) {
+                        const rendezVousCopy = structuredClone(this.rendezVous);
+                        const services = rendezVousCopy.services;
+                        for (const service of services) {
+                            if(service._id == idSousService) {
+                                service.avis = result.avis;
+                                service.note = result.note;
+                                break;
+                            }
+                        }
+    
+                        const rendezVousUpdate = await firstValueFrom(this.rendezVousService.updateRendezVous(rendezVousCopy));
+                        this.rendezVous.services = rendezVousUpdate.services;
+                    }
+
+                } catch (error: any) {
+                    console.error('Erreur lors de l’ajout:', error.message);
+                    await this.openAddAvisModal(idRendezVous, idSousService, error.message.replace("Error: ", ""));
+                }
+            }
+        });
     }
+
 }
+

@@ -17,7 +17,7 @@ import { SpecialiteService } from 'src/app/services/personne/specialite.service'
 import { SousServiceService } from 'src/app/services/services/sousService.service';
 import { VoitureService, Voiture } from 'src/app/services/caracteristiques/voiture.sevice';
 import { RendezVousModalComponent } from '../add-rendez-vous-modal/rendez-vous-modal.component';
-import { AnnulationConfirmationModalComponent } from '../confirm-annulation-modal/confirm-annulation-modal.component';
+import { AnnulationConfirmationModalComponent } from 'src/app/components/modal-generique/confirm-annulation-modal/confirm-annulation-modal.component';
 
 interface VoitureSelectItem {
     value: string;
@@ -71,12 +71,12 @@ export class HistoriqueRendezVousComponent {
                 this.status = status;
             console.log('Status:', this.status);
         });
-        
+
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const role = user.role.libelle;
         if (role === "manager")
             this.isAdmin = true;
-        else if(role === "client") {
+        else if (role === "client") {
             this.isClient = true;
             this.getAllVoitures();
             this.getAllSousServicesActives();
@@ -91,7 +91,7 @@ export class HistoriqueRendezVousComponent {
             this.getAllRendezVous();
 
         this.displayedColumns = this.isAdmin ? ['Date et heure demande', "Client", "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "Statut", 'actions']
-            : ['Date et heure demande', "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "Statut", 'actions'];
+            : ['Date et heure demande', "Date du rendez-vous", "N° Matriculation", "Validateur", "Remarque", "StatutClient", 'actions'];
 
     }
 
@@ -260,7 +260,7 @@ export class HistoriqueRendezVousComponent {
     async openEditModal(rendezVous: RendezVous, errorMessage: string = '') {
         const data = {
             title: 'Modifier un rendez-vous',
-            rendezVous: rendezVous, 
+            rendezVous: rendezVous,
             fields: [
                 {
                     name: 'voiture', label: 'Voiture', type: 'select', required: true,
@@ -343,13 +343,17 @@ export class HistoriqueRendezVousComponent {
 
             const dialogRef = this.dialog.open(AnnulationConfirmationModalComponent, {
                 width: '800px',
-                data: { errorMessage: errorMessage }
+                data: {
+                    errorMessage: errorMessage,
+                    title: "Confirmation d'annulation de demande de rendez-vous",
+                    message: "Êtes-vous sûr de vouloir annuler votre demande de rendez-vous ? Cette action est irréversible."
+                }
             });
 
             const result = await firstValueFrom(dialogRef.afterClosed());
             if (result) {
                 console.log('Annulation Rendez-vous repondu', result);
-                if(result.confirmed) {
+                if (result.confirmed) {
                     const updateRendezVous = await firstValueFrom(this.rendezVousService.answerRendezVous(rendezVous._id, 'annulé', result.raison, [], ''));
                     console.log(updateRendezVous);
                     // Mettre à jour la liste locale
@@ -359,7 +363,7 @@ export class HistoriqueRendezVousComponent {
                         this.updatePagination(); // Rafraîchir la liste affichée
                     }
                 }
-            } 
+            }
         } catch (error: any) {
             await this.openCancelModal(rendezVous, error.message);
         }
