@@ -62,7 +62,18 @@
                     <mat-header-cell *matHeaderCellDef> Statut </mat-header-cell>
                     <mat-cell *matCellDef="let rendezVous">
                         <div [ngClass]="getStatusClass(rendezVous.etat)" class="status-container"
-                            (click)="isValidable && isAdmin && rendezVous.etat === 'en attente' ? openAnswerDetailsModal(rendezVous) : openCancelModal(rendezVous)"
+                            (click)="isValidable && isAdmin && rendezVous.etat === 'en attente' ? openAnswerDetailsModal(rendezVous) : null"
+                            [style.cursor]="isAdmin && rendezVous.etat === 'en attente' ? 'pointer' : 'default'">
+                            <span>{{ rendezVous.etat }}</span>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="StatutClient">
+                    <mat-header-cell *matHeaderCellDef> Statut </mat-header-cell>
+                    <mat-cell *matCellDef="let rendezVous">
+                        <div [ngClass]="getStatusClass(rendezVous.etat)" class="status-container"
+                            (click)="isValidable && !isAdmin && rendezVous.etat === 'en attente' ? openCancelModal(rendezVous) : null"
                             [style.cursor]="isAdmin && rendezVous.etat === 'en attente' ? 'pointer' : 'default'">
                             <span>{{ rendezVous.etat }}</span>
                         </div>

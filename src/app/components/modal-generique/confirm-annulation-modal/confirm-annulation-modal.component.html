@@ -1,6 +1,6 @@
 <mat-card class="cardWithShadow theme-card">
     <mat-card-header>
-        <mat-card-title class="m-b-0">Confirmation d'annulation de demande de rendez-vous</mat-card-title>
+        <mat-card-title class="m-b-0"> {{ data.title }} </mat-card-title>
     </mat-card-header>
 
     <mat-card-content class="b-t-1">
@@ -11,7 +11,7 @@
             </div>
 
             <div class="error-message" style="color: red; margin-bottom: 20px;">
-                Êtes-vous sûr de vouloir annuler votre demande de rendez-vous ? Cette action est irréversible.
+                {{ data.message }}
             </div>
 
             <!-- Champ Raison d'annulation -->

@@ -38,19 +38,6 @@ export class CongeService {
     }
 
     /**
-     * Récupérer toutes les conge
-     */
-    getConge(): Observable<Conge[]> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${this.getToken()}`
-        });
-
-        return this.http.get<Conge[]>(`${this.apiUrl}/liste/parClient`, { headers }).pipe(
-            catchError(this.handleError) // Gestion des erreurs
-        );
-    }
-
-    /**
      * Récupérer toutes les conge by mecanicien
      */
     getCongeByMecanicien(): Observable<Conge[]> {
@@ -86,9 +73,9 @@ export class CongeService {
         });
 
         const congeData = {
-            dateHeureDebut: dateDebut, 
+            dateHeureDebut: dateDebut,
             dateHeureFin: dateFin,
-            raison: raison
+            raison: raison.trim()
         };
 
         return this.http.post<Conge>(this.apiUrl, congeData, { headers }).pipe(
@@ -128,14 +115,12 @@ export class CongeService {
             'Authorization': `Bearer ${this.getToken()}`
         });
 
-        const actions: any[] = [
-            {
-                action: action,
-                commentaire: commentaire
-            }
-        ];
+        const data = {
+            action: action,
+            commentaire: commentaire
+        };
 
-        return this.http.put<Conge[]>(`${this.apiUrl}/repondre/${idConge}`, { actions }, { headers }).pipe(
+        return this.http.put<Conge[]>(`${this.apiUrl}/repondre/${idConge}`,  data, { headers }).pipe(
             catchError(this.handleError) // Gestion des erreurs
         );
     }

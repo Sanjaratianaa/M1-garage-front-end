@@ -80,35 +80,6 @@ export class DemandeCongeComponent implements OnInit {
         this.view = view;
     }
 
-    // getAllConges() {
-    //     this.congeService.getAllConges().subscribe({
-    //         next: (conges: Conge[]) => {
-    //             this.conges = conges;
-
-    //             console.log(this.conges);
-
-    //             this.events = conges.map(conge => {
-    //                 const eventColor = this.getEventColor(conge.etat);
-    //                 return {
-    //                     start: conge.dateHeureDebut ? conge.dateHeureDebut : new Date(),
-    //                     end: conge.dateHeureFin ? conge.dateHeureFin : new Date(),
-    //                     title: this.isMecanicien && this.idPersonne === conge.mecanicien._id ? `Congé pour: ${conge.dateHeureDebut.toString("HH:mm:ss") || 'N/A'} - $- ${conge.raison}` : `Rendez-vous pour: ${ conge.mecanicien.nom } ${ conge.mecanicien.prenom } - ${conge.raison}`,
-    //                     allDay: false,
-    //                     meta: {
-    //                         conge: conge
-    //                     },
-    //                     color: eventColor,
-    //                 };
-    //             });
-    //             this.refresh.next();
-    //         },
-    //         error: (error) => {
-    //             console.error('Erreur lors du chargement des rendez-vous:', error.message);
-    //             alert('Impossible de charger les rendez-vous. Veuillez réessayer plus tard.');
-    //         }
-    //     });
-    // }
-
     getAllConges() {
         this.congeService.getAllConges().subscribe({
             next: (conges: Conge[]) => {
