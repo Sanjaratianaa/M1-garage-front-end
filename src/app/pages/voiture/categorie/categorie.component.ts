@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class CategorieComponent {
   displayedColumns: string[] = ['Libelle', "Date d'enregistrement", "Manager", "Date Suppression", "Manager Suppression", "Statut", 'actions'];
   categories: Categorie[];
+  filteredCategorie: Categorie[];
   isAdmin: boolean = false;
 
   paginatedCategories: Categorie[] = [];
@@ -57,6 +58,7 @@ export class CategorieComponent {
     this.categorieService.getCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
+        this.filteredCategorie = categories;
         this.updatePagination();
       },
       error: (error) => {
@@ -70,6 +72,7 @@ export class CategorieComponent {
     this.categorieService.getCategoriesActives().subscribe({
       next: (categories) => {
         this.categories = categories;
+        this.filteredCategorie = categories;
         this.updatePagination();
       },
       error: (error) => {
@@ -82,7 +85,7 @@ export class CategorieComponent {
   updatePagination() {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedCategories = this.categories.slice(startIndex, endIndex);
+    this.paginatedCategories = this.filteredCategorie.slice(startIndex, endIndex);
   }
 
 
@@ -254,17 +257,11 @@ export class CategorieComponent {
     console.log('Pagination changed: ', event);
   }
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.filteredCategorie = this.categories
+        .filter(s => s.libelle.toLowerCase().includes(filterValue));
+    this.updatePagination();
 }
 
-@Component({
-  selector: 'app-modal',
-  template: `
-  `,
-})
-export class ModalComponent {
-  constructor(public dialog: MatDialog) { }
-
-  close() {
-    this.dialog.closeAll(); // Ferme la modale
-  }
 }

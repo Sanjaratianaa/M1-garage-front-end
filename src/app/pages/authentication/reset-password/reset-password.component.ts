@@ -30,10 +30,6 @@ export class AppResetPasswordComponent {
     return this.form.controls;
   }
 
-  // submit() {
-  //   this.router.navigate(['']);
-  // }
-
   submit() {
     if (this.form.valid) {
       this.authService.changePassword(this.form.value.email!, this.form.value.oldPassword!, this.form.value.newPassword!, this.form.value.confirmPassword!).subscribe({

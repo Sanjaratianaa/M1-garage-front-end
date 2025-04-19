@@ -30,6 +30,14 @@
 // }
 
 ::ng-deep .mat-dialog-container {
-    max-width: none;  /* Désactive la largeur maximale */
-    width: 900px;     /* Définissez la largeur souhaitée */
+    /* Désactive la largeur maximale */
+    max-width: none;
+    /* Définissez la largeur souhaitée */
+    width: 900px;
 }
+
+// body {
+//     position: relative;
+//     /* Tout le contenu doit avoir un z-index supérieur */
+//     z-index: 2;
+// }

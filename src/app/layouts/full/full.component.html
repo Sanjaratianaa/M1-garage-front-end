@@ -8,7 +8,7 @@
       (openedChange)="onSidenavOpenedChange($event)" (closedStart)="onSidenavClosedStart()" class="sidebarNav">
       <div class="flex-layout">
         <app-sidebar (toggleMobileNav)="sidenav.toggle()" [showToggle]="isOver"></app-sidebar>
-        <ng-scrollbar class="position-relative ng-scrollbar-custom" style="height: 100%;">
+        <!-- <ng-scrollbar class="position-relative ng-scrollbar-custom" style="height: 100%;"> -->
           <mat-nav-list role="navigation" class="mat-mdc-nav-list mat-mdc-list-base mdc-list sidebar-list"
             aria-disabled="false">
             @for(item of navItems; track item) {
@@ -16,7 +16,7 @@
             </app-nav-item>
             }
           </mat-nav-list>
-        </ng-scrollbar>
+        <!-- </ng-scrollbar> -->
       </div>
     </mat-sidenav>
 
